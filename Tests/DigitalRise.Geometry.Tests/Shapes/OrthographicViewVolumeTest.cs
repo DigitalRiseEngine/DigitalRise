@@ -208,31 +208,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Far, b.Far);
       Assert.AreEqual(a.InnerPoint, b.InnerPoint);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new OrthographicViewVolume(-1.23f, 2.13f, -0.3f, 2.34f, 1.01f, 10.345f);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (OrthographicViewVolume)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Left, b.Left);
-      Assert.AreEqual(a.Right, b.Right);
-      Assert.AreEqual(a.Top, b.Top);
-      Assert.AreEqual(a.Bottom, b.Bottom);
-      Assert.AreEqual(a.Near, b.Near);
-      Assert.AreEqual(a.Far, b.Far);
-      Assert.AreEqual(a.InnerPoint, b.InnerPoint);
-    }
   }
 }

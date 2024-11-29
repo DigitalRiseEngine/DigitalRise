@@ -142,53 +142,30 @@ namespace DigitalRise.Geometry.Shapes.Tests
     }
 
 
-    //[Test]
-    //public void SerializationXml()
-    //{
-    //  Pose pose = new Pose(new Vector3(1, 2, 3));
-    //  PointShape pointShape = new PointShape(3, 4, 5);
-    //  var a = new TransformedShape(new GeometricObject(pointShape, pose));
+        [Test]
+        public void SerializationXml()
+        {
+            Pose pose = new Pose(new Vector3(1, 2, 3));
+            PointShape pointShape = new PointShape(3, 4, 5);
+            var a = new TransformedShape(new GeometricObject(pointShape, pose));
 
-    //  // Serialize object.
-    //  var stream = new MemoryStream();
-    //  var serializer = new XmlSerializer(typeof(Shape));
-    //  serializer.Serialize(stream, a);
+            // Serialize object.
+            var stream = new MemoryStream();
+            var serializer = new XmlSerializer(typeof(Shape));
+            serializer.Serialize(stream, a);
 
-    //  // Output generated xml. Can be manually checked in output window.
-    //  stream.Position = 0;
-    //  var xml = new StreamReader(stream).ReadToEnd();
-    //  Trace.WriteLine("Serialized Object:\n" + xml);
+            // Output generated xml. Can be manually checked in output window.
+            stream.Position = 0;
+            var xml = new StreamReader(stream).ReadToEnd();
+            Trace.WriteLine("Serialized Object:\n" + xml);
 
-    //  // Deserialize object.
-    //  stream.Position = 0;
-    //  var deserializer = new XmlSerializer(typeof(Shape));
-    //  var b = (TransformedShape)deserializer.Deserialize(stream);
+            // Deserialize object.
+            stream.Position = 0;
+            var deserializer = new XmlSerializer(typeof(Shape));
+            var b = (TransformedShape)deserializer.Deserialize(stream);
 
-    //  Assert.AreEqual(a.Child.Pose, b.Child.Pose);
-    //  Assert.AreEqual(((PointShape)a.Child.Shape).Position, ((PointShape)b.Child.Shape).Position);
-    //}
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      Pose pose = new Pose(new Vector3(1, 2, 3));
-      PointShape pointShape = new PointShape(3, 4, 5);
-      var a = new TransformedShape(new GeometricObject(pointShape, pose));
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (TransformedShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Child.Pose, b.Child.Pose);
-      Assert.AreEqual(((PointShape)a.Child.Shape).Position, ((PointShape)b.Child.Shape).Position);
+            Assert.AreEqual(a.Child.Pose, b.Child.Pose);
+            Assert.AreEqual(((PointShape)a.Child.Shape).Position, ((PointShape)b.Child.Shape).Position);
+        }
     }
-  }
 }

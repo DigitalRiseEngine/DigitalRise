@@ -1240,36 +1240,6 @@ namespace DigitalRise.Mathematics.Algebra.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      Matrix44F m1 = new Matrix44F(12, 23, 45, 56,
-                                   67, 89, 90, 12,
-                                   43, 65, 87, 43,
-                                   34, -12, 84, 44.3f);
-      Matrix44F m2;
-
-      string fileName = "SerializationMatrix44F.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, m1);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      m2 = (Matrix44F)formatter.Deserialize(fs);
-      fs.Close();
-
-      Assert.AreEqual(m1, m2);
-    }
-
-
-    [Test]
     public void SerializationXml2()
     {
       Matrix44F m1 = new Matrix44F(12, 23, 45, 56,

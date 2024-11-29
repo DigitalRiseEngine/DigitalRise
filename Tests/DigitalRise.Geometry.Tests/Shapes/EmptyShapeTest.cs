@@ -56,26 +56,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = Shape.Empty;
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (EmptyShape)deserializer.Deserialize(stream);
-
-      Assert.IsNotNull(b);
-    }
-
-
-    [Test]
     public void GetMesh()
     {
       var s = Shape.Empty;

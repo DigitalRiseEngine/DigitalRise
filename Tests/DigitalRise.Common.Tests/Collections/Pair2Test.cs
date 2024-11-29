@@ -108,24 +108,6 @@ namespace DigitalRise.Collections.Tests
     }
 
 
-#if !SILVERLIGHT
-    [Test]
-    public void BinarySerialization()
-    {
-      Pair<float, object> p = new Pair<float, object>(1.0f, "Hallo");
-
-      MemoryStream stream = new MemoryStream();
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(stream, p);
-      
-      
-      stream.Seek(0, SeekOrigin.Begin);
-      Pair<float, object> p2 = (Pair<float, object>)formatter.Deserialize(stream);
-      Assert.AreEqual(p, p2);
-    }
-#endif
-
-
     [Test]
     public void ToStringTest()
     {

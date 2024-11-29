@@ -82,33 +82,5 @@ namespace DigitalRise.CommandLine.Tests
             Assert.AreEqual(message, exception.Message);
             Assert.AreEqual(innerException, exception.InnerException);
         }
-
-
-        [Test]
-        public void SerializationTest()
-        {
-            const string argument = "arg01";
-            const string message = "message";
-            const string innerMessage = "Inner exception";
-            var innerException = new Exception(innerMessage);
-            var exception = new CommandLineParserException(argument, message, innerException);
-
-            using (var memoryStream = new MemoryStream())
-            {
-                // Serialize exception.
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(memoryStream, exception);
-
-                memoryStream.Position = 0;
-
-                // Deserialize exception.
-                formatter = new BinaryFormatter();
-                var deserializedException = (CommandLineParserException)formatter.Deserialize(memoryStream);
-
-                Assert.AreEqual(argument, deserializedException.Argument);
-                Assert.AreEqual(message, deserializedException.Message);
-                Assert.AreEqual(innerMessage, deserializedException.InnerException.Message);
-            }
-        }
     }
 }

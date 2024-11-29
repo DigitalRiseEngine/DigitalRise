@@ -212,26 +212,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.WidthX, b.WidthX);
       Assert.AreEqual(a.WidthY, b.WidthY);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new RectangleShape(11, 22);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (RectangleShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.WidthX, b.WidthX);
-      Assert.AreEqual(a.WidthY, b.WidthY);
-    }
   }
 }

@@ -224,26 +224,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Normal, b.Normal);
       Assert.AreEqual(a.DistanceFromOrigin, b.DistanceFromOrigin);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new PlaneShape(new Vector3(1, 2, 3).Normalized(), 44);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (PlaneShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Normal, b.Normal);
-      Assert.AreEqual(a.DistanceFromOrigin, b.DistanceFromOrigin);
-    }
   }
 }

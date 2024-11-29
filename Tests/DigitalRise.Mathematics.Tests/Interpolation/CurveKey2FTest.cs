@@ -1,5 +1,4 @@
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
@@ -58,39 +57,6 @@ namespace DigitalRise.Mathematics.Interpolation.Tests
       serializer = new XmlSerializer(typeof(CurveKey2F));
       FileStream fileStream = new FileStream(fileName, FileMode.Open);
       curveKey2 = (CurveKey2F)serializer.Deserialize(fileStream);
-      MathAssert.AreEqual(curveKey1, curveKey2);
-    }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      CurveKey2F curveKey1 = new CurveKey2F
-      {
-        Interpolation = SplineInterpolation.Bezier,
-        Point = new Vector2(1.2f, 3.4f),
-        TangentIn = new Vector2(0.7f, 2.6f),
-        TangentOut = new Vector2(1.9f, 3.3f)
-      };
-      CurveKey2F curveKey2;
-
-      const string fileName = "SerializationCurve2FKey.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, curveKey1);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      curveKey2 = (CurveKey2F)formatter.Deserialize(fs);
-      fs.Close();
-
       MathAssert.AreEqual(curveKey1, curveKey2);
     }
   }

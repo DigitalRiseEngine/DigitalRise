@@ -998,53 +998,5 @@ namespace DigitalRise.Mathematics.Interpolation.Tests
       Assert.AreEqual(CurveLoopType.CycleOffset, curve.PostLoop);
       Assert.AreEqual(true, curve.SmoothEnds);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      CurveKey2F curveKey1 = new CurveKey2F
-      {
-        Interpolation = SplineInterpolation.Bezier,
-        Point = new Vector2(1.2f, 3.4f),
-        TangentIn = new Vector2(0.7f, 2.6f),
-        TangentOut = new Vector2(1.9f, 3.3f)
-      };
-      CurveKey2F curveKey2 = new CurveKey2F
-      {
-        Interpolation = SplineInterpolation.Hermite,
-        Point = new Vector2(2.2f, 4.4f),
-        TangentIn = new Vector2(1.7f, 3.6f),
-        TangentOut = new Vector2(2.9f, 4.3f)
-      };
-      Curve2F curve = new Curve2F { curveKey1, curveKey2 };
-      curve.PreLoop = CurveLoopType.Cycle;
-      curve.PostLoop = CurveLoopType.CycleOffset;
-      curve.SmoothEnds = true;
-
-      const string fileName = "SerializationCurve2F.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, curve);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      curve = (Curve2F)formatter.Deserialize(fs);
-      fs.Close();
-
-      Assert.AreEqual(2, curve.Count);
-      MathAssert.AreEqual(curveKey1, curve[0]);
-      MathAssert.AreEqual(curveKey2, curve[1]);
-      Assert.AreEqual(CurveLoopType.Cycle, curve.PreLoop);
-      Assert.AreEqual(CurveLoopType.CycleOffset, curve.PostLoop);
-      Assert.AreEqual(true, curve.SmoothEnds);
-    }
   }
 }

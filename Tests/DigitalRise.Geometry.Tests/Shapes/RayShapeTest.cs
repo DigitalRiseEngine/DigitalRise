@@ -191,29 +191,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Origin, b.Origin);
       Assert.AreEqual(a.StopsAtFirstHit, b.StopsAtFirstHit);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new RayShape(new Vector3(1, 2, 3), new Vector3(2, 3, 4).Normalized(), 1234.567f);
-      a.StopsAtFirstHit = true;
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (RayShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Direction, b.Direction);
-      Assert.AreEqual(a.Length, b.Length);
-      Assert.AreEqual(a.Origin, b.Origin);
-      Assert.AreEqual(a.StopsAtFirstHit, b.StopsAtFirstHit);
-    }
   }
 }

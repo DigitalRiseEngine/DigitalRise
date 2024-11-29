@@ -589,32 +589,6 @@ namespace DigitalRise.Mathematics.Algebra.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      Vector4 v1 = new Vector4(0.1f, -0.2f, 2, 40);
-      Vector4 v2;
-      string fileName = "SerializationVector4.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, v1);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      v2 = (Vector4)formatter.Deserialize(fs);
-      fs.Close();
-
-      Assert.AreEqual(v1, v2);
-    }
-
-
-    [Test]
     public void SerializationXml2()
     {
       Vector4 v1 = new Vector4(0.1f, -0.2f, 2, 40);

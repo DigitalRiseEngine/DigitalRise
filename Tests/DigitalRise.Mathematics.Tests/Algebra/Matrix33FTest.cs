@@ -1114,34 +1114,6 @@ namespace DigitalRise.Mathematics.Algebra.Tests
 
 
     [Test]
-    public void SerializationBinary()
-    {
-      Matrix33F m1 = new Matrix33F(12, 23, 45, 
-                                   56, 67, 89, 
-                                   90, 12, 43.3f);
-      Matrix33F m2;
-
-      string fileName = "SerializationMatrix33F.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, m1);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      m2 = (Matrix33F) formatter.Deserialize(fs);
-      fs.Close();
-
-      Assert.AreEqual(m1, m2);
-    }
-
-
-    [Test]
     public void SerializationXml2()
     {
       Matrix33F m1 = new Matrix33F(12, 23, 45,

@@ -196,28 +196,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new CylinderShape(11, 22);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (CylinderShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Radius, b.Radius);
-      Assert.AreEqual(a.Height, b.Height);
-    }
-
-
-
-    [Test]
     public void GetMesh()
     {
       var s = new CylinderShape(3, 10);

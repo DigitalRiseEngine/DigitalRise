@@ -879,34 +879,6 @@ namespace DigitalRise.Mathematics.Algebra.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      Matrix22F m1 = new Matrix22F(12, 23, 
-                                   45, 56.3f);
-      Matrix22F m2;
-
-      string fileName = "SerializationMatrix22F.bin";
-
-      if (File.Exists(fileName))
-        File.Delete(fileName);
-
-      FileStream fs = new FileStream(fileName, FileMode.Create);
-
-      BinaryFormatter formatter = new BinaryFormatter();
-      formatter.Serialize(fs, m1);
-      fs.Close();
-
-      fs = new FileStream(fileName, FileMode.Open);
-      formatter = new BinaryFormatter();
-      m2 = (Matrix22F) formatter.Deserialize(fs);
-      fs.Close();
-
-      Assert.AreEqual(m1, m2);
-    }
-
-
-    [Test]
     public void SerializationXml2()
     {
       Matrix22F m1 = new Matrix22F(12, 23,

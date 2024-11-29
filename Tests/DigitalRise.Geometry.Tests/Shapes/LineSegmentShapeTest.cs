@@ -150,26 +150,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Start, b.Start);
       Assert.AreEqual(a.End, b.End);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new LineSegmentShape(new Vector3(1, 2, 3), new Vector3(2, 3, 4));
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (LineSegmentShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Start, b.Start);
-      Assert.AreEqual(a.End, b.End);
-    }
   }
 }

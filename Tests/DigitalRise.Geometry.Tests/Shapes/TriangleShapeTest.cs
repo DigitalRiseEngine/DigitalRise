@@ -327,27 +327,5 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Vertex1, b.Vertex1);
       Assert.AreEqual(a.Vertex2, b.Vertex2);
     }
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new TriangleShape(new Vector3(1, 2, 3), new Vector3(4, 5, 6), new Vector3(7, 8, 9));
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (TriangleShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.Vertex0, b.Vertex0);
-      Assert.AreEqual(a.Vertex1, b.Vertex1);
-      Assert.AreEqual(a.Vertex2, b.Vertex2);
-    }
   }
 }

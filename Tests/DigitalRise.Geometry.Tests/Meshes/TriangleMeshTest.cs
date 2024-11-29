@@ -176,32 +176,6 @@ namespace DigitalRise.Geometry.Meshes.Tests
 
 
     [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      var a = new TriangleMesh();
-      a.Add(new Triangle(new Vector3(0, 1, 2), new Vector3(3, 4, 5), new Vector3(6, 7, 8)), false);
-      a.Add(new Triangle(new Vector3(-0, -1, -2), new Vector3(-3, -4, -5), new Vector3(-6, -7, -8)), false);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (TriangleMesh)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.NumberOfTriangles, b.NumberOfTriangles);
-      for (int i = 0; i < a.Vertices.Count; i++)
-        Assert.AreEqual(a.Vertices[i], b.Vertices[i]);
-      for (int i = 0; i < a.Indices.Count; i++)
-        Assert.AreEqual(a.Indices[i], b.Indices[i]);
-    }
-
-
-    [Test]
     public void ReverseWindingOrder()
     {
       SphereShape sphere = new SphereShape(1);

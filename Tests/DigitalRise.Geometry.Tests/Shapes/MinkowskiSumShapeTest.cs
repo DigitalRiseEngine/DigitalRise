@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
@@ -117,69 +119,38 @@ namespace DigitalRise.Geometry.Shapes.Tests
     }
 
 
-    //[Test]
-    //public void SerializationXml()
-    //{
-    //  Pose poseA = new Pose(new Vector3(1, 2, 3));
-    //  PointShape pointA = new PointShape(3, 4, 5);
-    //  GeometricObject geometryA = new GeometricObject(pointA, poseA);
+        [Test]
+        public void SerializationXml()
+        {
+            Pose poseA = new Pose(new Vector3(1, 2, 3));
+            PointShape pointA = new PointShape(3, 4, 5);
+            GeometricObject geometryA = new GeometricObject(pointA, poseA);
 
-    //  Pose poseB = new Pose(new Vector3(11, 22, 33));
-    //  PointShape pointB = new PointShape(33, 44, 55);
-    //  GeometricObject geometryB = new GeometricObject(pointB, poseB);
+            Pose poseB = new Pose(new Vector3(11, 22, 33));
+            PointShape pointB = new PointShape(33, 44, 55);
+            GeometricObject geometryB = new GeometricObject(pointB, poseB);
 
-    //  var a = new MinkowskiSumShape(geometryA, geometryB);
+            var a = new MinkowskiSumShape(geometryA, geometryB);
 
-    //  // Serialize object.
-    //  var stream = new MemoryStream();
-    //  var serializer = new XmlSerializer(typeof(Shape));
-    //  serializer.Serialize(stream, a);
+            // Serialize object.
+            var stream = new MemoryStream();
+            var serializer = new XmlSerializer(typeof(Shape));
+            serializer.Serialize(stream, a);
 
-    //  // Output generated xml. Can be manually checked in output window.
-    //  stream.Position = 0;
-    //  var xml = new StreamReader(stream).ReadToEnd();
-    //  Trace.WriteLine("Serialized Object:\n" + xml);
+            // Output generated xml. Can be manually checked in output window.
+            stream.Position = 0;
+            var xml = new StreamReader(stream).ReadToEnd();
+            Trace.WriteLine("Serialized Object:\n" + xml);
 
-    //  // Deserialize object.
-    //  stream.Position = 0;
-    //  var deserializer = new XmlSerializer(typeof(Shape));
-    //  var b = (MinkowskiSumShape)deserializer.Deserialize(stream);
+            // Deserialize object.
+            stream.Position = 0;
+            var deserializer = new XmlSerializer(typeof(Shape));
+            var b = (MinkowskiSumShape)deserializer.Deserialize(stream);
 
-    //  Assert.AreEqual(a.ObjectA.Pose, b.ObjectA.Pose);
-    //  Assert.AreEqual(a.ObjectB.Pose, b.ObjectB.Pose);
-    //  Assert.AreEqual(((PointShape)a.ObjectA.Shape).Position, ((PointShape)b.ObjectA.Shape).Position);
-    //  Assert.AreEqual(((PointShape)a.ObjectB.Shape).Position, ((PointShape)b.ObjectB.Shape).Position);
-    //}
-
-
-    [Test]
-    [Ignore("Binary serialization not supported in PCL version.")]
-    public void SerializationBinary()
-    {
-      Pose poseA = new Pose(new Vector3(1, 2, 3));
-      PointShape pointA = new PointShape(3, 4, 5);
-      GeometricObject geometryA = new GeometricObject(pointA, poseA);
-
-      Pose poseB = new Pose(new Vector3(11, 22, 33));
-      PointShape pointB = new PointShape(33, 44, 55);
-      GeometricObject geometryB = new GeometricObject(pointB, poseB);
-
-      var a = new MinkowskiSumShape(geometryA, geometryB);
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var formatter = new BinaryFormatter();
-      formatter.Serialize(stream, a);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new BinaryFormatter();
-      var b = (MinkowskiSumShape)deserializer.Deserialize(stream);
-
-      Assert.AreEqual(a.ObjectA.Pose, b.ObjectA.Pose);
-      Assert.AreEqual(a.ObjectB.Pose, b.ObjectB.Pose);
-      Assert.AreEqual(((PointShape)a.ObjectA.Shape).Position, ((PointShape)b.ObjectA.Shape).Position);
-      Assert.AreEqual(((PointShape)a.ObjectB.Shape).Position, ((PointShape)b.ObjectB.Shape).Position);
+            Assert.AreEqual(a.ObjectA.Pose, b.ObjectA.Pose);
+            Assert.AreEqual(a.ObjectB.Pose, b.ObjectB.Pose);
+            Assert.AreEqual(((PointShape)a.ObjectA.Shape).Position, ((PointShape)b.ObjectA.Shape).Position);
+            Assert.AreEqual(((PointShape)a.ObjectB.Shape).Position, ((PointShape)b.ObjectB.Shape).Position);
+        }
     }
-  }
 }

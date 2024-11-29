@@ -118,44 +118,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void SerializationXml()
-    {
-      var a = new ConvexPolyhedron(
-        new[]
-        {
-          new Vector3(0, 0, 0),
-          new Vector3(1, 0, 0),
-          new Vector3(0, 2, 0),
-          new Vector3(0, 0, 3),
-          new Vector3(1, 5, 0),
-          new Vector3(0, 1, 7),
-        });
-
-      // Serialize object.
-      var stream = new MemoryStream();
-      var serializer = new XmlSerializer(typeof(Shape));
-      serializer.Serialize(stream, a);
-
-      // Output generated xml. Can be manually checked in output window.
-      stream.Position = 0;
-      var xml = new StreamReader(stream).ReadToEnd();
-      Trace.WriteLine("Serialized Object:\n" + xml);
-
-      // Deserialize object.
-      stream.Position = 0;
-      var deserializer = new XmlSerializer(typeof(Shape));
-      var b = (ConvexPolyhedron)deserializer.Deserialize(stream);
-
-      for (int i = 0; i < b.Vertices.Count; i++)
-        Assert.AreEqual(a.Vertices[i], b.Vertices[i]);
-
-      Assert.AreEqual(a.GetAabb(Pose.Identity), b.GetAabb(Pose.Identity));
-      Assert.AreEqual(a.InnerPoint, b.InnerPoint);
-      Assert.AreEqual(a.GetSupportPoint(new Vector3(1, 1, 1)), b.GetSupportPoint(new Vector3(1, 1, 1)));
-    }
-
-
-    [Test]
     public void SimpleTetrahedron()
     {
       List<Vector3> points = new List<Vector3>

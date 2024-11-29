@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GltfUtility": {
+      "commandName": "Project",
+      "commandLineArgs": "-f \"D:\\Projects\\DigitalRise\\Samples\\Assets\\Ground\\Ground2.gltf\" -t -u"
+    }
+  }
+}

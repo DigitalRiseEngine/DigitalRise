@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>DigitalRise.CommadLine</AssemblyName>
+    <RootNamespace>DigitalRise.CommadLine</RootNamespace>
+    <PackageId>DigitalRise.CommadLine</PackageId>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalRise.Common\DigitalRise.Common.MonoGame.csproj" />
+  </ItemGroup>
+</Project>

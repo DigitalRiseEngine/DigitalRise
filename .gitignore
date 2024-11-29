@@ -1,0 +1,56 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+
+#Visual Studio files
+*.pidb
+*.userprefs
+*.[Oo]bj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.[Cc]ache
+*.ilk
+*.log
+*.lib
+*.sbr
+*.sdf
+ipch/
+obj/
+[Bb]in
+Ankh.NoLoad
+.vs/
+*project.lock.json
+artifacts/
+packages/
+
+#Tooling
+_ReSharper*/
+*.resharper
+[Tt]est[Rr]esult*
+*.GhostDoc.xml
+
+#Subversion files
+.svn
+
+# Office Temp Files
+~$*
+
+# Compiled effects
+Samples/Assets/FNA/
+Samples/Assets/MonoGameDX11/
+Samples/Assets/MonoGameOGL/
+Source/DigitalRise.Graphics/Effects/FNA/
+Source/DigitalRise.Graphics/Effects/MonoGameDX11/
+Source/DigitalRise.Graphics/Effects/MonoGameOGL/

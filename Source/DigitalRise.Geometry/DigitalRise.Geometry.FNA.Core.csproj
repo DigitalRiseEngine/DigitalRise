@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>DigitalRise.Geometry.FNA</PackageId>
+    <AssemblyName>DigitalRise.Geometry</AssemblyName>
+    <RootNamespace>DigitalRise.Geometry</RootNamespace>
+    <Description>DigitalRise.Geometry for FNA.Core</Description>
+    <DefineConstants>$(DefineConstants);FNA</DefineConstants>
+    <OutputPath>bin\FNA.Core\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalRise.Mathematics\DigitalRise.Mathematics.FNA.Core.csproj" />
+  </ItemGroup>
+</Project>

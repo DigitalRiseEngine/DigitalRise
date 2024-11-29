@@ -1,0 +1,22 @@
+<Project>
+  <Project.ExportOptions Namespace="DigitalRise.Editor.UI" Class="AddNewItemDialog" OutputPath="D:\Projects\DigitalRise\DigitalRise.Editor\UI" />
+  <Dialog Title="Add New Scene" Left="808" Top="247" Width="300">
+    <VerticalStackPanel Spacing="8">
+      <HorizontalStackPanel Spacing="8">
+        <Label Text="Name:" />
+        <TextBox Id="_textName" StackPanel.ProportionType="Fill" />
+      </HorizontalStackPanel>
+      <VerticalStackPanel Spacing="4" Id="_itemsPanel">
+        <RadioButton>
+          <Label Text="Item 1" />
+        </RadioButton>
+        <RadioButton>
+          <Label Text="Item 2" />
+        </RadioButton>
+        <RadioButton>
+          <Label Text="Item 3" />
+        </RadioButton>
+      </VerticalStackPanel>
+    </VerticalStackPanel>
+  </Dialog>
+</Project>

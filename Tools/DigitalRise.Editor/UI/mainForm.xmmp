@@ -1,0 +1,72 @@
+<Project>
+  <Project.ExportOptions Namespace="DigitalRise.Editor.UI" Class="MainForm" OutputPath="D:\Projects\DigitalRise\Tools\DigitalRise.Editor\UI" />
+  <VerticalStackPanel Id="_mainPanel">
+    <HorizontalMenu>
+      <MenuItem Text="&amp;File">
+        <MenuItem Text="&amp;New" Id="_menuItemNew" />
+        <MenuItem Text="&amp;Open Solution" Id="_menuItemOpenSolution" />
+        <MenuItem Text="&amp;Save Current Item" Id="_menuItemSaveCurrentItem" />
+        <MenuItem Text="&amp;Save Everything" Id="_menuItemSaveEverything" />
+        <MenuItem Text="&amp;Quit" Id="_menuItemQuit" />
+      </MenuItem>
+      <MenuItem Text="&amp;Help">
+        <MenuItem Text="&amp;About" Id="_menuItemAbout" />
+      </MenuItem>
+    </HorizontalMenu>
+    <Panel StackPanel.ProportionType="Fill">
+      <HorizontalSplitPane Id="_topSplitPane">
+        <VerticalSplitPane Id="_leftSplitPane">
+          <ScrollViewer Id="_panelSceneExplorer" />
+          <ScrollViewer Id="_panelSolution" />
+        </VerticalSplitPane>
+        <Panel>
+          <VerticalStackPanel Id="_panelScenes">
+            <HorizontalStackPanel Spacing="8">
+              <ToggleButton Id="_buttonGrid">
+                <Label Text="Grid" />
+              </ToggleButton>
+              <ToggleButton Id="_buttonBoundingBoxes">
+                <Label Text="Bounding Boxes" />
+              </ToggleButton>
+              <ToggleButton Id="_buttonLightViewFrustum">
+                <Label Text="Light View Frustum" />
+              </ToggleButton>
+              <ToggleButton Id="_buttonVisualizeBuffers">
+                <Label Text="Render Buffers" />
+              </ToggleButton>
+            </HorizontalStackPanel>
+            <Panel StackPanel.ProportionType="Fill">
+              <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CloseableTabs="True" Id="_tabControlScenes">
+                <TabItem Text="Test">
+                  <HorizontalStackPanel Left="2" Top="2">
+                    <ToggleButton>
+                      <Label Text="Camera View" />
+                    </ToggleButton>
+                  </HorizontalStackPanel>
+                </TabItem>
+              </TabControl>
+              <Grid ColumnSpacing="8" HorizontalAlignment="Right" VerticalAlignment="Bottom" Left="-4" Id="_panelStatistics">
+                <Grid.DefaultRowProportion Type="Auto" />
+                <Grid.ColumnsProportions>
+                  <Proportion Type="Auto" />
+                  <Proportion Type="Fill" />
+                </Grid.ColumnsProportions>
+                <Label Text="Effects Switches:" />
+                <Label Text="Draw Calls:" Grid.Row="1" />
+                <Label Text="Vertices Drawn:" Grid.Row="2" />
+                <Label Text="Primitives Drawn:" Grid.Row="3" />
+                <Label Text="10" Id="_labelEffectsSwitches" Grid.Column="1" />
+                <Label Text="10" Id="_labelDrawCalls" Grid.Column="1" Grid.Row="1" />
+                <Label Text="10" Id="_labelVerticesDrawn" Grid.Column="1" Grid.Row="2" />
+                <Label Text="10" Id="_labelPrimitivesDrawn" Grid.Column="1" Grid.Row="3" />
+              </Grid>
+            </Panel>
+          </VerticalStackPanel>
+        </Panel>
+        <ScrollViewer>
+          <PropertyGrid Id="_propertyGrid" />
+        </ScrollViewer>
+      </HorizontalSplitPane>
+    </Panel>
+  </VerticalStackPanel>
+</Project>

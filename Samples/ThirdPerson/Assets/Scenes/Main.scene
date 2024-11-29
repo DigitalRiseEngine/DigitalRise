@@ -1,0 +1,127 @@
+{
+  "EnableMultithreading": true,
+  "Camera": {
+    "Camera": {
+      "Projection": {
+        "$type": "DigitalRise.Data.Cameras.PerspectiveProjection, DigitalRise",
+        "Left": -1.0264004,
+        "Right": 1.0264004,
+        "Bottom": -0.57735026,
+        "Top": 0.57735026,
+        "Near": 1.0,
+        "Far": 1000.0
+      }
+    },
+    "LodBias": 1.0,
+    "Children": [],
+    "IsEnabled": true,
+    "ScaleLocal": "1, 1, 1",
+    "PositionLocal": "-5.9461794, 7.8971972, 13.622673"
+  },
+  "Name": "Root",
+  "Children": [
+    {
+      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise",
+      "Light": {
+        "$type": "DigitalRise.Data.Lights.AmbientLight, DigitalRise",
+        "Color": "255, 255, 255, 255",
+        "Intensity": 0.1,
+        "HdrScale": 1.0,
+        "HemisphericAttenuation": 0.7
+      },
+      "Name": "_ambient",
+      "Children": [],
+      "IsEnabled": true,
+      "ScaleLocal": "1, 1, 1"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.Primitives.Plane, DigitalRise",
+      "Size": "100, 100",
+      "Tessellation": "1, 1",
+      "GenerateBackface": true,
+      "NormalDirection": 1,
+      "Material": {
+        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise",
+        "DiffuseColor": "255, 255, 255, 255",
+        "DiffuseTexturePath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets\\Textures\\checker.dds"
+      },
+      "UScale": 50.0,
+      "VScale": 50.0,
+      "Name": "_plane",
+      "Children": [],
+      "IsEnabled": true,
+      "CastsShadows": true,
+      "ScaleLocal": "1, 1, 1"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.Primitives.Capsule, DigitalRise",
+      "Length": 1.0,
+      "Radius": 0.5,
+      "Tessellation": 8,
+      "Material": {
+        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise",
+        "DiffuseColor": "255, 255, 255, 255"
+      },
+      "UScale": 2.0,
+      "VScale": 2.0,
+      "Name": "_capsule",
+      "Children": [],
+      "IsEnabled": true,
+      "CastsShadows": true,
+      "ScaleLocal": "1, 1, 1",
+      "PositionLocal": "8, 2, 10"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise",
+      "Light": {
+        "$type": "DigitalRise.Data.Lights.DirectionalLight, DigitalRise",
+        "Color": "255, 255, 255, 255",
+        "DiffuseIntensity": 1.0,
+        "SpecularIntensity": 1.0,
+        "HdrScale": 1.0,
+        "TextureScale": "1, 1",
+        "Shadow": {
+          "NumberOfCascades": 4,
+          "Distances": "4, 12, 20, 80",
+          "MinLightDistance": 100.0,
+          "DepthBias": "5, 5, 5, 5",
+          "NormalOffset": "2, 2, 2, 2",
+          "NumberOfSamples": -1,
+          "FilterRadius": 1.0,
+          "JitterResolution": 2048.0,
+          "FadeOutRange": 0.1,
+          "CascadeSelection": 1,
+          "IsCascadeLocked": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "SplitDistribution": 0.9,
+          "FadeOutDistance": 50.0,
+          "MaxDistance": 70.0,
+          "DepthBiasScale": "0.99, 0.99, 0.99, 0.99",
+          "DepthBiasOffset": "-0.001, -0.001, -0.001, -0.001",
+          "PreferredSize": 512,
+          "Prefer16Bit": true
+        }
+      },
+      "Name": "_directLight",
+      "Children": [],
+      "IsEnabled": true,
+      "ScaleLocal": "1, 1, 1",
+      "RotationLocal": "-49, 0, 0",
+      "PositionLocal": "0, 25, 0"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise",
+      "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.glb",
+      "Children": [],
+      "IsEnabled": true,
+      "CastsShadows": true,
+      "ScaleLocal": "1, 1, 1"
+    }
+  ],
+  "IsEnabled": true,
+  "ScaleLocal": "1, 1, 1"
+}

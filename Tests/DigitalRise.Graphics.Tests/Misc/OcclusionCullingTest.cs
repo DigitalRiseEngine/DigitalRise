@@ -25,25 +25,25 @@ namespace DigitalRise.Graphics.Tests
 
 			Vector3 center = new Vector3();
 			Vector3 halfExtent = new Vector3();
-			Aabb aabb = new Aabb(center - halfExtent, center + halfExtent);
-			Aabb aabb0, aabb1;
+			BoundingBox aabb = new BoundingBox(center - halfExtent, center + halfExtent);
+			BoundingBox aabb0, aabb1;
 			GetBoundsOrtho(aabb, viewProj, out aabb0);
 			GetBoundsOrthoSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
 
 			center = new Vector3(-9, 20, -110);
 			halfExtent = new Vector3(5, 2, 10);
-			aabb = new Aabb(center - halfExtent, center + halfExtent);
+			aabb = new BoundingBox(center - halfExtent, center + halfExtent);
 			GetBoundsOrtho(aabb, viewProj, out aabb0);
 			GetBoundsOrthoSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
 		}
 
 
-		private void GetBoundsOrtho(Aabb aabbWorld, Matrix44F viewProj, out Aabb aabbClip)
+		private void GetBoundsOrtho(BoundingBox aabbWorld, Matrix44F viewProj, out BoundingBox aabbClip)
 		{
-			Vector3 minimum = aabbWorld.Minimum;
-			Vector3 maximum = aabbWorld.Maximum;
+			Vector3 minimum = aabbWorld.Min;
+			Vector3 maximum = aabbWorld.Max;
 
 			Vector3 v0 = (viewProj * new Vector4(minimum.X, minimum.Y, minimum.Z, 1)).XYZ();
 			Vector3 minimumClip = v0;
@@ -70,15 +70,15 @@ namespace DigitalRise.Graphics.Tests
 			minimumClip = MathHelper.Min(minimumClip, v7);
 			maximumClip = MathHelper.Max(maximumClip, v7);
 
-			aabbClip.Minimum = minimumClip;
-			aabbClip.Maximum = maximumClip;
+			aabbClip.Min = minimumClip;
+			aabbClip.Max = maximumClip;
 		}
 
 
-		private void GetBoundsOrthoSmart(Aabb aabbWorld, Matrix44F viewProj, out Aabb aabbClip)
+		private void GetBoundsOrthoSmart(BoundingBox aabbWorld, Matrix44F viewProj, out BoundingBox aabbClip)
 		{
-			Vector3 minimum = aabbWorld.Minimum;
-			Vector3 maximum = aabbWorld.Maximum;
+			Vector3 minimum = aabbWorld.Min;
+			Vector3 maximum = aabbWorld.Max;
 			Vector3 extent = maximum - minimum;
 
 			Vector3 v0 = (viewProj * new Vector4(minimum.X, minimum.Y, minimum.Z, 1)).XYZ();
@@ -111,8 +111,8 @@ namespace DigitalRise.Graphics.Tests
 			minimumClip = MathHelper.Min(minimumClip, v7);
 			maximumClip = MathHelper.Max(maximumClip, v7);
 
-			aabbClip.Minimum = minimumClip;
-			aabbClip.Maximum = maximumClip;
+			aabbClip.Min = minimumClip;
+			aabbClip.Max = maximumClip;
 		}
 
 
@@ -132,8 +132,8 @@ namespace DigitalRise.Graphics.Tests
 			// Empty AABB at center of near plane.
 			Vector3 center = cameraPosition + cameraForward;
 			Vector3 halfExtent = new Vector3();
-			Aabb aabb = new Aabb(center - halfExtent, center + halfExtent);
-			Aabb aabb0, aabb1;
+			BoundingBox aabb = new BoundingBox(center - halfExtent, center + halfExtent);
+			BoundingBox aabb0, aabb1;
 			GetBoundsPersp(aabb, viewProj, out aabb0);
 			GetBoundsPerspSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
@@ -141,7 +141,7 @@ namespace DigitalRise.Graphics.Tests
 			// AABB inside frustum.
 			center = view.Inverse.TransformPosition(new Vector3(2, -3, -50));
 			halfExtent = new Vector3(1, 6, 10);
-			aabb = new Aabb(center - halfExtent, center + halfExtent);
+			aabb = new BoundingBox(center - halfExtent, center + halfExtent);
 			GetBoundsPersp(aabb, viewProj, out aabb0);
 			GetBoundsPerspSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
@@ -149,7 +149,7 @@ namespace DigitalRise.Graphics.Tests
 			// Behind camera.
 			center = view.Inverse.TransformPosition(new Vector3(2, -3, 50));
 			halfExtent = new Vector3(1, 6, 10);
-			aabb = new Aabb(center - halfExtent, center + halfExtent);
+			aabb = new BoundingBox(center - halfExtent, center + halfExtent);
 			GetBoundsPersp(aabb, viewProj, out aabb0);
 			GetBoundsPerspSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
@@ -157,17 +157,17 @@ namespace DigitalRise.Graphics.Tests
 			// Camera inside AABB.
 			center = view.Inverse.TransformPosition(new Vector3(2, -3, -50));
 			halfExtent = new Vector3(100, 100, 100);
-			aabb = new Aabb(center - halfExtent, center + halfExtent);
+			aabb = new BoundingBox(center - halfExtent, center + halfExtent);
 			GetBoundsPersp(aabb, viewProj, out aabb0);
 			GetBoundsPerspSmart(aabb, viewProj, out aabb1);
 			AssertExt.AreNumericallyEqual(aabb0, aabb1);
 		}
 
 
-		private void GetBoundsPersp(Aabb aabbWorld, Matrix44F viewProj, out Aabb aabbClip)
+		private void GetBoundsPersp(BoundingBox aabbWorld, Matrix44F viewProj, out BoundingBox aabbClip)
 		{
-			Vector3 minimum = aabbWorld.Minimum;
-			Vector3 maximum = aabbWorld.Maximum;
+			Vector3 minimum = aabbWorld.Min;
+			Vector3 maximum = aabbWorld.Max;
 
 			Vector4 v0 = (viewProj * new Vector4(minimum.X, minimum.Y, minimum.Z, 1));
 			Vector3 v;
@@ -242,15 +242,15 @@ namespace DigitalRise.Graphics.Tests
 			minimumClip = MathHelper.Min(minimumClip, v);
 			maximumClip = MathHelper.Max(maximumClip, v);
 
-			aabbClip.Minimum = minimumClip;
-			aabbClip.Maximum = maximumClip;
+			aabbClip.Min = minimumClip;
+			aabbClip.Max = maximumClip;
 		}
 
 
-		private void GetBoundsPerspSmart(Aabb aabbWorld, Matrix44F viewProj, out Aabb aabbClip)
+		private void GetBoundsPerspSmart(BoundingBox aabbWorld, Matrix44F viewProj, out BoundingBox aabbClip)
 		{
-			Vector3 minimum = aabbWorld.Minimum;
-			Vector3 maximum = aabbWorld.Maximum;
+			Vector3 minimum = aabbWorld.Min;
+			Vector3 maximum = aabbWorld.Max;
 			Vector3 extent = maximum - minimum;
 
 			Vector4 v0 = viewProj * new Vector4(minimum.X, minimum.Y, minimum.Z, 1);
@@ -331,8 +331,8 @@ namespace DigitalRise.Graphics.Tests
 			minimumClip = MathHelper.Min(minimumClip, v);
 			maximumClip = MathHelper.Max(maximumClip, v);
 
-			aabbClip.Minimum = minimumClip;
-			aabbClip.Maximum = maximumClip;
+			aabbClip.Min = minimumClip;
+			aabbClip.Max = maximumClip;
 		}
 	}
 }

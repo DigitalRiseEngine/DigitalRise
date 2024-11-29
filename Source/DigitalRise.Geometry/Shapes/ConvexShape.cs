@@ -63,7 +63,7 @@ namespace DigitalRise.Geometry.Shapes
     /// be overridden in derived classes.
     /// </para>
     /// </remarks>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       if (scale.X == scale.Y && scale.Y == scale.Z)
       {
@@ -90,9 +90,9 @@ namespace DigitalRise.Geometry.Shapes
 
         // Check minimum and maximum because scaling could be negative.
         if (minimum.IsLessOrEqual(maximum))
-          return new Aabb(minimum, maximum);
+          return new BoundingBox(minimum, maximum);
         else
-          return new Aabb(maximum, minimum);
+          return new BoundingBox(maximum, minimum);
       }
       else
       {
@@ -128,7 +128,7 @@ namespace DigitalRise.Geometry.Shapes
 
         Debug.Assert(minimum.IsLessOrEqual(maximum));
 
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
     }
 

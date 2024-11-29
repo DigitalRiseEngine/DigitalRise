@@ -4,14 +4,15 @@
 
 using System.Diagnostics;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class DynamicAabbTree<T>
+  partial class DynamicBoundingBoxTree<T>
   {
     /// <summary>
-    /// Represents a node of an <see cref="AabbTree{T}"/>.
+    /// Represents a node of an <see cref="BoundingBoxTree{T}"/>.
     /// </summary>
     /// <remarks>
     /// A node is also the root of a subtree. Each node can be either a leaf or an inner node.
@@ -30,12 +31,12 @@ namespace DigitalRise.Geometry.Partitioning
     /// </item>
     /// </list>
     /// </remarks>
-    private sealed class Node : IAabbTreeNode<T>
+    private sealed class Node : IBoundingBoxTreeNode<T>
     {
       /// <summary>
       /// The AABB of this node which contains the current subtree.
       /// </summary>
-      public Aabb Aabb;
+      public BoundingBox BoundingBox;
 
 
       /// <summary>
@@ -79,16 +80,16 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
 
-      #region ----- IAabbTreeNode<T> -----
+      #region ----- IBoundingBoxTreeNode<T> -----
 
       /// <summary>
       /// Gets or sets the AABB of this node which contains the current subtree.
       /// </summary>
       /// <value>The AABB of this node which contains the current subtree.</value>
-      Aabb IAabbTreeNode<T>.Aabb
+      BoundingBox IBoundingBoxTreeNode<T>.BoundingBox
       {
-        get { return Aabb; }
-        set { Aabb = value; }
+        get { return BoundingBox; }
+        set { BoundingBox = value; }
       }
 
 
@@ -98,7 +99,7 @@ namespace DigitalRise.Geometry.Partitioning
       /// <value>
       /// The left child node. (Or <see langword="null"/> if the node is a leaf node.)
       /// </value>
-      IAabbTreeNode<T> IAabbTreeNode<T>.LeftChild
+      IBoundingBoxTreeNode<T> IBoundingBoxTreeNode<T>.LeftChild
       {
         get { return LeftChild; }
         set
@@ -126,7 +127,7 @@ namespace DigitalRise.Geometry.Partitioning
       /// <value>
       /// The right child node. (Or <see langword="null"/> if the node is a leaf node.)
       /// </value>
-      IAabbTreeNode<T> IAabbTreeNode<T>.RightChild
+      IBoundingBoxTreeNode<T> IBoundingBoxTreeNode<T>.RightChild
       {
         get { return RightChild; }
         set
@@ -154,7 +155,7 @@ namespace DigitalRise.Geometry.Partitioning
       /// <value>
       /// The parent node. (Or <see langword="null"/> if the node is a leaf node.)
       /// </value>
-      IAabbTreeNode<T> IAabbTreeNode<T>.Parent
+      IBoundingBoxTreeNode<T> IBoundingBoxTreeNode<T>.Parent
       {
         get { return Parent; }
       }
@@ -164,7 +165,7 @@ namespace DigitalRise.Geometry.Partitioning
       /// Gets (or sets) the data held in this node.
       /// </summary>
       /// <value>The data of this node.</value>
-      T IAabbTreeNode<T>.Item
+      T IBoundingBoxTreeNode<T>.Item
       {
         get { return Item; }
       }

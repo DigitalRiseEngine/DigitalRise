@@ -247,9 +247,9 @@ namespace DigitalRise.Geometry.Shapes
 		/// </para>
 		/// </remarks>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-		public Aabb GetAabb()
+		public BoundingBox GetBoundingBox()
 		{
-			return GetAabb(Vector3.One, Pose.Identity);
+			return GetBoundingBox(Vector3.One, Pose.Identity);
 		}
 
 
@@ -268,9 +268,9 @@ namespace DigitalRise.Geometry.Shapes
 		/// </para>
 		/// </remarks>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-		public Aabb GetAabb(Pose pose)
+		public BoundingBox GetBoundingBox(Pose pose)
 		{
-			return GetAabb(Vector3.One, pose);
+			return GetBoundingBox(Vector3.One, pose);
 		}
 
 
@@ -291,7 +291,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// The AABB is axis-aligned to the axes of the world space (or the parent coordinate space).
 		/// </remarks>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-		public abstract Aabb GetAabb(Vector3 scale, Pose pose);
+		public abstract BoundingBox GetBoundingBox(Vector3 scale, Pose pose);
 
 
 		/// <summary>
@@ -329,7 +329,7 @@ namespace DigitalRise.Geometry.Shapes
 				throw new ArgumentOutOfRangeException("iterationLimit", "The iteration limit must be greater than 0.");
 
 			// Compute absolute distance threshold.
-			float maxExtent = GetAabb().Extent.LargestComponent();
+			float maxExtent = GetBoundingBox().Extent().LargestComponent();
 			float absoluteThreshold = maxExtent * relativeDistanceThreshold;
 
 			return OnGetMesh(absoluteThreshold, iterationLimit);
@@ -396,7 +396,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// <strong>Notes to Inheritors:</strong> The base implementation of this method computes the
 		/// volume from the mesh of the shape (see <see cref="Shape.GetMesh"/>). And if 
 		/// <paramref name="iterationLimit"/> is 0, the volume of the axis-aligned bounding box (see 
-		/// <see cref="Shape.GetAabb(Pose)"/>) is used. Derived classes should override this method to 
+		/// <see cref="Shape.GetBoundingBox(Pose)"/>) is used. Derived classes should override this method to 
 		/// compute a more accurate volume or to provide a faster implementation.
 		/// </para>
 		/// </remarks>
@@ -415,7 +415,7 @@ namespace DigitalRise.Geometry.Shapes
 
 			// Use AABB volume if iterationLimit is 0.
 			if (iterationLimit == 0)
-				return GetAabb().Volume;
+				return GetBoundingBox().Volume();
 
 			var mesh = GetMesh(relativeError, iterationLimit);
 			float volume = mesh.GetVolume();

@@ -138,10 +138,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             // ----- Boolean or Contact Query
 
             // Heuristic: Test large BVH vs. small BVH.
-            Aabb aabbOfA = geometricObjectA.Aabb;
-            Aabb aabbOfB = geometricObjectB.Aabb;
-            float largestExtentA = aabbOfA.Extent.LargestComponent();
-            float largestExtentB = aabbOfB.Extent.LargestComponent();
+            BoundingBox aabbOfA = geometricObjectA.BoundingBox;
+            BoundingBox aabbOfB = geometricObjectB.BoundingBox;
+            float largestExtentA = aabbOfA.Extent().LargestComponent();
+            float largestExtentB = aabbOfB.Extent().LargestComponent();
             IEnumerable<Pair<int>> overlaps;
             bool overlapsSwapped = largestExtentA < largestExtentB;
             if (overlapsSwapped)
@@ -212,10 +212,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
         }
         else
         {
-          Aabb aabbOfA = geometricObjectA.Aabb;
-          Aabb aabbOfB = geometricObjectB.Aabb;
-          float largestExtentA = aabbOfA.Extent.LargestComponent();
-          float largestExtentB = aabbOfB.Extent.LargestComponent();
+          BoundingBox aabbOfA = geometricObjectA.BoundingBox;
+          BoundingBox aabbOfB = geometricObjectB.BoundingBox;
+          float largestExtentA = aabbOfA.Extent().LargestComponent();
+          float largestExtentB = aabbOfB.Extent().LargestComponent();
 
           // Choose which object should be A.
           if (triangleMeshShapeA == null)
@@ -269,10 +269,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             // B is a very large object and no triangle mesh. 
             // Make a AABB vs. Shape of B test for quick rejection.
             BoxShape testBoxShape = ResourcePools.BoxShapes.Obtain();
-            testBoxShape.Extent = aabbOfA.Extent;
+            testBoxShape.Extent = aabbOfA.Extent();
             testGeometricObjectA.Shape = testBoxShape;
             testGeometricObjectA.Scale = Vector3.One;
-            testGeometricObjectA.Pose = new Pose(aabbOfA.Center);
+            testGeometricObjectA.Pose = new Pose(aabbOfA.Center());
 
             testCollisionObjectA.SetInternal(collisionObjectA, testGeometricObjectA);
 
@@ -298,7 +298,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             #region ----- TriangleMesh BVH vs. * -----
 
             // Get AABB of B in local space of A.
-            var aabbBInA = geometricObjectB.Shape.GetAabb(scaleB, poseA.Inverse * poseB);
+            var aabbBInA = geometricObjectB.Shape.GetBoundingBox(scaleB, poseA.Inverse * poseB);
 
             // Apply inverse scaling to do the AABB-tree checks in the unscaled local space of A.
             aabbBInA.Scale(Vector3.One / scaleA);
@@ -368,9 +368,9 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             }
 
             // The search-space is a space where the closest points must lie in.
-            Vector3 minimum = aabbOfB.Minimum - new Vector3(closestPairDistance);
-            Vector3 maximum = aabbOfB.Maximum + new Vector3(closestPairDistance);
-            Aabb searchSpaceAabb = new Aabb(minimum, maximum);
+            Vector3 minimum = aabbOfB.Min - new Vector3(closestPairDistance);
+            Vector3 maximum = aabbOfB.Max + new Vector3(closestPairDistance);
+            BoundingBox searchSpaceBoundingBox = new BoundingBox(minimum, maximum);
 
             // Test all triangles.
             ITriangleMesh triangleMeshA = triangleMeshShapeA.Mesh;
@@ -385,7 +385,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
               testTriangleShapeA.Vertex2 = triangle.Vertex2 * scaleA;
 
               // Make AABB test with search space.
-              if (GeometryHelper.HaveContact(searchSpaceAabb, testTriangleShapeA.GetAabb(poseA)))
+              if (GeometryHelper.HaveContact(searchSpaceBoundingBox, testTriangleShapeA.GetBoundingBox(poseA)))
               {
                 // IMPORTANT: Info in triangleShape is destroyed in this method!
                 // Triangle is given to the method so that method does not allocate garbage.
@@ -414,8 +414,8 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
                   else
                     closestPairDistance = 0;
 
-                  searchSpaceAabb.Minimum = aabbOfB.Minimum - new Vector3(closestPairDistance);
-                  searchSpaceAabb.Maximum = aabbOfB.Maximum + new Vector3(closestPairDistance);
+                  searchSpaceBoundingBox.Min = aabbOfB.Min - new Vector3(closestPairDistance);
+                  searchSpaceBoundingBox.Max = aabbOfB.Max + new Vector3(closestPairDistance);
                 }
               }
             }
@@ -746,8 +746,8 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       // To simplify, we assume that A is static and B is moving relative to A. 
       // In general, this is not correct! But for CCD we make this simplification.
       // We convert everything to the space of A.
-      var aabbSweptBInA = geometricObjectB.Shape.GetAabb(scaleB, startPoseA.Inverse * startPoseB);
-      aabbSweptBInA.Grow(geometricObjectB.Shape.GetAabb(scaleB, targetPoseA.Inverse * targetPoseB));
+      var aabbSweptBInA = geometricObjectB.Shape.GetBoundingBox(scaleB, startPoseA.Inverse * startPoseB);
+      aabbSweptBInA.Grow(geometricObjectB.Shape.GetBoundingBox(scaleB, targetPoseA.Inverse * targetPoseB));
 
       // Use temporary object.
       var triangleShape = ResourcePools.TriangleShapes.Obtain();
@@ -804,7 +804,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
           triangle.Vertex2 = triangle.Vertex2 * scaleA;
 
           // Make AABB test of triangle vs. sweep of B.
-          if (!GeometryHelper.HaveContact(aabbSweptBInA, triangle.Aabb))
+          if (!GeometryHelper.HaveContact(aabbSweptBInA, triangle.BoundingBox))
             continue;
 
           triangleShape.Vertex0 = triangle.Vertex0;

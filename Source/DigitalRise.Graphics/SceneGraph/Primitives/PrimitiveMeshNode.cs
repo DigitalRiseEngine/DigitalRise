@@ -113,7 +113,7 @@ namespace DigitalRise.SceneGraph.Primitives
 				return;
 			}
 
-			Shape = new BoxShape(RenderMesh.BoundingBox.Volume());
+			Shape = new BoxShape(RenderMesh.BoundingBox.Extent());
 		}
 	}
 }

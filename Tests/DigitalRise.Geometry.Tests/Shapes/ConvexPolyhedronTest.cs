@@ -23,7 +23,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexPolyhedron convexPolyhedron = new ConvexPolyhedron(Enumerable.Empty<Vector3>());
       Assert.AreEqual(0, convexPolyhedron.Vertices.Count);
       Assert.AreEqual(Vector3.Zero, convexPolyhedron.InnerPoint);
-      Assert.AreEqual(new Aabb(), convexPolyhedron.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(), convexPolyhedron.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -34,7 +34,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexPolyhedron convexPolyhedron = new ConvexPolyhedron(new[] { point });
       Assert.AreEqual(1, convexPolyhedron.Vertices.Count);
       Assert.AreEqual(point, convexPolyhedron.InnerPoint);
-      Assert.AreEqual(new Aabb(point, point), convexPolyhedron.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(point, point), convexPolyhedron.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -46,7 +46,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexPolyhedron convexPolyhedron = new ConvexPolyhedron(new[] { point0, point1 });
       Assert.AreEqual(2, convexPolyhedron.Vertices.Count);
       Assert.AreEqual((point0 + point1) / 2, convexPolyhedron.InnerPoint);
-      Assert.AreEqual(new Aabb(point0, point1), convexPolyhedron.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(point0, point1), convexPolyhedron.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -59,7 +59,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexPolyhedron convexPolyhedron = new ConvexPolyhedron(new[] { point0, point1, point2 });
       Assert.AreEqual(3, convexPolyhedron.Vertices.Count);
       Assert.AreEqual((point0 + point1 + point2) / 3, convexPolyhedron.InnerPoint);
-      Assert.AreEqual(new Aabb(new Vector3(1, 1, 1), new Vector3(2, 2, 1)), convexPolyhedron.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(1, 1, 1), new Vector3(2, 2, 1)), convexPolyhedron.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -108,12 +108,12 @@ namespace DigitalRise.Geometry.Shapes.Tests
       for (int i = 0; i < clone.Vertices.Count; i++)
         Assert.AreEqual(convexPolyhedron.Vertices[i], clone.Vertices[i]);
 
-      Assert.AreEqual(convexPolyhedron.GetAabb(Pose.Identity), clone.GetAabb(Pose.Identity));
+      Assert.AreEqual(convexPolyhedron.GetBoundingBox(Pose.Identity), clone.GetBoundingBox(Pose.Identity));
       Assert.AreEqual(convexPolyhedron.InnerPoint, clone.InnerPoint);
       Assert.AreEqual(convexPolyhedron.GetSupportPoint(new Vector3(1,1,1)), clone.GetSupportPoint(new Vector3(1, 1, 1)));
 
-      Assert.AreEqual(convexPolyhedron.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(convexPolyhedron.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(convexPolyhedron.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(convexPolyhedron.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

@@ -14,9 +14,9 @@ using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  public partial class AabbTree<T>
+  public partial class BoundingBoxTree<T>
   {
-    // TODO: Add AabbTree<T> vs. DynamicAabbTree<T>.
+    // TODO: Add BoundingBoxTree<T> vs. DynamicBoundingBoxTree<T>.
 
 
     /// <inheritdoc/>
@@ -36,15 +36,15 @@ namespace DigitalRise.Geometry.Partitioning
       if (_root == null)
         return LinqHelper.Empty<Pair<T>>();
 
-      var otherTree = otherPartition as AabbTree<T>;
+      var otherTree = otherPartition as BoundingBoxTree<T>;
       if (otherTree == null)
       {
-        // AabbTree<T> vs. ISpatialPartition<T>.
+        // BoundingBoxTree<T> vs. ISpatialPartition<T>.
         return GetOverlapsImpl(otherPartition);
       }
       else
       {
-        // AabbTree<T> vs. AabbTree<T>
+        // BoundingBoxTree<T> vs. BoundingBoxTree<T>
         if (otherTree._root == null)
           return LinqHelper.Empty<Pair<T>>();
 
@@ -57,9 +57,9 @@ namespace DigitalRise.Geometry.Partitioning
     {
 #if !POOL_ENUMERABLES
       // Test all leaf nodes that touch the other partition's AABB.
-      foreach (var leaf in GetLeafNodes(otherPartition.Aabb))
+      foreach (var leaf in GetLeafNodes(otherPartition.BoundingBox))
       {
-        var otherCandidates = otherPartition.GetOverlaps(leaf.Aabb);
+        var otherCandidates = otherPartition.GetOverlaps(leaf.BoundingBox);
 
         // We return one pair for each candidate vs. otherItem overlap.
         foreach (var otherCandidate in otherCandidates)
@@ -76,7 +76,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private IEnumerable<Pair<T>> GetOverlapsImpl(AabbTree<T> otherTree)
+    private IEnumerable<Pair<T>> GetOverlapsImpl(BoundingBoxTree<T> otherTree)
     {
 #if !POOL_ENUMERABLES
       var stack = DigitalRise.ResourcePools<Pair<Node, Node>>.Stacks.Obtain();
@@ -96,7 +96,7 @@ namespace DigitalRise.Geometry.Partitioning
             stack.Push(new Pair<Node, Node>(nodeA.LeftChild, nodeA.LeftChild));
           }
         }
-        else if (GeometryHelper.HaveContact(nodeA.Aabb, nodeB.Aabb))
+        else if (GeometryHelper.HaveContact(nodeA.BoundingBox, nodeB.BoundingBox))
         {
           if (!nodeA.IsLeaf)
           {
@@ -156,15 +156,15 @@ namespace DigitalRise.Geometry.Partitioning
       if (_root == null)
         return LinqHelper.Empty<Pair<T>>();
 
-      var otherTree = otherPartition as AabbTree<T>;
+      var otherTree = otherPartition as BoundingBoxTree<T>;
       if (otherTree == null)
       {
-        // AabbTree<T> vs. ISpatialPartition<T>.
+        // BoundingBoxTree<T> vs. ISpatialPartition<T>.
         return GetOverlapsImpl(scale, otherPartition, otherScale, pose.Inverse * otherPose);
       }
       else
       {
-        // AabbTree<T> vs. AabbTree<T>
+        // BoundingBoxTree<T> vs. BoundingBoxTree<T>
         if (otherTree._root == null)
           return LinqHelper.Empty<Pair<T>>();
 
@@ -182,17 +182,17 @@ namespace DigitalRise.Geometry.Partitioning
       Pose toOther = otherPose.Inverse;
 
       // Transform the AABB of the other partition into space of the this partition.
-      var otherAabb = otherPartition.Aabb;
-      otherAabb = otherAabb.GetAabb(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
-      otherAabb.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
+      var otherBoundingBox = otherPartition.BoundingBox;
+      otherBoundingBox = otherBoundingBox.GetBoundingBox(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
+      otherBoundingBox.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
 
-      var leafNodes = GetLeafNodes(otherAabb);
+      var leafNodes = GetLeafNodes(otherBoundingBox);
 
 #if !POOL_ENUMERABLES
       foreach (var leaf in leafNodes)
       {
         // Transform AABB of this partition into space of the other partition.
-        Aabb aabb = leaf.Aabb.GetAabb(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
+        BoundingBox aabb = leaf.BoundingBox.GetBoundingBox(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
         aabb.Scale(otherScaleInverse);                    // Transform to unscaled local space of other partition.
 
         foreach (var otherCandidate in otherPartition.GetOverlaps(aabb))
@@ -209,7 +209,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private IEnumerable<Pair<T>> GetOverlapsImpl(Vector3 scale, AabbTree<T> otherTree, Vector3 otherScale, Pose otherPose)
+    private IEnumerable<Pair<T>> GetOverlapsImpl(Vector3 scale, BoundingBoxTree<T> otherTree, Vector3 otherScale, Pose otherPose)
     {
       // Compute transformations.
       Vector3 scaleA = scale;      // Rename scales for readability.
@@ -225,7 +225,7 @@ namespace DigitalRise.Geometry.Partitioning
         var nodeA = nodePair.First;
         var nodeB = nodePair.Second;
 
-        if (HaveAabbContact(nodeA, scaleA, nodeB, scaleB, bToA))
+        if (HaveBoundingBoxContact(nodeA, scaleA, nodeB, scaleB, bToA))
         {
           if (!nodeA.IsLeaf)
           {
@@ -281,8 +281,8 @@ namespace DigitalRise.Geometry.Partitioning
     /// </returns>
     private static bool IsABiggerThanB(Node nodeA, Vector3 scaleA, Node nodeB, Vector3 scaleB)
     {
-      Vector3 extentA = nodeA.Aabb.Extent * MathHelper.Absolute(scaleA);
-      Vector3 extentB = nodeB.Aabb.Extent * MathHelper.Absolute(scaleB);
+      Vector3 extentA = nodeA.BoundingBox.Extent() * MathHelper.Absolute(scaleA);
+      Vector3 extentB = nodeB.BoundingBox.Extent() * MathHelper.Absolute(scaleB);
       return extentA.LargestComponent() > extentB.LargestComponent();
     }
 
@@ -298,19 +298,19 @@ namespace DigitalRise.Geometry.Partitioning
     /// <returns>
     /// <see langword="true"/> if the AABBs have contact; otherwise, <see langword="false"/>.
     /// </returns>
-    private static bool HaveAabbContact(Node nodeA, Vector3 scaleA, Node nodeB, Vector3 scaleB, Pose poseB)
+    private static bool HaveBoundingBoxContact(Node nodeA, Vector3 scaleA, Node nodeB, Vector3 scaleB, Pose poseB)
     {
       // Scale AABB of A.
-      Aabb aabbA = nodeA.Aabb;
+      BoundingBox aabbA = nodeA.BoundingBox;
       aabbA.Scale(scaleA);
 
       // Scale AABB of B.
-      Aabb aabbB = nodeB.Aabb;
+      BoundingBox aabbB = nodeB.BoundingBox;
       aabbB.Scale(scaleB);
 
       // Convert AABB of B to OBB in local space of A.
-      Vector3 boxExtentB = aabbB.Extent;
-      Pose poseBoxB = poseB * new Pose(aabbB.Center);
+      Vector3 boxExtentB = aabbB.Extent();
+      Pose poseBoxB = poseB * new Pose(aabbB.Center());
 
       // Test AABB of A against OBB.
       return GeometryHelper.HaveContact(aabbA, boxExtentB, poseBoxB,
@@ -340,22 +340,22 @@ namespace DigitalRise.Geometry.Partitioning
       if (_root == null)
         return;
 
-      if (otherPartition is AabbTree<T>)
+      if (otherPartition is BoundingBoxTree<T>)
       {
-        // ----- AabbTree<T> vs. AabbTree<T>
+        // ----- BoundingBoxTree<T> vs. BoundingBoxTree<T>
         // (Transform second partition into local space.)
-        var otherTree = (AabbTree<T>)otherPartition;
+        var otherTree = (BoundingBoxTree<T>)otherPartition;
         float closestPointDistanceSquared = float.PositiveInfinity;
         GetClosestPointCandidatesImpl(_root, scale, otherTree._root, otherScale, pose.Inverse * otherPose, callback, ref closestPointDistanceSquared);
       }
       else if (otherPartition is ISupportClosestPointQueries<T>)
       {
-        // ----- AabbTree<T> vs. ISupportClosestPointQueries<T>
+        // ----- BoundingBoxTree<T> vs. ISupportClosestPointQueries<T>
         GetClosestPointCandidatesImpl(scale, pose, (ISupportClosestPointQueries<T>)otherPartition, otherScale, otherPose, callback);
       }
       else
       {
-        // ----- AabbTree<T> vs. *
+        // ----- BoundingBoxTree<T> vs. *
         GetClosestPointCandidatesImpl(otherPartition, callback);
       }
     }
@@ -388,7 +388,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       // If we have a contact, it is not necessary to examine nodes with no AABB contact
       // because they cannot give a closer point pair.
-      if (closestPointDistanceSquared == 0 && !HaveAabbContact(nodeA, scaleA, nodeB, scaleB, poseB))
+      if (closestPointDistanceSquared == 0 && !HaveBoundingBoxContact(nodeA, scaleA, nodeB, scaleB, poseB))
         return;
 
       if (nodeA.IsLeaf && nodeB.IsLeaf)
@@ -424,31 +424,31 @@ namespace DigitalRise.Geometry.Partitioning
         // TODO: Optimize: We do not need to call GeometryHelper.GetDistanceLowerBoundSquared for OBBs. We have AABB + OBB.
 
         // Scale AABB of B.
-        Aabb aabbB = nodeB.Aabb;
+        BoundingBox aabbB = nodeB.BoundingBox;
         aabbB.Scale(scaleB);
 
         // Convert AABB of B to OBB in local space of A.
-        Vector3 boxExtentB = aabbB.Extent;
-        Pose poseBoxB = poseB * new Pose(aabbB.Center);
+        Vector3 boxExtentB = aabbB.Extent();
+        Pose poseBoxB = poseB * new Pose(aabbB.Center());
 
         // Scale left child AABB of A.
-        Aabb leftChildAabb = leftChild.Aabb;
-        leftChildAabb.Scale(scaleA);
+        BoundingBox leftChildBoundingBox = leftChild.BoundingBox;
+        leftChildBoundingBox.Scale(scaleA);
 
         // Convert left child AABB of A to OBB in local space of A.
-        Vector3 leftChildBoxExtent = leftChildAabb.Extent;
-        Pose leftChildBoxPose = new Pose(leftChildAabb.Center);
+        Vector3 leftChildBoxExtent = leftChildBoundingBox.Extent();
+        Pose leftChildBoxPose = new Pose(leftChildBoundingBox.Center());
 
         // Compute lower bound for distance to left child.
         float minDistanceLeft = GeometryHelper.GetDistanceLowerBoundSquared(leftChildBoxExtent, leftChildBoxPose, boxExtentB, poseBoxB);
 
         // Scale right child AABB of A.
-        Aabb rightChildAabb = rightChild.Aabb;
-        rightChildAabb.Scale(scaleA);
+        BoundingBox rightChildBoundingBox = rightChild.BoundingBox;
+        rightChildBoundingBox.Scale(scaleA);
 
         // Convert right child AABB of A to OBB in local space of A.
-        Vector3 rightChildBoxExtent = rightChildAabb.Extent;
-        Pose rightChildBoxPose = new Pose(rightChildAabb.Center);
+        Vector3 rightChildBoxExtent = rightChildBoundingBox.Extent();
+        Pose rightChildBoxPose = new Pose(rightChildBoundingBox.Center());
 
         // Compute lower bound for distance to right child.
         float minDistanceRight = GeometryHelper.GetDistanceLowerBoundSquared(rightChildBoxExtent, rightChildBoxPose, boxExtentB, poseBoxB);
@@ -508,31 +508,31 @@ namespace DigitalRise.Geometry.Partitioning
           // TODO: Optimize: We do not need to call GeometryHelper.GetDistanceLowerBoundSquared for OBBs. We have AABB + OBB.
 
           // Scale AABB of A.
-          Aabb aabbA = nodeA.Aabb;
+          BoundingBox aabbA = nodeA.BoundingBox;
           aabbA.Scale(scaleA);
 
           // Convert AABB of A to OBB in local space of A.
-          Vector3 boxExtentA = aabbA.Extent;
-          Pose poseBoxA = new Pose(aabbA.Center);
+          Vector3 boxExtentA = aabbA.Extent();
+          Pose poseBoxA = new Pose(aabbA.Center());
 
           // Scale left child AABB of B.
-          Aabb leftChildAabb = leftChildB.Aabb;
-          leftChildAabb.Scale(scaleB);
+          BoundingBox leftChildBoundingBox = leftChildB.BoundingBox;
+          leftChildBoundingBox.Scale(scaleB);
 
           // Convert left child AABB of B to OBB in local space of A.
-          Vector3 childBoxExtent = leftChildAabb.Extent;
-          Pose poseLeft = poseB * new Pose(leftChildAabb.Center);
+          Vector3 childBoxExtent = leftChildBoundingBox.Extent();
+          Pose poseLeft = poseB * new Pose(leftChildBoundingBox.Center());
 
           // Compute lower bound for distance to left child.
           float minDistanceLeft = GeometryHelper.GetDistanceLowerBoundSquared(childBoxExtent, poseLeft, boxExtentA, poseBoxA);
 
           // Scale right child AABB of B.
-          Aabb rightChildAabb = rightChildB.Aabb;
-          rightChildAabb.Scale(scaleB);
+          BoundingBox rightChildBoundingBox = rightChildB.BoundingBox;
+          rightChildBoundingBox.Scale(scaleB);
 
           // Convert right child AABB of B to OBB in local space of A.
-          childBoxExtent = rightChildAabb.Extent;
-          Pose poseRight = poseB * new Pose(rightChildAabb.Center);
+          childBoxExtent = rightChildBoundingBox.Extent();
+          Pose poseRight = poseB * new Pose(rightChildBoundingBox.Center());
 
           // Compute lower bound for distance to right child.
           float minDistanceRight = GeometryHelper.GetDistanceLowerBoundSquared(childBoxExtent, poseRight, boxExtentA, poseBoxA);
@@ -597,7 +597,7 @@ namespace DigitalRise.Geometry.Partitioning
         callbackWrapper.Item = leaf.Item;
 
         // Transform AABB into local space of other partition.
-        Aabb aabb = leaf.Aabb.GetAabb(scale, toOther);
+        BoundingBox aabb = leaf.BoundingBox.GetBoundingBox(scale, toOther);
         aabb.Scale(otherScaleInverse);
 
         closestPointDistanceSquared = otherPartition.GetClosestPointCandidates(aabb, closestPointDistanceSquared, callbackWrapper.Callback);
@@ -667,7 +667,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// </exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
-    public void GetOverlaps(Vector3 scale, Pose pose, AabbTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
+    public void GetOverlaps(Vector3 scale, Pose pose, BoundingBoxTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
     {
       // TODO: Overlaps should use Pair<T, T> (ordered pair) instead of Pair<T> (unordered pair)!
       // TODO: Getting all overlaps is slow when used with boolean queries. For this case following 
@@ -695,7 +695,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private void GetOverlapsStackless(Vector3 scale, Pose pose, AabbTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
+    private void GetOverlapsStackless(Vector3 scale, Pose pose, BoundingBoxTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
     {
       // Note: Stackless traversal requires a Parent reference in the Node class!
 
@@ -706,9 +706,9 @@ namespace DigitalRise.Geometry.Partitioning
       Pose toOther = otherPose.Inverse * pose;
 
       // Transform the AABB of the other partition into space of this partition.
-      var otherAabb = otherTree.Aabb;
-      otherAabb = otherAabb.GetAabb(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
-      otherAabb.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
+      var otherBoundingBox = otherTree.BoundingBox;
+      otherBoundingBox = otherBoundingBox.GetBoundingBox(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
+      otherBoundingBox.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
 
       var filter = Filter;
 
@@ -716,30 +716,30 @@ namespace DigitalRise.Geometry.Partitioning
       var node = _root;
       do
       {
-        var aabb = node.Aabb;
-        if (aabb.Minimum.X <= otherAabb.Maximum.X
-            && aabb.Maximum.X >= otherAabb.Minimum.X
-            && aabb.Minimum.Y <= otherAabb.Maximum.Y
-            && aabb.Maximum.Y >= otherAabb.Minimum.Y
-            && aabb.Minimum.Z <= otherAabb.Maximum.Z
-            && aabb.Maximum.Z >= otherAabb.Minimum.Z)
+        var aabb = node.BoundingBox;
+        if (aabb.Min.X <= otherBoundingBox.Max.X
+            && aabb.Max.X >= otherBoundingBox.Min.X
+            && aabb.Min.Y <= otherBoundingBox.Max.Y
+            && aabb.Max.Y >= otherBoundingBox.Min.Y
+            && aabb.Min.Z <= otherBoundingBox.Max.Z
+            && aabb.Max.Z >= otherBoundingBox.Min.Z)
         {
           if (node.LeftChild == null && node.RightChild == null)
           {
             // Transform AABB of this partition into space of the other partition.
-            aabb = aabb.GetAabb(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
+            aabb = aabb.GetBoundingBox(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
             aabb.Scale(otherScaleInverse);          // Transform to unscaled local space of other partition.
 
             long otherLevelIndex = 0;
             var otherNode = otherTree._root;
             do
             {
-              if (aabb.Minimum.X <= otherNode.Aabb.Maximum.X
-                  && aabb.Maximum.X >= otherNode.Aabb.Minimum.X
-                  && aabb.Minimum.Y <= otherNode.Aabb.Maximum.Y
-                  && aabb.Maximum.Y >= otherNode.Aabb.Minimum.Y
-                  && aabb.Minimum.Z <= otherNode.Aabb.Maximum.Z
-                  && aabb.Maximum.Z >= otherNode.Aabb.Minimum.Z)
+              if (aabb.Min.X <= otherNode.BoundingBox.Max.X
+                  && aabb.Max.X >= otherNode.BoundingBox.Min.X
+                  && aabb.Min.Y <= otherNode.BoundingBox.Max.Y
+                  && aabb.Max.Y >= otherNode.BoundingBox.Min.Y
+                  && aabb.Min.Z <= otherNode.BoundingBox.Max.Z
+                  && aabb.Max.Z >= otherNode.BoundingBox.Min.Z)
               {
                 if (otherNode.LeftChild == null && otherNode.RightChild == null)
                 {
@@ -790,7 +790,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private void GetOverlapsStackBased(Vector3 scale, Pose pose, AabbTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
+    private void GetOverlapsStackBased(Vector3 scale, Pose pose, BoundingBoxTree<T> otherTree, Vector3 otherScale, Pose otherPose, List<Pair<T>> overlaps)
     {
       // Compute transformations.
       Vector3 scaleInverse = Vector3.One / scale;
@@ -799,9 +799,9 @@ namespace DigitalRise.Geometry.Partitioning
       Pose toOther = otherPose.Inverse * pose;
 
       // Transform the AABB of the other partition into space of this partition.
-      var otherAabb = otherTree.Aabb;
-      otherAabb = otherAabb.GetAabb(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
-      otherAabb.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
+      var otherBoundingBox = otherTree.BoundingBox;
+      otherBoundingBox = otherBoundingBox.GetBoundingBox(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
+      otherBoundingBox.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
 
       var stack = Stacks.Obtain();
       var stack2 = Stacks.Obtain();
@@ -811,18 +811,18 @@ namespace DigitalRise.Geometry.Partitioning
       var node = _root;
       while (node != null)
       {
-        var aabb = node.Aabb;
-        if (aabb.Minimum.X <= otherAabb.Maximum.X
-            && aabb.Maximum.X >= otherAabb.Minimum.X
-            && aabb.Minimum.Y <= otherAabb.Maximum.Y
-            && aabb.Maximum.Y >= otherAabb.Minimum.Y
-            && aabb.Minimum.Z <= otherAabb.Maximum.Z
-            && aabb.Maximum.Z >= otherAabb.Minimum.Z)
+        var aabb = node.BoundingBox;
+        if (aabb.Min.X <= otherBoundingBox.Max.X
+            && aabb.Max.X >= otherBoundingBox.Min.X
+            && aabb.Min.Y <= otherBoundingBox.Max.Y
+            && aabb.Max.Y >= otherBoundingBox.Min.Y
+            && aabb.Min.Z <= otherBoundingBox.Max.Z
+            && aabb.Max.Z >= otherBoundingBox.Min.Z)
         {
           if (node.IsLeaf)
           {
             // Transform AABB of this partition into space of the other partition.
-            aabb = aabb.GetAabb(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
+            aabb = aabb.GetBoundingBox(scale, toOther);    // Apply local scale and transform to scaled local space of other partition.
             aabb.Scale(otherScaleInverse);          // Transform to unscaled local space of other partition.
 
             stack2.Clear();
@@ -830,12 +830,12 @@ namespace DigitalRise.Geometry.Partitioning
             var otherNode = otherTree._root;
             while (otherNode != null)
             {
-              if (aabb.Minimum.X <= otherNode.Aabb.Maximum.X
-                  && aabb.Maximum.X >= otherNode.Aabb.Minimum.X
-                  && aabb.Minimum.Y <= otherNode.Aabb.Maximum.Y
-                  && aabb.Maximum.Y >= otherNode.Aabb.Minimum.Y
-                  && aabb.Minimum.Z <= otherNode.Aabb.Maximum.Z
-                  && aabb.Maximum.Z >= otherNode.Aabb.Minimum.Z)
+              if (aabb.Min.X <= otherNode.BoundingBox.Max.X
+                  && aabb.Max.X >= otherNode.BoundingBox.Min.X
+                  && aabb.Min.Y <= otherNode.BoundingBox.Max.Y
+                  && aabb.Max.Y >= otherNode.BoundingBox.Min.Y
+                  && aabb.Min.Z <= otherNode.BoundingBox.Max.Z
+                  && aabb.Max.Z >= otherNode.BoundingBox.Min.Z)
               {
                 if (otherNode.IsLeaf)
                 {

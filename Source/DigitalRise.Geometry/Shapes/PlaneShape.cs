@@ -257,12 +257,12 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Uniform scales do not influence the normal direction. Non-uniform scales change the normal
       // direction, but don't make much sense for planes. --> Return an infinite AABB.
       if (scale.X != scale.Y || scale.Y != scale.Z)
-        return new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+        return new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
 
       // Note: Compute AABB in world space
       Vector3 normal = pose.ToWorldDirection(_normal);
@@ -281,42 +281,42 @@ namespace DigitalRise.Geometry.Shapes
       {
         Vector3 minimum = new Vector3(float.NegativeInfinity);
         Vector3 maximum = new Vector3(pose.Position.X + scaledDistance, float.PositiveInfinity, float.PositiveInfinity);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else if (MathHelper.AreNumericallyEqual(normal, Vector3.UnitY))
       {
         Vector3 minimum = new Vector3(float.NegativeInfinity);
         Vector3 maximum = new Vector3(float.PositiveInfinity, pose.Position.Y + scaledDistance, float.PositiveInfinity);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else if (MathHelper.AreNumericallyEqual(normal, Vector3.UnitZ))
       {
         Vector3 minimum = new Vector3(float.NegativeInfinity);
         Vector3 maximum = new Vector3(float.PositiveInfinity, float.PositiveInfinity, pose.Position.Z + scaledDistance);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else if (MathHelper.AreNumericallyEqual(normal, -Vector3.UnitX))
       {
         Vector3 minimum = new Vector3(pose.Position.X - scaledDistance, float.NegativeInfinity, float.NegativeInfinity);
         Vector3 maximum = new Vector3(float.PositiveInfinity);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else if (MathHelper.AreNumericallyEqual(normal, -Vector3.UnitY))
       {
         Vector3 minimum = new Vector3(float.NegativeInfinity, pose.Position.Y - scaledDistance, float.NegativeInfinity);
         Vector3 maximum = new Vector3(float.PositiveInfinity);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else if (MathHelper.AreNumericallyEqual(normal, -Vector3.UnitZ))
       {
         Vector3 minimum = new Vector3(float.NegativeInfinity, float.NegativeInfinity, pose.Position.Z - scaledDistance);
         Vector3 maximum = new Vector3(float.PositiveInfinity);
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else
       {
         // Plane is not axis-aligned. --> AABB is infinite
-        return new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+        return new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
       }
     }
 

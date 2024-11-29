@@ -600,7 +600,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Recompute local cached AABB if it is invalid.
       if (Numeric.IsNaN(_minHeight))
@@ -622,15 +622,15 @@ namespace DigitalRise.Geometry.Shapes
       Vector3 maximum = new Vector3(_originX + _widthX, _maxHeight, _originZ + _widthZ);
 
       // Apply scale.
-      var scaledLocalAabb = new Aabb(minimum, maximum);
-      scaledLocalAabb.Scale(scale);
+      var scaledLocalBoundingBox = new BoundingBox(minimum, maximum);
+      scaledLocalBoundingBox.Scale(scale);
 
       // Add depth after scaling because scaleY = 0 makes sense to flatten the height field
       // but the bounding box should have a height > 0 to avoid tunneling.
-      scaledLocalAabb.Minimum.Y = Math.Min(scaledLocalAabb.Minimum.Y - _depth, -_depth);
+      scaledLocalBoundingBox.Min.Y = Math.Min(scaledLocalBoundingBox.Min.Y - _depth, -_depth);
 
       // Apply pose.
-      return scaledLocalAabb.GetAabb(pose);
+      return scaledLocalBoundingBox.GetBoundingBox(pose);
     }
 
 

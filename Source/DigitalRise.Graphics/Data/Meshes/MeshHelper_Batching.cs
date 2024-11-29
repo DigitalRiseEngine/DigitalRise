@@ -100,7 +100,7 @@ namespace DigitalRise.Data.Meshes
 				// For indices we only need one counter because we use only one shared index buffer.
 				int indexCount = 0;
 
-				var mergedAabb = new Aabb(new Vector3(float.MaxValue), new Vector3(float.MinValue));
+				var mergedBoundingBox = new BoundingBox(new Vector3(float.MaxValue), new Vector3(float.MinValue));
 
 				// Merge materials, create job list, merge AABBs, check if there is an occluder.
 				bool hasOccluder = false;
@@ -183,7 +183,7 @@ namespace DigitalRise.Data.Meshes
 					}
 
 					// Merge AABBs.
-					mergedAabb = Aabb.Merge(meshNode.Aabb, mergedAabb);
+					mergedBoundingBox = BoundingBox.CreateMerged(meshNode.BoundingBox, mergedBoundingBox);
 
 					hasOccluder |= (mesh.Occluder != null);
 				}

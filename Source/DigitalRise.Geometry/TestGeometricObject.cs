@@ -40,20 +40,20 @@ namespace DigitalRise.Geometry
     #region Properties & Events
     //--------------------------------------------------------------
 
-    public Aabb Aabb
+    public BoundingBox BoundingBox
     {
       get
       {
         if (_aabbIsValid == false)
         {
-          _aabb = Shape.GetAabb(Scale, Pose);
+          _aabb = Shape.GetBoundingBox(Scale, Pose);
           _aabbIsValid = true;
         }
 
         return _aabb;
       }
     }
-    private Aabb _aabb;
+    private BoundingBox _aabb;
     private bool _aabbIsValid;
     
 

@@ -15,12 +15,12 @@ namespace DigitalRise.Geometry.Partitioning
   /// <summary>
   /// Provides methods to build AABB trees.
   /// </summary>
-  internal static class AabbTreeBuilder
+  internal static class BoundingBoxTreeBuilder
   {
-    // Note: The parameter leaves could be of type IList<IAabbTreeNode<T>> and we could pass a simple
-    // array instead of a List<IAabbTreeNode<T>>. This works fine in Windows, but raises a 
+    // Note: The parameter leaves could be of type IList<IBoundingBoxTreeNode<T>> and we could pass a simple
+    // array instead of a List<IBoundingBoxTreeNode<T>>. This works fine in Windows, but raises a 
     // NotSupportedException on Xbox 360. (The .NET CF seems to have problems dealing with arrays 
-    // cast to IList<IAabbTreeNode<T>>.)
+    // cast to IList<IBoundingBoxTreeNode<T>>.)
 
     /// <summary>
     /// Builds the AABB tree for the specified leaf nodes.
@@ -32,7 +32,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// The order of the nodes in <paramref name="leaves"/> is changed.
     /// </remarks>
-    public static IAabbTreeNode<T> Build<T>(List<IAabbTreeNode<T>> leaves, Func<IAabbTreeNode<T>> createNode)
+    public static IBoundingBoxTreeNode<T> Build<T>(List<IBoundingBoxTreeNode<T>> leaves, Func<IBoundingBoxTreeNode<T>> createNode)
     {
       //return BuildTopDownCenterSplit(leaves, 0, leaves.Count - 1, createNode);
       //return BuildTopDownVarianceBasedSplit(leaves, 0, leaves.Count - 1, createNode);
@@ -55,7 +55,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// The order of the nodes in <paramref name="leaves"/> is changed.
     /// </remarks>
-    public static IAabbTreeNode<T> Build<T>(List<IAabbTreeNode<T>> leaves, Func<IAabbTreeNode<T>> createNode, int bottomUpThreshold)
+    public static IBoundingBoxTreeNode<T> Build<T>(List<IBoundingBoxTreeNode<T>> leaves, Func<IBoundingBoxTreeNode<T>> createNode, int bottomUpThreshold)
     {
       //return BuildTopDownCenterSplit(leaves, 0, leaves.Count - 1, createNode);
       //return BuildTopDownVarianceBasedSplit(leaves, 0, leaves.Count - 1, createNode);
@@ -76,10 +76,10 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="lastLeaf">The last leaf.</param>
     /// <param name="createNode">A function that creates a new, empty node.</param>
     /// <returns>The root node of the subtree.</returns>
-    private static IAabbTreeNode<T> BuildBottomUp<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IAabbTreeNode<T>> createNode)
+    private static IBoundingBoxTreeNode<T> BuildBottomUp<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IBoundingBoxTreeNode<T>> createNode)
     {
       // Replace 'leaves' with new list we can work with.
-      var nodes = DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Obtain();
+      var nodes = DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Obtain();
       for (int i = firstLeaf; i <= lastLeaf; i++)
         nodes.Add(leaves[i]);
 
@@ -93,11 +93,11 @@ namespace DigitalRise.Geometry.Partitioning
           // Compare node with all subsequent nodes in list.
           for (int j = i + 1; j < nodes.Count; j++)
           {
-            Aabb mergedAabb = Aabb.Merge(nodes[i].Aabb, nodes[j].Aabb);
+            BoundingBox mergedBoundingBox = BoundingBox.CreateMerged(nodes[i].BoundingBox, nodes[j].BoundingBox);
 
             // Compute a "size" which can be used to estimate the fit of the new node. 
             // Here: volume + edges
-            Vector3 edges = mergedAabb.Extent;
+            Vector3 edges = mergedBoundingBox.Extent();
             float size = edges.X * edges.Y * edges.Z + edges.X + edges.Y + edges.Z;
             if (size <= minSize)  // Note: We compare with ≤ because size can be ∞.
             {
@@ -112,10 +112,10 @@ namespace DigitalRise.Geometry.Partitioning
           throw new GeometryException("Could not build AABB tree because the AABB of an item is invalid (e.g. NaN).");
 
         // Create a new parent node that merges the two subtrees.
-        IAabbTreeNode<T> leftChild = nodes[minPair.First];
-        IAabbTreeNode<T> rightChild = nodes[minPair.Second];
-        IAabbTreeNode<T> parent = createNode();
-        parent.Aabb = Aabb.Merge(leftChild.Aabb, rightChild.Aabb);
+        IBoundingBoxTreeNode<T> leftChild = nodes[minPair.First];
+        IBoundingBoxTreeNode<T> rightChild = nodes[minPair.Second];
+        IBoundingBoxTreeNode<T> parent = createNode();
+        parent.BoundingBox = BoundingBox.CreateMerged(leftChild.BoundingBox, rightChild.BoundingBox);
         parent.LeftChild = leftChild;
         parent.RightChild = rightChild;
 
@@ -125,8 +125,8 @@ namespace DigitalRise.Geometry.Partitioning
         nodes.Add(parent);
       }
 
-      IAabbTreeNode<T> root = nodes[0];
-      DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Recycle(nodes);
+      IBoundingBoxTreeNode<T> root = nodes[0];
+      DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Recycle(nodes);
       return root;
     }
     #endregion
@@ -150,20 +150,20 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="createNode">A function that creates a new, empty node.</param>
     /// <returns>The root node of the subtree.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-    private static IAabbTreeNode<T> BuildTopDownCenterSplit<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IAabbTreeNode<T>> createNode)
+    private static IBoundingBoxTreeNode<T> BuildTopDownCenterSplit<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IBoundingBoxTreeNode<T>> createNode)
     {
       int numberOfNodes = lastLeaf - firstLeaf + 1;
       if (numberOfNodes == 1)
         return leaves[firstLeaf];
 
-      IAabbTreeNode<T> node = createNode();
-      node.Aabb = MergeLeaveAabbs(leaves, firstLeaf, lastLeaf);
+      IBoundingBoxTreeNode<T> node = createNode();
+      node.BoundingBox = MergeLeaveBoundingBoxs(leaves, firstLeaf, lastLeaf);
 
       // Get max axis.
-      int splitAxis = node.Aabb.Extent.IndexOfLargestComponent();
+      int splitAxis = node.BoundingBox.Extent().IndexOfLargestComponent();
 
       // Split at center of AABB.
-      float splitValue = node.Aabb.Center.GetComponentByIndex(splitAxis);
+      float splitValue = node.BoundingBox.Center().GetComponentByIndex(splitAxis);
 
       // Sort indices in list.
       int rightLeaf;  // Leaf index where the right tree begins.
@@ -217,7 +217,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="createNode">A function that creates a new, empty node.</param>
     /// <returns>The root node of the subtree.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-    private static IAabbTreeNode<T> BuildTopDownVarianceBasedSplit<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IAabbTreeNode<T>> createNode)
+    private static IBoundingBoxTreeNode<T> BuildTopDownVarianceBasedSplit<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IBoundingBoxTreeNode<T>> createNode)
     {
       int numberOfNodes = lastLeaf - firstLeaf + 1;
       if (numberOfNodes == 1)
@@ -226,7 +226,7 @@ namespace DigitalRise.Geometry.Partitioning
       // Compute mean of AABB centers.
       Vector3 mean = new Vector3();
       for (int i = firstLeaf; i <= lastLeaf; i++)
-        mean += leaves[i].Aabb.Center;
+        mean += leaves[i].BoundingBox.Center();
 
       mean /= numberOfNodes;
 
@@ -234,7 +234,7 @@ namespace DigitalRise.Geometry.Partitioning
       Vector3 variance = new Vector3();
       for (int i = firstLeaf; i <= lastLeaf; i++)
       {
-        Vector3 difference = leaves[i].Aabb.Center - mean;
+        Vector3 difference = leaves[i].BoundingBox.Center() - mean;
         variance += difference * difference;
       }
 
@@ -244,8 +244,8 @@ namespace DigitalRise.Geometry.Partitioning
       int splitAxis = variance.IndexOfLargestComponent();
       float splitValue = mean.GetComponentByIndex(splitAxis);
 
-      IAabbTreeNode<T> node = createNode();
-      node.Aabb = MergeLeaveAabbs(leaves, firstLeaf, lastLeaf);
+      IBoundingBoxTreeNode<T> node = createNode();
+      node.BoundingBox = MergeLeaveBoundingBoxs(leaves, firstLeaf, lastLeaf);
 
       // Sort indices in list.
       int rightLeaf;  // Leaf index where the right tree begins.
@@ -286,7 +286,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="lastLeaf">The last leaf.</param>
     /// <param name="createNode">A function that creates a new, empty node.</param>
     /// <returns>The root node of the subtree.</returns>
-    private static IAabbTreeNode<T> BuildMixed<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IAabbTreeNode<T>> createNode)
+    private static IBoundingBoxTreeNode<T> BuildMixed<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IBoundingBoxTreeNode<T>> createNode)
     {
       const int DefaultBottomUpThreshold = 128;
       return BuildMixed(leaves, firstLeaf, lastLeaf, createNode, DefaultBottomUpThreshold);
@@ -307,7 +307,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// </param>
     /// <returns>The root node of the subtree.</returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Body")]
-    private static IAabbTreeNode<T> BuildMixed<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IAabbTreeNode<T>> createNode, int bottomUpThreshold)
+    private static IBoundingBoxTreeNode<T> BuildMixed<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, Func<IBoundingBoxTreeNode<T>> createNode, int bottomUpThreshold)
     {
       int numberOfNodes = lastLeaf - firstLeaf + 1;
       if (numberOfNodes == 1)
@@ -316,15 +316,15 @@ namespace DigitalRise.Geometry.Partitioning
       if (numberOfNodes <= bottomUpThreshold)
         return BuildBottomUp(leaves, firstLeaf, lastLeaf, createNode);
 
-      IAabbTreeNode<T> node = createNode();
-      node.Aabb = MergeLeaveAabbs(leaves, firstLeaf, lastLeaf);
-      Vector3 center = node.Aabb.Center;
+      IBoundingBoxTreeNode<T> node = createNode();
+      node.BoundingBox = MergeLeaveBoundingBoxs(leaves, firstLeaf, lastLeaf);
+      Vector3 center = node.BoundingBox.Center();
 
       // Check which split yields the most balanced tree.
       int[,] splitCount = new int[3,2];   // splitCount[number of axis, left or right]
       for (int i = firstLeaf; i <= lastLeaf; i++)
       {
-        Vector3 offset = leaves[i].Aabb.Center - center;
+        Vector3 offset = leaves[i].BoundingBox.Center() - center;
         for (int axis = 0; axis < 3; axis++)
         {
           if (offset.GetComponentByIndex(axis) <= 0)
@@ -381,16 +381,16 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="firstLeaf">The first leaf index (included).</param>
     /// <param name="lastLeaf">The last leaf index (included).</param>
     /// <returns>The AABB of the leaves.</returns>
-    private static Aabb MergeLeaveAabbs<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf)
+    private static BoundingBox MergeLeaveBoundingBoxs<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf)
     {
       Debug.Assert(leaves != null, "Array of leaves is empty.");
       Debug.Assert(firstLeaf < lastLeaf, "Invalid leaf indices.");
 
-      Aabb aabb = leaves[firstLeaf].Aabb;
+      BoundingBox aabb = leaves[firstLeaf].BoundingBox;
 
       // Compute union of all leaf AABBs.
       for (int i = firstLeaf + 1; i <= lastLeaf; i++)
-        aabb.Grow(leaves[i].Aabb);
+        aabb.Grow(leaves[i].BoundingBox);
 
       return aabb;
     }
@@ -406,7 +406,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <param name="splitAxis">The index of the split axis.</param>
     /// <param name="splitValue">The split value.</param>
     /// <param name="rightLeaf">The index of the first leaf of the right subtree.</param>
-    private static void SortLeaves<T>(List<IAabbTreeNode<T>> leaves, int firstLeaf, int lastLeaf, int splitAxis, float splitValue, out int rightLeaf)
+    private static void SortLeaves<T>(List<IBoundingBoxTreeNode<T>> leaves, int firstLeaf, int lastLeaf, int splitAxis, float splitValue, out int rightLeaf)
     {
       int unhandledLeaf = firstLeaf; // Leaf index of first untested leaf.
       rightLeaf = lastLeaf + 1;
@@ -415,7 +415,7 @@ namespace DigitalRise.Geometry.Partitioning
       // first are objects in the left half and then all objects in the right half.
       while (unhandledLeaf < rightLeaf)
       {
-        if (leaves[unhandledLeaf].Aabb.Center.GetComponentByIndex(splitAxis) <= splitValue)
+        if (leaves[unhandledLeaf].BoundingBox.Center().GetComponentByIndex(splitAxis) <= splitValue)
         {
           // Object of leaf is in left half. We can test the next.
           unhandledLeaf++;
@@ -425,7 +425,7 @@ namespace DigitalRise.Geometry.Partitioning
           // Object of leaf is in right half. Swap with a leaf at end.
           rightLeaf--;
 
-          IAabbTreeNode<T> dummy = leaves[unhandledLeaf];
+          IBoundingBoxTreeNode<T> dummy = leaves[unhandledLeaf];
           leaves[unhandledLeaf] = leaves[rightLeaf];
           leaves[rightLeaf] = dummy;
         }

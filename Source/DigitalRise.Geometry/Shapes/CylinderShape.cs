@@ -163,7 +163,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       if (scale.X == scale.Y && scale.Y == scale.Z)
       {
@@ -187,12 +187,12 @@ namespace DigitalRise.Geometry.Shapes
 
         Debug.Assert(minimum.IsLessOrEqual(maximum));
 
-        return new Aabb(minimum, maximum);
+        return new BoundingBox(minimum, maximum);
       }
       else
       {
         // Non-uniform scaling.
-        return base.GetAabb(scale, pose);
+        return base.GetBoundingBox(scale, pose);
       }
     }
 

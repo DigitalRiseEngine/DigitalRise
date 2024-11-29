@@ -107,7 +107,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       // above. The height field is our screen and we will select the cells as if we draw
       // a pixel line. This could be made more efficient when we do not recompute values and 
       // reuse values and make incremental steps Bresenham-style.
-      // See GeometryHelper_Casts.cs method HaveContact(Aabb, ray) for explanation of the 
+      // See GeometryHelper_Casts.cs method HaveContact(BoundingBox, ray) for explanation of the 
       // ray parameter formula.
 
       var rayUnscaledDirectionInverse = new Vector3(

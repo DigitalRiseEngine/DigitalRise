@@ -2,16 +2,17 @@
   <PropertyGroup>
     <AssemblyName>NUnit.Utils</AssemblyName>
     <PackageId>NUnit.Utils</PackageId>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);FNA</DefineConstants>
+    <OutputPath>bin\FNA.Core\$(Configuration)</OutputPath>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" PrivateAssets="All" Version="$(MonoGameVersion)" />
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
     <PackageReference Include="System.Reactive" Version="$(ReactiveVersion)" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\DigitalRise.Geometry\DigitalRise.Geometry.MonoGame.csproj" />
-  </ItemGroup>  
+    <ProjectReference Include="..\..\Source\DigitalRise.Geometry\DigitalRise.Geometry.FNA.Core.csproj" />
+  </ItemGroup>
 </Project>

@@ -22,20 +22,20 @@ namespace DigitalRise.Particles
     //--------------------------------------------------------------
 
     /// <inheritdoc/>
-    public Aabb Aabb
+    public BoundingBox BoundingBox
     {
       get
       {
         if (_aabbIsValid == false)
         {
-          _aabb = Shape.GetAabb(Vector3.One, Pose);
+          _aabb = Shape.GetBoundingBox(Vector3.One, Pose);
           _aabbIsValid = true;
         }
 
         return _aabb;
       }
     }
-    private Aabb _aabb;
+    private BoundingBox _aabb;
     private bool _aabbIsValid;
 
 

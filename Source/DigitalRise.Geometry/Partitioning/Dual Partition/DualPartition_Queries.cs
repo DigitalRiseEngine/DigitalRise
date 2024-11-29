@@ -5,6 +5,10 @@
 using System;
 using System.Collections.Generic;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
+using Ray = DigitalRise.Geometry.Shapes.Ray;
+
+
 
 #if !POOL_ENUMERABLES
 using System.Linq;
@@ -16,7 +20,7 @@ namespace DigitalRise.Geometry.Partitioning
   partial class DualPartition<T>
   {
     /// <inheritdoc/>
-    public override IEnumerable<T> GetOverlaps(Aabb aabb)
+    public override IEnumerable<T> GetOverlaps(BoundingBox aabb)
     {
       UpdateInternal();
       var overlapsStatic = StaticPartition.GetOverlaps(aabb);
@@ -47,7 +51,7 @@ namespace DigitalRise.Geometry.Partitioning
 
     /// <inheritdoc/>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
-    public IEnumerable<T> GetOverlaps(IList<Plane> planes)
+    public IEnumerable<T> GetOverlaps(IList<Shapes.Plane> planes)
     {
       UpdateInternal();
 

@@ -53,13 +53,13 @@ namespace DigitalRise.Geometry.Partitioning
   /// </para>
   /// <para>
   /// Spatial partitions use approximate representations of the managed items - usually bounding 
-  /// volumes instead of the actual geometry. For example, when using a <see cref="AabbTree{T}"/> 
+  /// volumes instead of the actual geometry. For example, when using a <see cref="BoundingBoxTree{T}"/> 
   /// items are represented using their axis-aligned bounding box (AABB). The 
   /// <strong>GetOverlaps</strong> methods only test the bounding volumes against each other to 
   /// check for potential intersections. When a <strong>GetOverlaps</strong> method returns an item 
   /// or an item pair, it is not guaranteed that the items are actually touching - for returned 
   /// items the spatial partition computed that it is very likely that they are touching. For 
-  /// example: When managing triangles with the help of an <see cref="AabbTree{T}"/> the method 
+  /// example: When managing triangles with the help of an <see cref="BoundingBoxTree{T}"/> the method 
   /// <see cref="GetOverlaps()"/> returns all triangles where the bounding boxes overlap. 
   /// Overlapping bounding volumes do not guarantee that the contained items are actually 
   /// intersecting - the triangles could still be separated.
@@ -70,12 +70,12 @@ namespace DigitalRise.Geometry.Partitioning
   /// </para>
   /// <para>
   /// <strong>AABB Computation of Items:</strong> When creating an instance of an 
-  /// <see cref="ISpatialPartition{T}"/> a callback that computes the <see cref="Shapes.Aabb"/> for 
+  /// <see cref="ISpatialPartition{T}"/> a callback that computes the <see cref="Shapes.BoundingBox"/> for 
   /// a given item must be specified. The spatial partition does not know how to compute the 
-  /// positions and extents of the items. The <see cref="ISpatialPartition{T}.GetAabbForItem"/>
-  /// delegate is used to compute an <see cref="Shapes.Aabb"/>s for each item. The computed 
-  /// <see cref="Shapes.Aabb"/> is used to define the spatial properties of an item. For a single
-  /// item the method must always return the same <see cref="Aabb"/>. If the AABB of an item has
+  /// positions and extents of the items. The <see cref="ISpatialPartition{T}.GetBoundingBoxForItem"/>
+  /// delegate is used to compute an <see cref="Shapes.BoundingBox"/>s for each item. The computed 
+  /// <see cref="Shapes.BoundingBox"/> is used to define the spatial properties of an item. For a single
+  /// item the method must always return the same <see cref="BoundingBox"/>. If the AABB of an item has
   /// changed (e.g. the item has moved or changed shape), 
   /// <see cref="BasePartition{T}.Invalidate()"/> must be called.
   /// </para>
@@ -90,7 +90,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// methods return all found overlaps. A <see cref="Filter"/> can be set. Then, whenever a pair of
   /// items is tested the overlap will only be accepted if <see cref="IPairFilter{T}.Filter"/>
   /// returns <see langword="true"/>. The filter is not used if an item is tested against an 
-  /// <see cref="Shapes.Aabb"/> or a <see cref="Ray"/>.
+  /// <see cref="Shapes.BoundingBox"/> or a <see cref="Ray"/>.
   /// </para>
   /// <para>
   /// <strong>Rebuild versus Refit:</strong> The spatial partitioning is performed when 
@@ -116,7 +116,7 @@ namespace DigitalRise.Geometry.Partitioning
     // Notes:
     //
     // Possible spatial partitions:
-    // - AabbTree, CompressedAabbTree, QuantizedAabbTree, QuantizedCompressedAabbTree
+    // - BoundingBoxTree, CompressedBoundingBoxTree, QuantizedBoundingBoxTree, QuantizedCompressedBoundingBoxTree
     // - SweepAndPruneSpace, SAP with DBVT for ray casts and ad-hoc queries.
     // - kD-Tree, BSP-Tree, Octree, Quadtree
     // - Grid, HierarchicalGrid, HashGrid, HierarchicalHashGrid
@@ -136,8 +136,8 @@ namespace DigitalRise.Geometry.Partitioning
     // To allow for optimizations the interface would be commented as "subject to change".
 
     // TODO: Do we need this?
-    // IEnumerable<T> GetOverlaps(IEnumerable<Aabb> aabbs);
-    // IEnumerable<T> GetOverlaps(Aabb aabb, Vector3 start, Vector3 end)
+    // IEnumerable<T> GetOverlaps(IEnumerable<BoundingBox> aabbs);
+    // IEnumerable<T> GetOverlaps(BoundingBox aabb, Vector3 start, Vector3 end)
     // event EventHandler<OverlapEventArgs<T>> OverlapsChanged;
 
 
@@ -146,11 +146,11 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <value>The axis-aligned bounding box (AABB) that contains all items.</value>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    Aabb Aabb { get; }
+    BoundingBox BoundingBox { get; }
 
 
     /// <summary>
-    /// Gets or sets the method that computes the <see cref="Shapes.Aabb"/> of an item.
+    /// Gets or sets the method that computes the <see cref="Shapes.BoundingBox"/> of an item.
     /// </summary>
     /// <value>
     /// The method that computes the axis-aligned bounding box of an item.
@@ -158,11 +158,11 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// <para>
     /// When creating a <see cref="ISpatialPartition{T}"/> a callback that computes the 
-    /// <see cref="Shapes.Aabb"/> for a given item, must be specified. The spatial partition does 
+    /// <see cref="Shapes.BoundingBox"/> for a given item, must be specified. The spatial partition does 
     /// not know how to compute the positions and extents of the items. Only the 
-    /// <see cref="GetAabbForItem"/> delegate is used to compute an <see cref="Shapes.Aabb"/>s for
-    /// each item. The computed <see cref="Shapes.Aabb"/> is used to define the spatial properties 
-    /// of a property. For a single item the method must always return the same <see cref="Aabb"/>. 
+    /// <see cref="GetBoundingBoxForItem"/> delegate is used to compute an <see cref="Shapes.BoundingBox"/>s for
+    /// each item. The computed <see cref="Shapes.BoundingBox"/> is used to define the spatial properties 
+    /// of a property. For a single item the method must always return the same <see cref="BoundingBox"/>. 
     /// If the AABB of an item has changed (e.g. the item has moved or changed shape), 
     /// <see cref="Invalidate(T)"/> must be called.
     /// </para>
@@ -174,7 +174,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// </para>
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    Func<T, Aabb> GetAabbForItem { get; set; }
+    Func<T, BoundingBox> GetBoundingBoxForItem { get; set; }
 
 
     /// <summary>
@@ -232,7 +232,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// Filtering (see <see cref="Filter"/>) is not applied.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    IEnumerable<T> GetOverlaps(Aabb aabb);
+    IEnumerable<T> GetOverlaps(BoundingBox aabb);
 
 
     /// <summary>

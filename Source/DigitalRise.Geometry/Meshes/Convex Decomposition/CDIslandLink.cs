@@ -43,7 +43,7 @@ namespace DigitalRise.Geometry.Meshes
     public readonly float DecimationCost;
 
     // The AABB enclosing both islands.
-    public readonly Aabb Aabb;
+    public readonly BoundingBox BoundingBox;
 
     // The hull vertices of the hull over IslandA + IslandB.
     public Vector3[] Vertices;
@@ -62,11 +62,11 @@ namespace DigitalRise.Geometry.Meshes
       IslandA = islandA;
       IslandB = islandB;
 
-      Aabb aabb = IslandA.Aabb;
-      aabb.Grow(IslandB.Aabb);
-      Aabb = aabb;
+      BoundingBox aabb = IslandA.BoundingBox;
+      aabb.Grow(IslandB.BoundingBox);
+      BoundingBox = aabb;
 
-      float aabbExtentLength = aabb.Extent.Length();
+      float aabbExtentLength = aabb.Extent().Length();
 
       Concavity = GetConcavity(vertexLimit, sampleVertices, sampleCenters);
 
@@ -202,13 +202,13 @@ namespace DigitalRise.Geometry.Meshes
         // Now, we have a reduced set of vertices.
         Vertices = hullMesh.Vertices.ToArray();
 
-        // For larger meshes we create an AabbTree as acceleration structure.
-        AabbTree<int> partition = null;
+        // For larger meshes we create an BoundingBoxTree as acceleration structure.
+        BoundingBoxTree<int> partition = null;
         if (hullMesh.NumberOfTriangles > 12)
         {
-          partition = new AabbTree<int>
+          partition = new BoundingBoxTree<int>
           {
-            GetAabbForItem = i => hullMesh.GetTriangle(i).Aabb,
+            GetBoundingBoxForItem = i => hullMesh.GetTriangle(i).BoundingBox,
             BottomUpBuildThreshold = 0,
           };
           for (int i = 0; i < hullMesh.NumberOfTriangles; i++)
@@ -217,8 +217,8 @@ namespace DigitalRise.Geometry.Meshes
           partition.Update(true);
         }
 
-        Aabb aabb = Aabb;
-        float aabbExtent = aabb.Extent.Length();
+        BoundingBox aabb = BoundingBox;
+        float aabbExtent = aabb.Extent().Length();
 
         // Note: For a speed-up we could skip some ray tests in the next loop and only sample
         // a few vertices if there would be a lot of tests.

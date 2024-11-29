@@ -22,7 +22,7 @@ namespace DigitalRise.Geometry
     /// <see langword="false"/>.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabb, Ray ray)
+    public static bool HaveContact(BoundingBox aabb, Ray ray)
     {
       if (Numeric.IsZero(ray.Length))
         return HaveContact(aabb, ray.Origin);
@@ -51,7 +51,7 @@ namespace DigitalRise.Geometry
     /// <see langword="false"/>.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabb, Ray ray, float epsilon)
+    public static bool HaveContact(BoundingBox aabb, Ray ray, float epsilon)
     {
       if (Numeric.IsZero(ray.Length))
         return HaveContact(aabb, ray.Origin);
@@ -75,7 +75,7 @@ namespace DigitalRise.Geometry
     /// <see langword="true"/> if the AABB and the ray have a contact; otherwise, 
     /// <see langword="false"/>.
     /// </returns>
-    internal static bool HaveContactFast(Aabb aabb, Ray ray)
+    internal static bool HaveContactFast(BoundingBox aabb, Ray ray)
     {
       if (Numeric.IsZero(ray.Length))
         return HaveContact(aabb, ray.Origin);
@@ -107,7 +107,7 @@ namespace DigitalRise.Geometry
     /// This method will return <see langword="true"/> if a ray is in the plane that goes through
     /// an AABB side (false positive).
     /// </remarks>
-    internal static bool HaveContactFast(Aabb aabb, Vector3 rayOrigin, Vector3 rayDirectionInverse, float rayLength)
+    internal static bool HaveContactFast(BoundingBox aabb, Vector3 rayOrigin, Vector3 rayDirectionInverse, float rayLength)
     {
       // Note: If HaveContact is called several times for the same ray, we could return
       // tMin and tMax --> Parameter (ref float tMin and ref float tMax). Check tMin and tMax
@@ -118,18 +118,18 @@ namespace DigitalRise.Geometry
       // Substituting the x in the second equation, we can solve for t and get:
       // t = (planeDistanceFromOrigin - rayOrigin . planeNormal) / (rayDirection . planeNormal)
       // 
-      // For Aabbs the planeNormals are the unit vectors.
-      // The planeDistances are the components of Aabb.Minimum and Maximum.
+      // For BoundingBoxs the planeNormals are the unit vectors.
+      // The planeDistances are the components of BoundingBox.Min and Maximum.
 
       // Compute tMin and tMax for all plane intersections. If a tMin is greater than a
       // tMax we can abort early. If tMin <= rayLength and tMax >= 0 we have a hit.
 
       // tMinX
-      float nearPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Minimum.X : aabb.Maximum.X;
+      float nearPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Min.X : aabb.Max.X;
       float tMinX = (nearPlaneDistanceX - rayOrigin.X) * rayDirectionInverse.X;
 
       // tMaxX
-      float farPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Maximum.X : aabb.Minimum.X;
+      float farPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Max.X : aabb.Min.X;
       float tMaxX = (farPlaneDistanceX - rayOrigin.X) * rayDirectionInverse.X;
 
       // Note: tMinX/tMaxX can be NaN if the ray origin is in the min or max X plane and the
@@ -143,7 +143,7 @@ namespace DigitalRise.Geometry
       float tMax = tMaxX;
 
       // tMaxY
-      float farPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Maximum.Y : aabb.Minimum.Y;
+      float farPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Max.Y : aabb.Min.Y;
       float tMaxY = (farPlaneDistanceY - rayOrigin.Y) * rayDirectionInverse.Y;
       if (tMin > tMaxY)
         return false;
@@ -151,7 +151,7 @@ namespace DigitalRise.Geometry
         tMax = tMaxY;
 
       // tMinY
-      float nearPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Minimum.Y : aabb.Maximum.Y;
+      float nearPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Min.Y : aabb.Max.Y;
       float tMinY = (nearPlaneDistanceY - rayOrigin.Y) * rayDirectionInverse.Y;
       if (tMinY > tMax)
         return false;
@@ -159,7 +159,7 @@ namespace DigitalRise.Geometry
         tMin = tMinY;
 
       // tMinZ
-      float nearPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Minimum.Z : aabb.Maximum.Z;
+      float nearPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Min.Z : aabb.Max.Z;
       float tMinZ = (nearPlaneDistanceZ - rayOrigin.Z) * rayDirectionInverse.Z;
       if (tMinZ > tMax)
         return false;
@@ -167,7 +167,7 @@ namespace DigitalRise.Geometry
         tMin = tMinZ;
 
       // tMaxZ
-      float farPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Maximum.Z : aabb.Minimum.Z;
+      float farPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Max.Z : aabb.Min.Z;
       float tMaxZ = (farPlaneDistanceZ - rayOrigin.Z) * rayDirectionInverse.Z;
       if (tMin > tMaxZ)
         return false;
@@ -203,10 +203,10 @@ namespace DigitalRise.Geometry
     /// <see langword="true"/> if the AABB and the ray have a contact; otherwise, <see langword="false"/>.
     /// </returns>
     /// <remarks>
-    /// Unlike <see cref="HaveContactFast(Aabb,Vector3,Vector3,float)"/>, this method is exact.
+    /// Unlike <see cref="HaveContactFast(BoundingBox,Vector3,Vector3,float)"/>, this method is exact.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-    internal static bool HaveContact(Aabb aabb, Vector3 rayOrigin, Vector3 rayDirectionInverse, float rayLength, float epsilon)
+    internal static bool HaveContact(BoundingBox aabb, Vector3 rayOrigin, Vector3 rayDirectionInverse, float rayLength, float epsilon)
     {
       // Note: If HaveContact is called several times for the same ray, we could return
       // tMin and tMax --> Parameter (ref float tMin and ref float tMax). Check tMin and tMax
@@ -217,8 +217,8 @@ namespace DigitalRise.Geometry
       // Substituting the x in the second equation, we can solve for t and get:
       // t = (planeDistanceFromOrigin - rayOrigin . planeNormal) / (rayDirection . planeNormal)
       // 
-      // For Aabbs the planeNormals are the unit vectors.
-      // The planeDistances are the components of Aabb.Minimum and Maximum.
+      // For BoundingBoxs the planeNormals are the unit vectors.
+      // The planeDistances are the components of BoundingBox.Min and Maximum.
 
       // Compute tMin and tMax for all plane intersections. If a tMin is greater than a
       // tMax we can abort early. If tMin <= rayLength and tMax >= 0 we have a hit.
@@ -228,7 +228,7 @@ namespace DigitalRise.Geometry
 
       {
         // tMinX
-        float nearPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Minimum.X - epsilon : aabb.Maximum.X + epsilon;
+        float nearPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Min.X - epsilon : aabb.Max.X + epsilon;
         float tMinX = (nearPlaneDistanceX - rayOrigin.X) * rayDirectionInverse.X;
         if (tMinX > tMax)
           return false;
@@ -236,7 +236,7 @@ namespace DigitalRise.Geometry
           tMin = tMinX;
 
         // tMaxX
-        float farPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Maximum.X + epsilon : aabb.Minimum.X - epsilon;
+        float farPlaneDistanceX = (rayDirectionInverse.X > 0) ? aabb.Max.X + epsilon : aabb.Min.X - epsilon;
         float tMaxX = (farPlaneDistanceX - rayOrigin.X) * rayDirectionInverse.X;
         if (tMin > tMaxX)
           return false;
@@ -251,7 +251,7 @@ namespace DigitalRise.Geometry
 
       {
         // tMaxY
-        float farPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Maximum.Y + epsilon: aabb.Minimum.Y - epsilon;
+        float farPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Max.Y + epsilon: aabb.Min.Y - epsilon;
         float tMaxY = (farPlaneDistanceY - rayOrigin.Y) * rayDirectionInverse.Y;
         if (tMin > tMaxY)
           return false;
@@ -259,7 +259,7 @@ namespace DigitalRise.Geometry
           tMax = tMaxY;
 
         // tMinY
-        float nearPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Minimum.Y - epsilon : aabb.Maximum.Y + epsilon;
+        float nearPlaneDistanceY = (rayDirectionInverse.Y > 0) ? aabb.Min.Y - epsilon : aabb.Max.Y + epsilon;
         float tMinY = (nearPlaneDistanceY - rayOrigin.Y) * rayDirectionInverse.Y;
         if (tMinY > tMax)
           return false;
@@ -269,7 +269,7 @@ namespace DigitalRise.Geometry
 
       {
         // tMinZ
-        float nearPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Minimum.Z - epsilon: aabb.Maximum.Z + epsilon;
+        float nearPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Min.Z - epsilon: aabb.Max.Z + epsilon;
         float tMinZ = (nearPlaneDistanceZ - rayOrigin.Z) * rayDirectionInverse.Z;
         if (tMinZ > tMax)
           return false;
@@ -277,7 +277,7 @@ namespace DigitalRise.Geometry
           tMin = tMinZ;
 
         // tMaxZ
-        float farPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Maximum.Z + epsilon : aabb.Minimum.Z - epsilon;
+        float farPlaneDistanceZ = (rayDirectionInverse.Z > 0) ? aabb.Max.Z + epsilon : aabb.Min.Z - epsilon;
         float tMaxZ = (farPlaneDistanceZ - rayOrigin.Z) * rayDirectionInverse.Z;
         if (tMin > tMaxZ)
           return false;
@@ -321,9 +321,9 @@ namespace DigitalRise.Geometry
     /// </para>
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabbA, Aabb aabbB, Vector3 movementB)
+    public static bool HaveContact(BoundingBox aabbA, BoundingBox aabbB, Vector3 movementB)
     {
-      // TODO: Add overload GeometryHelper.HaveContact(Aabb aabbA, Vector3 movementA, Aabb aabbB, Vector3 movementB).
+      // TODO: Add overload GeometryHelper.HaveContact(BoundingBox aabbA, Vector3 movementA, BoundingBox aabbB, Vector3 movementB).
 
       // Testing if moving A and B have contact is the same as testing whether (A - B) hits a ray, 
       // where the ray is the relative movement of B (starting at the origin).
@@ -338,8 +338,8 @@ namespace DigitalRise.Geometry
       {
         // Convert to AABB vs. Ray check.
         Vector3 movementBDirection = movementB / movementBLength;
-        Aabb aabbAMinusB = new Aabb(aabbA.Minimum - aabbB.Maximum, aabbA.Maximum - aabbB.Minimum);
-        Debug.Assert(aabbAMinusB.Minimum.IsLessOrEqual(aabbAMinusB.Maximum));
+        BoundingBox aabbAMinusB = new BoundingBox(aabbA.Min - aabbB.Max, aabbA.Max - aabbB.Min);
+        Debug.Assert(aabbAMinusB.Min.IsLessOrEqual(aabbAMinusB.Max));
         return HaveContact(aabbAMinusB, new Ray(Vector3.Zero, movementBDirection, movementBLength));
       }
     }

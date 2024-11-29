@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using DigitalRise.Collections;
-using DigitalRise.Geometry.Shapes;
-using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using Ray = DigitalRise.Geometry.Shapes.Ray;
 
@@ -20,7 +18,7 @@ namespace DigitalRise.Geometry.Partitioning
   public partial class BasePartition<T>
   {
     /// <inheritdoc/>
-    public abstract IEnumerable<T> GetOverlaps(Aabb aabb);
+    public abstract IEnumerable<T> GetOverlaps(BoundingBox aabb);
 
 
     /// <summary>
@@ -28,8 +26,8 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="item">
     /// The item. (Whether the given item must be a part of the spatial partition or whether it can
-    /// be an external object depends on the <see cref="GetAabbForItem"/> callback. The 
-    /// <see cref="GetAabbForItem"/> must be able to compute the AABB for the given item.)
+    /// be an external object depends on the <see cref="GetBoundingBoxForItem"/> callback. The 
+    /// <see cref="GetBoundingBoxForItem"/> must be able to compute the AABB for the given item.)
     /// </param>
     /// <returns>All items that touch the given item.</returns>
     /// <remarks>
@@ -38,11 +36,11 @@ namespace DigitalRise.Geometry.Partitioning
     public IEnumerable<T> GetOverlaps(T item)
     {
       // Note: We could make this virtual, then in derived classes
-      // the equality and filter tests could be made before the Aabb test.
+      // the equality and filter tests could be made before the BoundingBox test.
       // --> No big advantage...or?
 
 #if !POOL_ENUMERABLES
-      Aabb aabb = GetAabbForItem(item);
+      BoundingBox aabb = GetBoundingBoxForItem(item);
 
       foreach (var touchedItem in GetOverlaps(aabb))
       {
@@ -60,18 +58,18 @@ namespace DigitalRise.Geometry.Partitioning
     public virtual IEnumerable<T> GetOverlaps(Ray ray)
     {
 #if !POOL_ENUMERABLES
-      Aabb rayAabb = new Aabb(ray.Origin, ray.Origin);
-      rayAabb.Grow(ray.Origin + ray.Direction * ray.Length);
+      BoundingBox rayBoundingBox = new BoundingBox(ray.Origin, ray.Origin);
+      rayBoundingBox.Grow(ray.Origin + ray.Direction * ray.Length);
 
       var rayDirectionInverse = new Vector3(
             1 / ray.Direction.X,
             1 / ray.Direction.Y,
             1 / ray.Direction.Z);
 
-      float epsilon = Numeric.EpsilonF * (1 + Aabb.Extent.Length());
+      float epsilon = Numeric.EpsilonF * (1 + BoundingBox.Extent().Length());
 
-      foreach (var candidate in GetOverlaps(rayAabb))
-        if (GeometryHelper.HaveContact(GetAabbForItem(candidate), ray.Origin, rayDirectionInverse, ray.Length, epsilon))
+      foreach (var candidate in GetOverlaps(rayBoundingBox))
+        if (GeometryHelper.HaveContact(GetBoundingBoxForItem(candidate), ray.Origin, rayDirectionInverse, ray.Length, epsilon))
           yield return candidate;
 #else
       // Avoiding garbage:
@@ -110,13 +108,13 @@ namespace DigitalRise.Geometry.Partitioning
 
 #if !POOL_ENUMERABLES
       // Get all items that touch the other partition's AABB.
-      var candidates = GetOverlaps(otherPartition.Aabb);
+      var candidates = GetOverlaps(otherPartition.BoundingBox);
 
       // Now, we test each candidate against the other partition.
       foreach (var candidate in candidates)
       {
-        Aabb candidateAabb = GetAabbForItem(candidate);
-        var otherCandidates = otherPartition.GetOverlaps(candidateAabb);
+        BoundingBox candidateBoundingBox = GetBoundingBoxForItem(candidate);
+        var otherCandidates = otherPartition.GetOverlaps(candidateBoundingBox);
 
         // We return one pair for each candidate vs. otherItem overlap.
         foreach (var otherCandidate in otherCandidates)
@@ -154,18 +152,18 @@ namespace DigitalRise.Geometry.Partitioning
       Pose toOther = toLocal.Inverse;
 
       // Transform the AABB of the other partition into space of the this partition.
-      var otherAabb = otherPartition.Aabb;
-      otherAabb = otherAabb.GetAabb(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
-      otherAabb.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
+      var otherBoundingBox = otherPartition.BoundingBox;
+      otherBoundingBox = otherBoundingBox.GetBoundingBox(otherScale, toLocal); // Apply local scale and transform to scaled local space of this partition.
+      otherBoundingBox.Scale(scaleInverse);                      // Transform to unscaled local space of this partition.
 
-      var candidates = GetOverlaps(otherAabb);
+      var candidates = GetOverlaps(otherBoundingBox);
 
 #if !POOL_ENUMERABLES
       foreach (var candidate in candidates)
       {
         // Transform AABB of this partition into space of the other partition.
-        var aabb = GetAabbForItem(candidate);
-        aabb = aabb.GetAabb(scale, toOther);  // Apply local scale and transform to scaled local space of other partition.
+        var aabb = GetBoundingBoxForItem(candidate);
+        aabb = aabb.GetBoundingBox(scale, toOther);  // Apply local scale and transform to scaled local space of other partition.
         aabb.Scale(otherScaleInverse);        // Transform to unscaled local space of other partition.
 
         foreach (var otherCandidate in otherPartition.GetOverlaps(aabb))

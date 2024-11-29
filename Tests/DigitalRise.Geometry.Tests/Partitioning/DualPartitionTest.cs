@@ -10,22 +10,22 @@ namespace DigitalRise.Geometry.Partitioning.Tests
   [TestFixture]
   public class DualPartitionTest
   {
-    private Aabb GetAabbForItem(int i)
+    private BoundingBox GetBoundingBoxForItem(int i)
     {
       switch (i)
       {
         case 0:
-          return new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+          return new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
         case 1:
-          return new Aabb(new Vector3(-1), new Vector3(2));
+          return new BoundingBox(new Vector3(-1), new Vector3(2));
         case 2:
-          return new Aabb(new Vector3(1), new Vector3(3));
+          return new BoundingBox(new Vector3(1), new Vector3(3));
         case 3:
-          return new Aabb(new Vector3(4), new Vector3(5));
+          return new BoundingBox(new Vector3(4), new Vector3(5));
         case 4:
-          return new Aabb(new Vector3(0), new Vector3(1, float.NaN, 1));
+          return new BoundingBox(new Vector3(0), new Vector3(1, float.NaN, 1));
         default:
-          return new Aabb(new Vector3(), new Vector3());
+          return new BoundingBox(new Vector3(), new Vector3());
       }
     }
 
@@ -38,7 +38,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       var partition = new DualPartition<int>
       {
         EnableSelfOverlaps = true,
-        GetAabbForItem = GetAabbForItem
+        GetBoundingBoxForItem = GetBoundingBoxForItem
       };
 
       partition.Add(1);
@@ -46,7 +46,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       partition.Add(2);
       partition.Add(3);
 
-      Assert.AreEqual(new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity)), partition.Aabb);
+      Assert.AreEqual(new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity)), partition.BoundingBox);
 
       var overlaps = partition.GetOverlaps().ToArray();
       Assert.AreEqual(4, overlaps.Length);
@@ -65,7 +65,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       var partition = new DualPartition<int>
       {
         EnableSelfOverlaps = true,
-        GetAabbForItem = GetAabbForItem
+        GetBoundingBoxForItem = GetBoundingBoxForItem
       };
 
       partition.Add(1);
@@ -86,7 +86,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
 
       var partition = new DualPartition<int>();
       partition.EnableSelfOverlaps = true;
-      partition.GetAabbForItem = GetAabbForItem;
+      partition.GetBoundingBoxForItem = GetBoundingBoxForItem;
 
       partition.Add(1);
       partition.Add(4);
@@ -98,7 +98,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
 
       partition = new DualPartition<int>();
       partition.EnableSelfOverlaps = true;
-      partition.GetAabbForItem = GetAabbForItem;
+      partition.GetBoundingBoxForItem = GetBoundingBoxForItem;
 
       partition.Add(1);
       partition.Add(2);
@@ -113,10 +113,10 @@ namespace DigitalRise.Geometry.Partitioning.Tests
     [Test]
     public void Clone()
     {
-      AdaptiveAabbTree<int> staticPartition = new AdaptiveAabbTree<int>();
-      DynamicAabbTree<int> dynamicPartition = new DynamicAabbTree<int>();
+      AdaptiveBoundingBoxTree<int> staticPartition = new AdaptiveBoundingBoxTree<int>();
+      DynamicBoundingBoxTree<int> dynamicPartition = new DynamicBoundingBoxTree<int>();
       DualPartition<int> partition = new DualPartition<int>(staticPartition, dynamicPartition);
-      partition.GetAabbForItem = i => new Aabb();
+      partition.GetBoundingBoxForItem = i => new BoundingBox();
       partition.EnableSelfOverlaps = true;
       partition.Filter = new DelegatePairFilter<int>(pair => true);
       partition.Add(0);

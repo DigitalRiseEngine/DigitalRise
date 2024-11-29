@@ -91,7 +91,7 @@ namespace DigitalRise.Geometry.Collisions
         // Clear old spatial partition before we throw it away.
         if (_spatialPartition != null)
         {
-          _spatialPartition.GetAabbForItem = null;
+          _spatialPartition.GetBoundingBoxForItem = null;
           _spatialPartition.Clear();
 
           // Unregister broad phase.
@@ -103,7 +103,7 @@ namespace DigitalRise.Geometry.Collisions
         _spatialPartition = value;
 
         // Set a callback method that computes the AABB of each collision object.
-        _spatialPartition.GetAabbForItem = collisionObject => collisionObject.GeometricObject.Aabb;
+        _spatialPartition.GetBoundingBoxForItem = collisionObject => collisionObject.GeometricObject.BoundingBox;
 
         // Check for ISupportBroadPhase.
         _broadPhasePartition = _spatialPartition as ISupportBroadPhase<CollisionObject>;

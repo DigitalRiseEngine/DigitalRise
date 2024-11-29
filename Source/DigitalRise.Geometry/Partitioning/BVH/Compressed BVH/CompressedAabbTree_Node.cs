@@ -9,17 +9,17 @@ using System.Runtime.InteropServices;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class CompressedAabbTree
+  partial class CompressedBoundingBoxTree
   {
     /// <summary>
-    /// Represents a node of an <see cref="CompressedAabbTree"/>.
+    /// Represents a node of an <see cref="CompressedBoundingBoxTree"/>.
     /// </summary>
     /// <remarks>
     /// <para>
     /// The minimum and maximum of the AABB are stored as quantized 16-bit integer values.
     /// </para>
     /// <para>
-    /// The <see cref="CompressedAabbTree"/> supports a stackless, non-recursive traversal of the 
+    /// The <see cref="CompressedBoundingBoxTree"/> supports a stackless, non-recursive traversal of the 
     /// tree. The tree is traversed in pre-order traversal order. The nodes are stored in the order 
     /// as they are visited in the traversal: The left child follows the parent node. The right 
     /// child follows after the left subtree. If a node is a leaf then the right sibling directly 

@@ -2,20 +2,19 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <RootNamespace>DigitalRise.Mathematics.Tests</RootNamespace>
-    <AssemblyName>DigitalRise.Mathematics.Tests</AssemblyName>
-    <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
-    <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
+    <RootNamespace>DigitalRise.Geometry.Tests</RootNamespace>
+    <AssemblyName>DigitalRise.Geometry.Tests</AssemblyName>
+    <DefineConstants>$(DefineConstants);FNA</DefineConstants>
+    <OutputPath>bin\FNA.Core\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="$(MonoGameVersion)" />
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MNTestSdkVersion)" />
-  </ItemGroup>
+  </ItemGroup>  
 
   <ItemGroup>
-    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.MonoGame.csproj" />
+    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.FNA.Core.csproj" />
   </ItemGroup>
 </Project>

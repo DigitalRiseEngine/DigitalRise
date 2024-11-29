@@ -4,8 +4,8 @@
 
 #region ----- Credits -----
 /* 
-   The CompressedAabbTree is based on the quantized/optimized bounding volume hierarchy of Bullet.
-   (Note: Our CompressedAabbTree and the original version of Bullet have only the general algorithm
+   The CompressedBoundingBoxTree is based on the quantized/optimized bounding volume hierarchy of Bullet.
+   (Note: Our CompressedBoundingBoxTree and the original version of Bullet have only the general algorithm
    in common. The implementation is significantly different.)
 
      Bullet Continuous Collision Detection and Physics Library
@@ -45,28 +45,28 @@ namespace DigitalRise.Geometry.Partitioning
   /// </summary>
   /// <remarks>
   /// <para>
-  /// The <see cref="CompressedAabbTree"/> is a specialized version of an <see cref="AabbTree{T}"/>
+  /// The <see cref="CompressedBoundingBoxTree"/> is a specialized version of an <see cref="BoundingBoxTree{T}"/>
   /// for items of type <see cref="int"/>. It requires significantly less memory than an 
-  /// <see cref="AabbTree{T}"/>, but building or updating ("refitting") a
-  /// <see cref="CompressedAabbTree"/> is more expensive. It should be used for partitioning static
+  /// <see cref="BoundingBoxTree{T}"/>, but building or updating ("refitting") a
+  /// <see cref="CompressedBoundingBoxTree"/> is more expensive. It should be used for partitioning static
   /// <see cref="CompositeShape"/>s or <see cref="TriangleMeshShape"/>s that consist of many shapes
   /// or triangles.
   /// </para>
   /// <para>
-  /// The <see cref="CompressedAabbTree"/> can store up to 2<sup>32-1</sup> data values of type
+  /// The <see cref="CompressedBoundingBoxTree"/> can store up to 2<sup>32-1</sup> data values of type
   /// <see cref="int"/> (range 0 - 2,147,483,647).
   /// </para>
   /// <para>
-  /// <strong>Limitations:</strong> Objects organized by the <see cref="CompressedAabbTree"/> need 
-  /// to have finite size. The <see cref="CompressedAabbTree"/> cannot be used for extremely large, 
+  /// <strong>Limitations:</strong> Objects organized by the <see cref="CompressedBoundingBoxTree"/> need 
+  /// to have finite size. The <see cref="CompressedBoundingBoxTree"/> cannot be used for extremely large, 
   /// or infinitely large objects. For example: A <see cref="CompositeShape"/> using a 
-  /// <see cref="CompressedAabbTree"/> must not contain an <see cref="InfiniteShape"/>, a 
+  /// <see cref="CompressedBoundingBoxTree"/> must not contain an <see cref="InfiniteShape"/>, a 
   /// <see cref="LineShape"/>, or a <see cref="PlaneShape"/>.
   /// </para>
   /// </remarks>
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-  public sealed partial class CompressedAabbTree : ISpatialPartition<int>, ISupportClosestPointQueries<int>
+  public sealed partial class CompressedBoundingBoxTree : ISpatialPartition<int>, ISupportClosestPointQueries<int>
   {
     // TODO: We could optimize the compressed AABB tree regarding cache.
     // Cache-aware for PS3: see Bullet, btQuantizedBvh/btOptimizedBvh
@@ -94,7 +94,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <summary>
     /// A margin which is added to the tree's AABB to avoid divisions by zero.
     /// </summary>
-    private static readonly float AabbMargin = Numeric.EpsilonF;
+    private static readonly float BoundingBoxMargin = Numeric.EpsilonF;
     #endregion
 
 
@@ -112,7 +112,7 @@ namespace DigitalRise.Geometry.Partitioning
 
     private HashSet<Pair<int>> _selfOverlaps;
 
-    internal Aabb _aabb;
+    internal BoundingBox _aabb;
     internal Vector3 _quantizationFactor;
     internal Vector3 _dequantizationFactor;
 
@@ -127,7 +127,7 @@ namespace DigitalRise.Geometry.Partitioning
     //--------------------------------------------------------------
 
     /// <inheritdoc/>
-    public Aabb Aabb
+    public BoundingBox BoundingBox
     {
       get
       {
@@ -194,12 +194,12 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    public Func<int, Aabb> GetAabbForItem
+    public Func<int, BoundingBox> GetBoundingBoxForItem
     {
-      get { return _getAabbForItem; }
-      set { _getAabbForItem = value; }
+      get { return _getBoundingBoxForItem; }
+      set { _getBoundingBoxForItem = value; }
     }
-    private Func<int, Aabb> _getAabbForItem;
+    private Func<int, BoundingBox> _getBoundingBoxForItem;
 
 
     /// <summary>
@@ -262,9 +262,9 @@ namespace DigitalRise.Geometry.Partitioning
     //--------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CompressedAabbTree"/> class.
+    /// Initializes a new instance of the <see cref="CompressedBoundingBoxTree"/> class.
     /// </summary>
-    public CompressedAabbTree()
+    public CompressedBoundingBoxTree()
     {
       _items = DigitalRise.ResourcePools<int>.Lists.Obtain();
 
@@ -288,19 +288,19 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Creates a new <see cref="CompressedAabbTree"/> that is a clone (deep copy) of the current
+    /// Creates a new <see cref="CompressedBoundingBoxTree"/> that is a clone (deep copy) of the current
     /// instance.
     /// </summary>
     /// <returns>
-    /// A new <see cref="CompressedAabbTree"/> that is a clone (deep copy) of the current instance.
+    /// A new <see cref="CompressedBoundingBoxTree"/> that is a clone (deep copy) of the current instance.
     /// </returns>
-    public CompressedAabbTree Clone()
+    public CompressedBoundingBoxTree Clone()
     {
-      return new CompressedAabbTree
+      return new CompressedBoundingBoxTree
       {
         EnableSelfOverlaps = EnableSelfOverlaps,
         Filter = Filter,
-        GetAabbForItem = GetAabbForItem,
+        GetBoundingBoxForItem = GetBoundingBoxForItem,
       };
     }
     #endregion
@@ -347,12 +347,12 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Adds an item to the <see cref="CompressedAabbTree"/>.
+    /// Adds an item to the <see cref="CompressedBoundingBoxTree"/>.
     /// </summary>
-    /// <param name="item">The object to add to the <see cref="CompressedAabbTree"/>.</param>
+    /// <param name="item">The object to add to the <see cref="CompressedBoundingBoxTree"/>.</param>
     /// <remarks>
     /// Duplicate items or <see langword="null"/> are not allowed in the 
-    /// <see cref="CompressedAabbTree"/>.
+    /// <see cref="CompressedBoundingBoxTree"/>.
     /// </remarks>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="item"/> is <see langword="null"/>.
@@ -365,7 +365,7 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Removes all items from the <see cref="CompressedAabbTree"/>.
+    /// Removes all items from the <see cref="CompressedBoundingBoxTree"/>.
     /// </summary>
     public void Clear()
     {
@@ -383,18 +383,18 @@ namespace DigitalRise.Geometry.Partitioning
           _selfOverlaps.Clear();
       }
 
-      _aabb = new Aabb();
+      _aabb = new BoundingBox();
       _state = State.IsUpToDate;  // Nothing to do in Update().
     }
 
 
     /// <summary>
-    /// Determines whether the <see cref="CompressedAabbTree"/> contains a specific item.
+    /// Determines whether the <see cref="CompressedBoundingBoxTree"/> contains a specific item.
     /// </summary>
-    /// <param name="item">The object to locate in the <see cref="CompressedAabbTree"/>.</param>
+    /// <param name="item">The object to locate in the <see cref="CompressedBoundingBoxTree"/>.</param>
     /// <returns>
     /// <see langword="true"/> if <paramref name="item"/> is found in the 
-    /// <see cref="CompressedAabbTree"/>; otherwise, <see langword="false"/>.
+    /// <see cref="CompressedBoundingBoxTree"/>; otherwise, <see langword="false"/>.
     /// </returns>
     public bool Contains(int item)
     {
@@ -421,7 +421,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="array">
     /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied from 
-    /// <see cref="CompressedAabbTree"/>. The <see cref="Array"/> must have zero-based indexing.
+    /// <see cref="CompressedBoundingBoxTree"/>. The <see cref="Array"/> must have zero-based indexing.
     /// </param>
     /// <param name="arrayIndex">
     /// The zero-based index in <paramref name="array"/> at which copying begins.
@@ -435,12 +435,12 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentException">
     /// <paramref name="array"/> is multidimensional. Or <paramref name="arrayIndex"/> is equal to 
     /// or greater than the length of <paramref name="array"/>. Or the number of elements in the 
-    /// source <see cref="CompressedAabbTree"/> is greater than the available space from 
+    /// source <see cref="CompressedBoundingBoxTree"/> is greater than the available space from 
     /// <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
     /// </exception>
     /// <remarks>
     /// <para>
-    /// The <see cref="CompressedAabbTree"/> is not modified. The order of the elements in the new 
+    /// The <see cref="CompressedBoundingBoxTree"/> is not modified. The order of the elements in the new 
     /// array is the same as the order of the elements in the tree in depth-first order.
     /// </para>
     /// <para>
@@ -500,16 +500,16 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Removes the first occurrence of a specific item from the <see cref="CompressedAabbTree"/>.
+    /// Removes the first occurrence of a specific item from the <see cref="CompressedBoundingBoxTree"/>.
     /// </summary>
     /// <param name="item">
-    /// The object to remove from the <see cref="CompressedAabbTree"/>.
+    /// The object to remove from the <see cref="CompressedBoundingBoxTree"/>.
     /// </param>
     /// <returns>
     /// <see langword="true"/> if <paramref name="item"/> was successfully removed from the 
-    /// <see cref="CompressedAabbTree"/>; otherwise, <see langword="false"/>. This method also 
+    /// <see cref="CompressedBoundingBoxTree"/>; otherwise, <see langword="false"/>. This method also 
     /// returns <see langword="false"/> if <paramref name="item"/> is not found in the original 
-    /// <see cref="CompressedAabbTree"/>.
+    /// <see cref="CompressedBoundingBoxTree"/>.
     /// </returns>
     public bool Remove(int item)
     {
@@ -628,21 +628,21 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="aabb">The AABB of the spatial partition.</param>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
-    private void SetQuantizationValues(Aabb aabb)
+    private void SetQuantizationValues(BoundingBox aabb)
     {
       _aabb = aabb;
 
       // ----- Compute quantization factor.
       // Add a margin to the AABB to avoid divisions by zero.
-      Vector3 margin = new Vector3(AabbMargin);
-      _aabb.Minimum = aabb.Minimum - margin;
-      _aabb.Maximum = aabb.Maximum + margin;
+      Vector3 margin = new Vector3(BoundingBoxMargin);
+      _aabb.Min = aabb.Min - margin;
+      _aabb.Max = aabb.Max + margin;
 
-      Vector3 extent = _aabb.Extent;
+      Vector3 extent = _aabb.Extent();
       if (Numeric.IsNaN(extent.X) || Numeric.IsNaN(extent.Y) || Numeric.IsNaN(extent.Z))
-        throw new GeometryException("Cannot build CompressedAabbTree. The AABB of some items contains NaN.");
+        throw new GeometryException("Cannot build CompressedBoundingBoxTree. The AABB of some items contains NaN.");
       if (float.IsInfinity(extent.X) || float.IsInfinity(extent.Y) || float.IsInfinity(extent.Z))
-        throw new GeometryException("Cannot build CompressedAabbTree. All objects need to have finite size. The CompressedAabbTree cannot be used for infinitely large objects.");
+        throw new GeometryException("Cannot build CompressedBoundingBoxTree. All objects need to have finite size. The CompressedBoundingBoxTree cannot be used for infinitely large objects.");
 
       // Cache the quantization factors.
       // The max value used for quantization is ushort.MaxValue minus 2: In order to calculate 
@@ -658,16 +658,16 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="node">The compressed AABB node.</param>
     /// <returns>The dequantized AABB.</returns>
-    private Aabb GetAabb(Node node)
+    private BoundingBox GetBoundingBox(Node node)
     {
-      Aabb reference = _aabb;
-      Aabb aabb;
-      aabb.Minimum.X = reference.Minimum.X + node.MinimumX * _dequantizationFactor.X;
-      aabb.Minimum.Y = reference.Minimum.Y + node.MinimumY * _dequantizationFactor.Y;
-      aabb.Minimum.Z = reference.Minimum.Z + node.MinimumZ * _dequantizationFactor.Z;
-      aabb.Maximum.X = reference.Minimum.X + node.MaximumX * _dequantizationFactor.X;
-      aabb.Maximum.Y = reference.Minimum.Y + node.MaximumY * _dequantizationFactor.Y;
-      aabb.Maximum.Z = reference.Minimum.Z + node.MaximumZ * _dequantizationFactor.Z;
+      BoundingBox reference = _aabb;
+      BoundingBox aabb;
+      aabb.Min.X = reference.Min.X + node.MinimumX * _dequantizationFactor.X;
+      aabb.Min.Y = reference.Min.Y + node.MinimumY * _dequantizationFactor.Y;
+      aabb.Min.Z = reference.Min.Z + node.MinimumZ * _dequantizationFactor.Z;
+      aabb.Max.X = reference.Min.X + node.MaximumX * _dequantizationFactor.X;
+      aabb.Max.Y = reference.Min.Y + node.MaximumY * _dequantizationFactor.Y;
+      aabb.Max.Z = reference.Min.Z + node.MaximumZ * _dequantizationFactor.Z;
       return aabb;
     }
 
@@ -677,17 +677,17 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="node">The compressed AABB node.</param>
     /// <param name="aabb">The AABB to be quantized.</param>
-    private void SetAabb(ref Node node, Aabb aabb)
+    private void SetBoundingBox(ref Node node, BoundingBox aabb)
     {
       Debug.Assert(
-        aabb.Minimum.IsGreaterOrEqual(_aabb.Minimum)
-        && aabb.Minimum.IsLessOrEqual(_aabb.Maximum)
-        && aabb.Maximum.IsGreaterOrEqual(_aabb.Minimum)
-        && aabb.Maximum.IsLessOrEqual(_aabb.Maximum),
+        aabb.Min.IsGreaterOrEqual(_aabb.Min)
+        && aabb.Min.IsLessOrEqual(_aabb.Max)
+        && aabb.Max.IsGreaterOrEqual(_aabb.Min)
+        && aabb.Max.IsLessOrEqual(_aabb.Max),
         "Child node has invalid AABB. Child AABB must be contained in root AABB.");
 
-      Vector3 quantizedMinimum = (aabb.Minimum - _aabb.Minimum) * _quantizationFactor;
-      Vector3 quantizedMaximum = (aabb.Maximum - _aabb.Minimum) * _quantizationFactor;
+      Vector3 quantizedMinimum = (aabb.Min - _aabb.Min) * _quantizationFactor;
+      Vector3 quantizedMaximum = (aabb.Max - _aabb.Min) * _quantizationFactor;
 
       // Convert quantized minimum to ushort. (Subtract 1 to ensure that AABB is conservative.)
       node.MinimumX = (quantizedMinimum.X > 1.0f) ? (ushort)(quantizedMinimum.X - 1.0f) : (ushort)0;
@@ -701,7 +701,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       // Check whether quantized AABB is conservative.
       // ! This assert can fail. The numerical error is tiny.
-      //Debug.Assert(GetAabb(node).Contains(aabb), String.Format("Quantization failed: Quantized AABB must be bigger than or equal to original AABB. Quantized: {0} Original: {1}", GetAabb(node), aabb));
+      //Debug.Assert(GetBoundingBox(node).Contains(aabb), String.Format("Quantization failed: Quantized AABB must be bigger than or equal to original AABB. Quantized: {0} Original: {1}", GetBoundingBox(node), aabb));
 
       // Note: Our tests have shown that Bullet's approach is non-conservative in certain cases. Our
       // approach is conservative in all of our test cases. However, when we were using Bullet's 
@@ -727,7 +727,7 @@ namespace DigitalRise.Geometry.Partitioning
       {
         if (node.IsLeaf)
         {
-          Aabb aabb = GetAabb(node);
+          BoundingBox aabb = GetBoundingBox(node);
 
           // Important: Do not call GetOverlaps(this) because this would lead to recursive
           // Update() calls!

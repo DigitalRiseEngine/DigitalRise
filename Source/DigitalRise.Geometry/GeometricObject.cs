@@ -33,19 +33,19 @@ namespace DigitalRise.Geometry
     /// Gets the axis-aligned bounding box (AABB).
     /// </summary>
     /// <value>The axis-aligned bounding box (AABB).</value>
-    public Aabb Aabb
+    public BoundingBox BoundingBox
     {
       get
       {
         if (_aabbIsValid == false)
         {
-          _aabb = Shape.GetAabb(Scale, Pose);
+          _aabb = Shape.GetBoundingBox(Scale, Pose);
           _aabbIsValid = true;
         }
         return _aabb;
       }
     }
-    private Aabb _aabb;
+    private BoundingBox _aabb;
     private bool _aabbIsValid;
 
 
@@ -110,7 +110,7 @@ namespace DigitalRise.Geometry
     /// Changing this value does not actually change any values in the <see cref="Shape"/> instance.
     /// Collision algorithms and anyone who uses this geometric object must use the shape and apply
     /// the scale factor as appropriate. The scale is automatically applied in the property
-    /// <see cref="Aabb"/>.
+    /// <see cref="BoundingBox"/>.
     /// </para>
     /// <para>
     /// Changing this property raises the <see cref="ShapeChanged"/> event.

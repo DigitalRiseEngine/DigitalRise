@@ -144,7 +144,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
         if (isOverHole)
         {
           // Guesses over holes are useless. --> Check the whole terrain.
-          currentSearchDistance = heightFieldGeometricObject.Aabb.Extent.Length();
+          currentSearchDistance = heightFieldGeometricObject.BoundingBox.Extent().Length();
         }
         else if (guessedClosestPair.PenetrationDepth < 0)
         {
@@ -162,17 +162,17 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       }
 
       // Get AABB of the other object in local space of the height field.
-      Aabb aabbOfOther = otherShape.GetAabb(scaleOther, heightFieldPose.Inverse * otherGeometricObject.Pose);
+      BoundingBox aabbOfOther = otherShape.GetBoundingBox(scaleOther, heightFieldPose.Inverse * otherGeometricObject.Pose);
 
       float originX = heightField.OriginX * scaleHeightField.X;
       float originZ = heightField.OriginZ * scaleHeightField.Z;
 
       // ----- Compute the cell indices of the search-space.
       // Estimate start and end indices from our search distance.
-      int xIndexStartEstimated = (int)((aabbOfOther.Minimum.X - currentSearchDistance - originX) / cellWidthX);
-      int xIndexEndEstimated = (int)((aabbOfOther.Maximum.X + currentSearchDistance - originX) / cellWidthX);
-      int zIndexStartEstimated = (int)((aabbOfOther.Minimum.Z - currentSearchDistance - originZ) / cellWidthZ);
-      int zIndexEndEstimated = (int)((aabbOfOther.Maximum.Z + currentSearchDistance - originZ) / cellWidthZ);
+      int xIndexStartEstimated = (int)((aabbOfOther.Min.X - currentSearchDistance - originX) / cellWidthX);
+      int xIndexEndEstimated = (int)((aabbOfOther.Max.X + currentSearchDistance - originX) / cellWidthX);
+      int zIndexStartEstimated = (int)((aabbOfOther.Min.Z - currentSearchDistance - originZ) / cellWidthZ);
+      int zIndexEndEstimated = (int)((aabbOfOther.Max.Z + currentSearchDistance - originZ) / cellWidthZ);
 
       // Clamp indices to valid range.
       int xIndexMax = arrayLengthX - 2;
@@ -454,10 +454,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
                     currentSearchDistance = Math.Max(0, separationDistance);
 
                   // Update search space indices.
-                  xIndexStartEstimated = (int)((aabbOfOther.Minimum.X - currentSearchDistance - originX) / cellWidthX);
-                  xIndexEndEstimated = (int)((aabbOfOther.Maximum.X + currentSearchDistance - originX) / cellWidthX);
-                  zIndexStartEstimated = (int)((aabbOfOther.Minimum.Z - currentSearchDistance - originZ) / cellWidthZ);
-                  zIndexEndEstimated = (int)((aabbOfOther.Maximum.Z + currentSearchDistance - originZ) / cellWidthZ);
+                  xIndexStartEstimated = (int)((aabbOfOther.Min.X - currentSearchDistance - originX) / cellWidthX);
+                  xIndexEndEstimated = (int)((aabbOfOther.Max.X + currentSearchDistance - originX) / cellWidthX);
+                  zIndexStartEstimated = (int)((aabbOfOther.Min.Z - currentSearchDistance - originZ) / cellWidthZ);
+                  zIndexEndEstimated = (int)((aabbOfOther.Max.Z + currentSearchDistance - originZ) / cellWidthZ);
 
                   xIndexStart = Math.Max(xIndexStart, xIndexStartEstimated);
                   xIndexEnd = Math.Min(xIndexEndEstimated, xIndexMax);
@@ -708,8 +708,8 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       // To simplify, we assume that A is static and B is moving relative to A. 
       // In general, this is not correct! But for CCD we make this simplification.
       // We convert everything to the space of A.
-      var aabbSweptBInA = geometricObjectB.Shape.GetAabb(scaleB, startPoseA.Inverse * startPoseB);
-      aabbSweptBInA.Grow(geometricObjectB.Shape.GetAabb(scaleB, targetPoseA.Inverse * targetPoseB));
+      var aabbSweptBInA = geometricObjectB.Shape.GetBoundingBox(scaleB, startPoseA.Inverse * startPoseB);
+      aabbSweptBInA.Grow(geometricObjectB.Shape.GetBoundingBox(scaleB, targetPoseA.Inverse * targetPoseB));
 
       // Use temporary object.
       var triangleShape = ResourcePools.TriangleShapes.Obtain();
@@ -737,10 +737,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
 
       // ----- Compute the cell indices for the AABB.
       // Estimate start and end indices from our search distance.
-      int xIndexStartEstimated = (int)((aabbSweptBInA.Minimum.X - originX) / cellWidthX);
-      int xIndexEndEstimated = (int)((aabbSweptBInA.Maximum.X - originX) / cellWidthX);
-      int zIndexStartEstimated = (int)((aabbSweptBInA.Minimum.Z - originZ) / cellWidthZ);
-      int zIndexEndEstimated = (int)((aabbSweptBInA.Maximum.Z - originZ) / cellWidthZ);
+      int xIndexStartEstimated = (int)((aabbSweptBInA.Min.X - originX) / cellWidthX);
+      int xIndexEndEstimated = (int)((aabbSweptBInA.Max.X - originX) / cellWidthX);
+      int zIndexStartEstimated = (int)((aabbSweptBInA.Min.Z - originZ) / cellWidthZ);
+      int zIndexEndEstimated = (int)((aabbSweptBInA.Max.Z - originZ) / cellWidthZ);
 
       // Clamp indices to valid range.
       int xIndexMax = arrayLengthX - 2;
@@ -769,7 +769,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             triangle.Vertex2 = triangle.Vertex2 * scaleA;
 
             // Make AABB test of triangle vs. sweep of B.
-            if (!GeometryHelper.HaveContact(aabbSweptBInA, triangle.Aabb))
+            if (!GeometryHelper.HaveContact(aabbSweptBInA, triangle.BoundingBox))
               continue;
 
             triangleShape.Vertex0 = triangle.Vertex0;

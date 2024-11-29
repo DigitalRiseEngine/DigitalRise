@@ -62,12 +62,12 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(), new SphereShape().GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
-                     new SphereShape().GetAabb(new Pose(new Vector3(10, 100, -13),
+      Assert.AreEqual(new BoundingBox(), new SphereShape().GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
+                     new SphereShape().GetBoundingBox(new Pose(new Vector3(10, 100, -13),
                                                                          MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
-      Assert.AreEqual(new Aabb(new Vector3(0, 90, 990), new Vector3(20, 110, 1010)),
-                     new SphereShape(10).GetAabb(new Pose(new Vector3(10, 100, 1000),
+      Assert.AreEqual(new BoundingBox(new Vector3(0, 90, 990), new Vector3(20, 110, 1010)),
+                     new SphereShape(10).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
                                                                          MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
     }
 
@@ -136,8 +136,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       SphereShape clone = sphere.Clone() as SphereShape;
       Assert.IsNotNull(clone);
       Assert.AreEqual(sphere.Radius, clone.Radius);
-      Assert.AreEqual(sphere.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(sphere.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(sphere.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(sphere.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

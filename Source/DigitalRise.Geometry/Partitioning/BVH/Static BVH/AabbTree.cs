@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using DigitalRise.Collections;
-using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -16,15 +16,15 @@ namespace DigitalRise.Geometry.Partitioning
   /// <typeparam name="T">The type of item in the spatial partition.</typeparam>
   /// <remarks>
   /// <para>
-  /// <see cref="AabbTree{T}"/> partitions are good for partitioning static models or spaces where
+  /// <see cref="BoundingBoxTree{T}"/> partitions are good for partitioning static models or spaces where
   /// items are not changed at runtime or when the changes are small or local. For example, an 
-  /// <see cref="AabbTree{T}"/> is appropriate for managing large static triangle meshes
+  /// <see cref="BoundingBoxTree{T}"/> is appropriate for managing large static triangle meshes
   /// efficiently. But they are not suitable for dynamic models or spaces where items are
   /// added/removed at runtime or when the large changes are applied to items.
   /// </para>
   /// <para>
-  /// Consider using the <see cref="CompressedAabbTree"/> instead of the <see cref="AabbTree{T}"/>
-  /// if items of type <see cref="int"/> need to be stored. The <see cref="CompressedAabbTree"/>
+  /// Consider using the <see cref="CompressedBoundingBoxTree"/> instead of the <see cref="BoundingBoxTree{T}"/>
+  /// if items of type <see cref="int"/> need to be stored. The <see cref="CompressedBoundingBoxTree"/>
   /// reduced the memory requirements considerably.
   /// </para>
   /// <para>
@@ -38,9 +38,9 @@ namespace DigitalRise.Geometry.Partitioning
   /// </remarks>
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-  public partial class AabbTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>
+  public partial class BoundingBoxTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>
   {
-    // Note: We could create a common abstract base class 'AbstractAabbTree<T>' for all AABB trees.
+    // Note: We could create a common abstract base class 'AbstractBoundingBoxTree<T>' for all AABB trees.
     // The base class could implement ISpatialPartition<T> and ISupportClosestPointQueries<T> and
     // even automatically handle tree vs. tree tests. However, tests have shown that this reduces
     // performance by 50%! (The GetOverlap-methods take twice as long! The AABB tree nodes must use 
@@ -51,9 +51,9 @@ namespace DigitalRise.Geometry.Partitioning
     #region Fields
     //--------------------------------------------------------------
 
-    internal static readonly ResourcePool<FastStack<AabbTree<T>.Node>> Stacks =
-      new ResourcePool<FastStack<AabbTree<T>.Node>>(
-        () => new FastStack<AabbTree<T>.Node>(32),
+    internal static readonly ResourcePool<FastStack<BoundingBoxTree<T>.Node>> Stacks =
+      new ResourcePool<FastStack<BoundingBoxTree<T>.Node>>(
+        () => new FastStack<BoundingBoxTree<T>.Node>(32),
         null,
         stack => stack.Clear());
 
@@ -94,7 +94,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <inheritdoc/>
     protected override BasePartition<T> CreateInstanceCore()
     {
-      return new AabbTree<T>();
+      return new BoundingBoxTree<T>();
     }
 
 
@@ -124,14 +124,14 @@ namespace DigitalRise.Geometry.Partitioning
         Refit(_root, invalidItems);
       }
 
-      UpdateAabb();
+      UpdateBoundingBox();
       UpdateSelfOverlaps();
     }
 
 
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
-      Aabb = (_root != null) ? _root.Aabb : new Aabb();
+      BoundingBox = (_root != null) ? _root.BoundingBox : new BoundingBox();
     }
 
 
@@ -160,7 +160,7 @@ namespace DigitalRise.Geometry.Partitioning
         //{
         //  foreach (var leave in _leaves)
         //  {
-        //    foreach (var touchedItem in GetOverlaps(leave.Aabb))
+        //    foreach (var touchedItem in GetOverlaps(leave.BoundingBox))
         //    {
         //      var overlap = new Pair<T>(leave.Item, touchedItem);
 

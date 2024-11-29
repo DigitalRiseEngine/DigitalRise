@@ -236,7 +236,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Note: Compute AABB in world space
       Vector3 vertex0 = pose.ToWorldPosition(_vertex0 * scale);
@@ -244,7 +244,7 @@ namespace DigitalRise.Geometry.Shapes
       Vector3 vertex2 = pose.ToWorldPosition(_vertex2 * scale);
       Vector3 minimum = MathHelper.Min(vertex0, MathHelper.Min(vertex1, vertex2));
       Vector3 maximum = MathHelper.Max(vertex0, MathHelper.Max(vertex1, vertex2));
-      return new Aabb(minimum, maximum);
+      return new BoundingBox(minimum, maximum);
     }
 
 

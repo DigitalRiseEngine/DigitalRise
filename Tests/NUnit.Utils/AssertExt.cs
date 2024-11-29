@@ -145,9 +145,9 @@ namespace NUnit.Utils
 		public static void AreNumericallyEqual(SrtTransform expected, SrtTransform actual) =>
 			AreNumericallyEqual(expected, actual, Numeric.EpsilonF);
 
-		public static void AreNumericallyEqual(Aabb expected, Aabb actual, float epsilon)
+		public static void AreNumericallyEqual(BoundingBox expected, BoundingBox actual, float epsilon)
 		{
-			if (Aabb.AreNumericallyEqual(expected, actual, epsilon))
+			if (MathHelper.AreNumericallyEqual(expected, actual, epsilon))
 			{
 				return;
 			}
@@ -155,7 +155,7 @@ namespace NUnit.Utils
 			ReportEqualFailure(expected, actual, epsilon);
 		}
 
-		public static void AreNumericallyEqual(Aabb expected, Aabb actual) =>
+		public static void AreNumericallyEqual(BoundingBox expected, BoundingBox actual) =>
 			AreNumericallyEqual(expected, actual, Numeric.EpsilonF);
 
 		public static void AreNumericallyEqual(TimeSpan expected, TimeSpan actual, float epsilon)

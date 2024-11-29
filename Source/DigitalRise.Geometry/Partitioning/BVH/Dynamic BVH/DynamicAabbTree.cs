@@ -4,8 +4,8 @@
 
 #region ----- Credits -----
 /* 
-   The DynamicAabbTree is based on the dynamic bounding volume tree of Bullet.
-   (Note: Our DynamicAabbTree and the original version of Bullet have only the general algorithm
+   The DynamicBoundingBoxTree is based on the dynamic bounding volume tree of Bullet.
+   (Note: Our DynamicBoundingBoxTree and the original version of Bullet have only the general algorithm
    in common. The implementation is significantly different.)
 
      Bullet Continuous Collision Detection and Physics Library
@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using DigitalRise.Collections;
 using DigitalRise.Geometry.Collisions;
 using DigitalRise.Geometry.Shapes;
-using DigitalRise.Mathematics;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -41,13 +41,13 @@ namespace DigitalRise.Geometry.Partitioning
   /// <typeparam name="T">The type of item in the spatial partition.</typeparam>
   /// <remarks>
   /// <para>
-  /// The <see cref="DynamicAabbTree{T}"/> was inspired by the dynamic bounding volume tree 
+  /// The <see cref="DynamicBoundingBoxTree{T}"/> was inspired by the dynamic bounding volume tree 
   /// (<c>btDbvt</c>) as implemented in the <see href="http://bulletphysics.org/">Bullet Continuous 
   /// Collision Detection and Physics Library</see>. (Original <c>btDbvt</c> implementation by 
   /// Nathanael Presson.)
   /// </para>
   /// <para>
-  /// The <see cref="DynamicAabbTree{T}"/> was designed to manage deformable objects efficiently. It
+  /// The <see cref="DynamicBoundingBoxTree{T}"/> was designed to manage deformable objects efficiently. It
   /// should be uses for <see cref="CompositeShape"/>s or <see cref="TriangleMeshShape"/>s when the
   /// the contained shapes or triangles are updated at runtime.
   /// </para>
@@ -58,13 +58,13 @@ namespace DigitalRise.Geometry.Partitioning
   /// <para>
   /// <strong>Incremental Optimization:</strong> When items in the AABB tree are added, removed or
   /// moved the AABB tree might become unbalanced and less optimal for collision detection. 
-  /// Therefore, the <see cref="DynamicAabbTree{T}"/> tries to optimize its tree structure over 
+  /// Therefore, the <see cref="DynamicBoundingBoxTree{T}"/> tries to optimize its tree structure over 
   /// time. In each frame (time step) it performs a number of optimization passes. The amount of 
   /// optimization per frame can be controlled by setting <see cref="OptimizationPerFrame"/>.
   /// </para>
   /// <para>
   /// <strong>Motion Prediction:</strong> The dynamic AABB tree is further optimized for 
-  /// models/space where items are constantly moving. The <see cref="DynamicAabbTree{T}"/> 
+  /// models/space where items are constantly moving. The <see cref="DynamicBoundingBoxTree{T}"/> 
   /// automatically detects when items are moving. It adds a small margin (see 
   /// <see cref="RelativeMargin"/>) to the AABB of these items to account for small random movements
   /// ("jittering") and it extends the AABB in the direction the items are moving (see 
@@ -77,9 +77,9 @@ namespace DigitalRise.Geometry.Partitioning
   /// is disabled by default.
   /// </para>
   /// <para>
-  /// <strong><see cref="AdaptiveAabbTree{T}"/> vs. <see cref="DynamicAabbTree{T}"/>:</strong> The 
-  /// <see cref="AdaptiveAabbTree{T}"/> and the <see cref="DynamicAabbTree{T}"/> are similar data
-  /// structures. As a general rule, the <see cref="AdaptiveAabbTree{T}"/> should be used if
+  /// <strong><see cref="AdaptiveBoundingBoxTree{T}"/> vs. <see cref="DynamicBoundingBoxTree{T}"/>:</strong> The 
+  /// <see cref="AdaptiveBoundingBoxTree{T}"/> and the <see cref="DynamicBoundingBoxTree{T}"/> are similar data
+  /// structures. As a general rule, the <see cref="AdaptiveBoundingBoxTree{T}"/> should be used if
   /// <list type="bullet">
   /// <item>
   /// <description>
@@ -94,7 +94,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// </description>
   /// </item>
   /// </list>
-  /// Whereas the <see cref="DynamicAabbTree{T}"/> should be used if
+  /// Whereas the <see cref="DynamicBoundingBoxTree{T}"/> should be used if
   /// <list type="bullet">
   /// <item>
   /// <description>
@@ -105,15 +105,15 @@ namespace DigitalRise.Geometry.Partitioning
   /// <item>
   /// <description>
   /// Items are added or removed frequently. (Inserting or removing individual items into/from a 
-  /// <see cref="DynamicAabbTree{T}"/> is fast.)
+  /// <see cref="DynamicBoundingBoxTree{T}"/> is fast.)
   /// </description>
   /// </item>
   /// </list>
   /// </para>
   /// <para>
-  /// The <see cref="AdaptiveAabbTree{T}"/> should not be used as the collision detection 
+  /// The <see cref="AdaptiveBoundingBoxTree{T}"/> should not be used as the collision detection 
   /// broad-phase (see <see cref="CollisionDomain.BroadPhase"/>). Whereas, a 
-  /// <see cref="DynamicAabbTree{T}"/> can be used as the collision detection broad-phase.
+  /// <see cref="DynamicBoundingBoxTree{T}"/> can be used as the collision detection broad-phase.
   /// </para>
   /// <para>
   /// However, please note these are just general rules. You should always try different 
@@ -132,7 +132,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// </remarks>
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-  public partial class DynamicAabbTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>, ISupportFrustumCulling<T>
+  public partial class DynamicBoundingBoxTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>, ISupportFrustumCulling<T>
   {
     //--------------------------------------------------------------
     #region Fields
@@ -298,9 +298,9 @@ namespace DigitalRise.Geometry.Partitioning
     //--------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DynamicAabbTree{T}" /> class.
+    /// Initializes a new instance of the <see cref="DynamicBoundingBoxTree{T}" /> class.
     /// </summary>
-    public DynamicAabbTree()
+    public DynamicBoundingBoxTree()
     {
       _leaves = new Dictionary<T, Node>();
     }
@@ -316,7 +316,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <inheritdoc/>
     protected override BasePartition<T> CreateInstanceCore()
     {
-      return new DynamicAabbTree<T>();
+      return new DynamicBoundingBoxTree<T>();
     }
 
 
@@ -326,8 +326,8 @@ namespace DigitalRise.Geometry.Partitioning
       // Clone BasePartition<T> properties.
       base.CloneCore(source);
 
-      // Clone DynamicAabbTree<T> properties.
-      var sourceTyped = (DynamicAabbTree<T>)source;
+      // Clone DynamicBoundingBoxTree<T> properties.
+      var sourceTyped = (DynamicBoundingBoxTree<T>)source;
       EnableMotionPrediction = sourceTyped.EnableMotionPrediction;
       MotionPrediction = sourceTyped.MotionPrediction;
       OptimizationPerFrame = sourceTyped.OptimizationPerFrame;
@@ -352,8 +352,8 @@ namespace DigitalRise.Geometry.Partitioning
         var node = GetNode(item);
         if (node != null)
         {
-          var aabb = GetAabbForItem(item);
-          if (node.Aabb.Contains(aabb))
+          var aabb = GetBoundingBoxForItem(item);
+          if (node.BoundingBox.Contains(aabb) == Microsoft.Xna.Framework.ContainmentType.Contains)
             return;
         }
       }
@@ -426,7 +426,7 @@ namespace DigitalRise.Geometry.Partitioning
           {
             Node node = GetNode(item);
 
-            Aabb aabb = GetAabbForItem(item);
+            BoundingBox aabb = GetBoundingBoxForItem(item);
             UpdateLeaf(node, aabb);
 
             if (trackInvalidNodes)
@@ -446,7 +446,7 @@ namespace DigitalRise.Geometry.Partitioning
           foreach (T addedItem in addedItems)
           {
             Node node = Nodes.Obtain();
-            node.Aabb = GetAabbForItem(addedItem);
+            node.BoundingBox = GetBoundingBoxForItem(addedItem);
             node.Item = addedItem;
             AddLeaf(_root, node);
             _leaves.Add(addedItem, node);
@@ -460,7 +460,7 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
       // ----- Finally, update AABB and self-overlaps.
-      UpdateAabb();
+      UpdateBoundingBox();
       UpdateSelfOverlaps(addedItems, removedItems, invalidItems, invalidNodes);
 
       // Clean up.
@@ -492,9 +492,9 @@ namespace DigitalRise.Geometry.Partitioning
     /// <summary>
     /// Updates the AABB of the spatial partition.
     /// </summary>
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
-      Aabb = (_root != null) ? _root.Aabb : new Aabb();
+      BoundingBox = (_root != null) ? _root.BoundingBox : new BoundingBox();
     }
 
 

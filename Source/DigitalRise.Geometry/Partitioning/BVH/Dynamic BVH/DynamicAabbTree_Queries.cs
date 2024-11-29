@@ -19,10 +19,10 @@ using DigitalRise.Mathematics;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class DynamicAabbTree<T>
+  partial class DynamicBoundingBoxTree<T>
   {
     /// <inheritdoc/>
-    public override IEnumerable<T> GetOverlaps(Aabb aabb)
+    public override IEnumerable<T> GetOverlaps(BoundingBox aabb)
     {
       UpdateInternal();
 
@@ -36,7 +36,7 @@ namespace DigitalRise.Geometry.Partitioning
       {
         Node node = stack.Pop();
 
-        if (GeometryHelper.HaveContact(node.Aabb, aabb))
+        if (GeometryHelper.HaveContact(node.BoundingBox, aabb))
         {
           if (node.IsLeaf)
           {
@@ -60,7 +60,7 @@ namespace DigitalRise.Geometry.Partitioning
 
     private IEnumerable<T> GetOverlapsImpl(Node leaf)
     {
-      // Note: This method is the same as GetOverlapsImpl(Aabb), except that before 
+      // Note: This method is the same as GetOverlapsImpl(BoundingBox), except that before 
       // checking the AABBs we compare the nodes. This removes some unnecessary AABB
       // checks when computing self-overlaps. Filtering is not applied.
 
@@ -74,7 +74,7 @@ namespace DigitalRise.Geometry.Partitioning
       {
         Node node = stack.Pop();
 
-        if (node != leaf && GeometryHelper.HaveContact(node.Aabb, leaf.Aabb))
+        if (node != leaf && GeometryHelper.HaveContact(node.BoundingBox, leaf.BoundingBox))
         {
           if (node.IsLeaf)
           {
@@ -96,7 +96,7 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Gets the leaf nodes that touch the given AABB. (Same as <see cref="GetOverlaps(Aabb)"/>
+    /// Gets the leaf nodes that touch the given AABB. (Same as <see cref="GetOverlaps(BoundingBox)"/>
     /// except we directly return the AABB tree node.
     /// </summary>
     /// <param name="aabb">The axis-aligned bounding box.</param>
@@ -104,9 +104,9 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// Filtering (see <see cref="BasePartition{T}.Filter"/>) is not applied.
     /// </remarks>
-    private IEnumerable<Node> GetLeafNodes(Aabb aabb)
+    private IEnumerable<Node> GetLeafNodes(BoundingBox aabb)
     {
-      // Note: This methods is the same as GetOverlaps(Aabb), but instead of returning items we 
+      // Note: This methods is the same as GetOverlaps(BoundingBox), but instead of returning items we 
       // return the nodes directly. This is used in tree vs. tree tests, so we do not have to 
       // recompute the AABBs of each leaf node.
 
@@ -122,7 +122,7 @@ namespace DigitalRise.Geometry.Partitioning
       {
         Node node = stack.Pop();
 
-        if (GeometryHelper.HaveContact(node.Aabb, aabb))
+        if (GeometryHelper.HaveContact(node.BoundingBox, aabb))
         {
           if (node.IsLeaf)
           {
@@ -158,7 +158,7 @@ namespace DigitalRise.Geometry.Partitioning
             1 / ray.Direction.Y,
             1 / ray.Direction.Z);
 
-      float epsilon = Numeric.EpsilonF * (1 + Aabb.Extent.Length());
+      float epsilon = Numeric.EpsilonF * (1 + BoundingBox.Extent().Length());
 
       var stack = DigitalRise.ResourcePools<Node>.Stacks.Obtain();
       stack.Push(_root);
@@ -166,7 +166,7 @@ namespace DigitalRise.Geometry.Partitioning
       {
         var node = stack.Pop();
 
-        if (GeometryHelper.HaveContact(node.Aabb, ray.Origin, rayDirectionInverse, ray.Length, epsilon))
+        if (GeometryHelper.HaveContact(node.BoundingBox, ray.Origin, rayDirectionInverse, ray.Length, epsilon))
         {
           if (node.IsLeaf)
           {
@@ -231,7 +231,7 @@ namespace DigitalRise.Geometry.Partitioning
         {
           if ((mask & j) == 0)
           {
-            var aabb = node.Aabb;
+            var aabb = node.BoundingBox;
             var plane = planes[i];
             int side = Classify(ref aabb, ref plane, signs[i]);
             switch (side)
@@ -295,10 +295,10 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private static int Classify(ref Aabb aabb, ref Plane plane, int signs)
+    private static int Classify(ref BoundingBox aabb, ref Plane plane, int signs)
     {
-      Vector3 min = aabb.Minimum;
-      Vector3 max = aabb.Maximum;
+      Vector3 min = aabb.Min;
+      Vector3 max = aabb.Max;
 
       // Get near and far corners of the AABB.
       Vector3 pNear, pFar;
@@ -352,7 +352,7 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    public float GetClosestPointCandidates(Aabb aabb, float maxDistanceSquared, Func<T, float> callback)
+    public float GetClosestPointCandidates(BoundingBox aabb, float maxDistanceSquared, Func<T, float> callback)
     {
       if (callback == null)
         throw new ArgumentNullException("callback");
@@ -368,7 +368,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private static void GetClosestPointCandidatesImpl(Node node, Aabb aabb, Func<T, float> callback, ref float closestPointDistanceSquared)
+    private static void GetClosestPointCandidatesImpl(Node node, BoundingBox aabb, Func<T, float> callback, ref float closestPointDistanceSquared)
     {
       // closestPointDistanceSquared == -1 indicates early exit.
       if (closestPointDistanceSquared < 0)
@@ -379,7 +379,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       // If we have a contact, it is not necessary to examine nodes with no AABB contact
       // because they cannot give a closer point pair.
-      if (closestPointDistanceSquared == 0 && !GeometryHelper.HaveContact(aabb, node.Aabb))
+      if (closestPointDistanceSquared == 0 && !GeometryHelper.HaveContact(aabb, node.BoundingBox))
         return;
 
       if (node.IsLeaf)
@@ -402,8 +402,8 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
       // No contact. Use lower bound estimates to search the best nodes first.
-      float minDistanceLeft = GeometryHelper.GetDistanceSquared(aabb, leftChild.Aabb);
-      float minDistanceRight = GeometryHelper.GetDistanceSquared(aabb, rightChild.Aabb);
+      float minDistanceLeft = GeometryHelper.GetDistanceSquared(aabb, leftChild.BoundingBox);
+      float minDistanceRight = GeometryHelper.GetDistanceSquared(aabb, rightChild.BoundingBox);
 
       if (minDistanceLeft < minDistanceRight)
       {

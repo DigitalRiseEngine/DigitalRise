@@ -137,7 +137,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             1 / ray.Direction.Y,
             1 / ray.Direction.Z);
 
-          float epsilon = Numeric.EpsilonF * (1 + compositeObject.Aabb.Extent.Length());
+          float epsilon = Numeric.EpsilonF * (1 + compositeObject.BoundingBox.Extent().Length());
 
           // Go through list of children and find contacts.
           int numberOfChildGeometries = compositeShape.Children.Count;
@@ -145,7 +145,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
           {
             IGeometricObject child = compositeShape.Children[i];
 
-            if (GeometryHelper.HaveContact(child.Shape.GetAabb(child.Scale, child.Pose), ray.Origin, rayDirectionInverse, ray.Length, epsilon))
+            if (GeometryHelper.HaveContact(child.Shape.GetBoundingBox(child.Scale, child.Pose), ray.Origin, rayDirectionInverse, ray.Length, epsilon))
             {
               AddChildContacts(
                 contactSet,

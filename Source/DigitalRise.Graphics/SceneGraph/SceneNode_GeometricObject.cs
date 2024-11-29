@@ -42,20 +42,20 @@ namespace DigitalRise.SceneGraph
 		[Browsable(false)]
 		[JsonIgnore]
 		[Category("Geometry")]
-		public Aabb Aabb
+		public BoundingBox BoundingBox
 		{
 			get
 			{
-				if (GetFlag(SceneNodeFlags.IsAabbDirty))
+				if (GetFlag(SceneNodeFlags.IsBoundingBoxDirty))
 				{
-					_aabb = _shape.GetAabb(ScaleWorld, PoseWorld);
-					ClearFlag(SceneNodeFlags.IsAabbDirty);
+					_aabb = _shape.GetBoundingBox(ScaleWorld, PoseWorld);
+					ClearFlag(SceneNodeFlags.IsBoundingBoxDirty);
 				}
 
 				return _aabb;
 			}
 		}
-		private Aabb _aabb;
+		private BoundingBox _aabb;
 
 
 		/// <summary>
@@ -591,7 +591,7 @@ namespace DigitalRise.SceneGraph
 		/// </remarks>
 		protected virtual void OnPoseChanged(EventArgs eventArgs)
 		{
-			SetFlag(SceneNodeFlags.IsAabbDirty | SceneNodeFlags.IsDirty | SceneNodeFlags.IsDirtyScene);
+			SetFlag(SceneNodeFlags.IsBoundingBoxDirty | SceneNodeFlags.IsDirty | SceneNodeFlags.IsDirtyScene);
 
 			var handler = _poseChanged;
 			if (handler != null)
@@ -628,7 +628,7 @@ namespace DigitalRise.SceneGraph
 		/// </remarks>
 		protected virtual void OnShapeChanged(ShapeChangedEventArgs eventArgs)
 		{
-			SetFlag(SceneNodeFlags.IsAabbDirty | SceneNodeFlags.IsDirty | SceneNodeFlags.IsDirtyScene);
+			SetFlag(SceneNodeFlags.IsBoundingBoxDirty | SceneNodeFlags.IsDirty | SceneNodeFlags.IsDirtyScene);
 
 			var handler = ShapeChanged;
 			if (handler != null)

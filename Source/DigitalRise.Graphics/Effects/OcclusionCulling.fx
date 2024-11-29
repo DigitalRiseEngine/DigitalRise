@@ -22,8 +22,8 @@
 //-----------------------------------------------------------------------------
 
 // Camera/light AABB.
-float3 ClampAabbMinimum;    // The minimum of the camera/light AABB in world space.
-float3 ClampAabbMaximum;    // The maximum of the camera/light AABB in world space.
+float3 ClampBoundingBoxMinimum;    // The minimum of the camera/light AABB in world space.
+float3 ClampBoundingBoxMaximum;    // The maximum of the camera/light AABB in world space.
 
 // Camera settings.
 float4x4 CameraViewProj;    // View-projection matrix of camera.
@@ -224,10 +224,10 @@ float4 PSCopy(float2 texCoord : TEXCOORD0) : COLOR0
 /// \param[inout] maximum   The maximum of the AABB in world space.
 /// \remarks
 /// Necessary for infinite objects, but also helps with very large objects!
-void ClampAabb(inout float3 minimum, inout float3 maximum)
+void ClampBoundingBox(inout float3 minimum, inout float3 maximum)
 {
-  minimum = max(minimum, min(maximum, ClampAabbMinimum));
-  maximum = min(maximum, max(minimum, ClampAabbMaximum));
+  minimum = max(minimum, min(maximum, ClampBoundingBoxMinimum));
+  maximum = min(maximum, max(minimum, ClampBoundingBoxMaximum));
 }
 
 
@@ -602,7 +602,7 @@ VSOutputQuery VSQuery(VSInputQuery input)
   output.Position = float4(position, 0, 1);
   
   // Clamp AABB to reasonable size.
-  ClampAabb(input.Minimum, input.Maximum);
+  ClampBoundingBox(input.Minimum, input.Maximum);
   output.Minimum = input.Minimum;
   output.Maximum = input.Maximum;
   
@@ -788,7 +788,7 @@ float4 PSVisualizeObject(PSInputVisualObject input) : COLOR0
 #endif
   
   // Clamp AABB to reasonable size.
-  ClampAabb(minimum, maximum);
+  ClampBoundingBox(minimum, maximum);
   
   // Project AABB and get bounds relative to viewport.
   bool visible;     // Result of frustum culling.
@@ -875,7 +875,7 @@ float4 PSVisualizeShadowCaster(PSInputVisualObject input) : COLOR0
 #endif
   
   // Clamp AABB to reasonable size.
-  ClampAabb(minimum, maximum);
+  ClampBoundingBox(minimum, maximum);
   
   // Get bounds in light HZB.
   bool visible;
@@ -931,7 +931,7 @@ float4 PSVisualizeShadowVolume(PSInputVisualObject input) : COLOR0
 #endif
   
   // Clamp AABB to reasonable size.
-  ClampAabb(minimum, maximum);
+  ClampBoundingBox(minimum, maximum);
   
   // Get bounds of shadow caster in light HZB.
   bool visible;

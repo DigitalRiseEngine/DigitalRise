@@ -90,12 +90,12 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(), new ConeShape().GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
-                     new ConeShape().GetAabb(new Pose(new Vector3(10, 100, -13),
+      Assert.AreEqual(new BoundingBox(), new ConeShape().GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
+                     new ConeShape().GetBoundingBox(new Pose(new Vector3(10, 100, -13),
                                                                          MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
-      Assert.AreEqual(new Aabb(new Vector3(0, 100, 990), new Vector3(20, 140, 1010)),
-                     new ConeShape(10, 40).GetAabb(new Pose(new Vector3(10, 100, 1000),
+      Assert.AreEqual(new BoundingBox(new Vector3(0, 100, 990), new Vector3(20, 140, 1010)),
+                     new ConeShape(10, 40).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
                                                                    Quaternion.Identity)));
       // TODO: Test rotations.
     }
@@ -159,8 +159,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.IsNotNull(clone);
       Assert.AreEqual(cone.Radius, clone.Radius);
       Assert.AreEqual(cone.Height, clone.Height);
-      Assert.AreEqual(cone.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(cone.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(cone.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(cone.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

@@ -734,7 +734,7 @@ namespace DigitalRise.Geometry.Collisions
       var centerToContact = contactPosition - pose.Position;
 
       // Compute a perturbation angle proportional to the dimension of the object.
-      var radius = geometricObject.Aabb.Extent.Length();
+      var radius = geometricObject.BoundingBox.Extent().Length();
       var angle = collisionDetection.ContactPositionTolerance / radius;
 
       // axis1 is in the contact tangent plane, orthogonal to normal.

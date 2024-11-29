@@ -372,7 +372,7 @@ namespace DigitalRise.Data.Lights
 		/// <see cref="LightNode"/> 's <see cref="SceneNode.ScaleLocal"/> and
 		/// <see cref="SceneNode.PoseLocal"/> properties.
 		/// </remarks>
-		public Aabb? LocalizedReflectionBox { get; set; }
+		public BoundingBox? LocalizedReflectionBox { get; set; }
 		#endregion
 
 

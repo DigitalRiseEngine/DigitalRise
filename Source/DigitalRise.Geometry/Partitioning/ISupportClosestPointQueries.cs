@@ -59,7 +59,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <paramref name="callback"/> is <see langword="null"/>.
     /// </exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    float GetClosestPointCandidates(Aabb aabb, float maxDistanceSquared, Func<T, float> callback);
+    float GetClosestPointCandidates(BoundingBox aabb, float maxDistanceSquared, Func<T, float> callback);
 
 
     /// <summary>

@@ -13,7 +13,7 @@ using DigitalRise.Mathematics.Algebra;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  public class Octree<T> : BaseAabbPartition<T>
+  public class Octree<T> : BaseBoundingBoxPartition<T>
   {
     //
     // Note:
@@ -34,7 +34,7 @@ namespace DigitalRise.Geometry.Partitioning
 
     private sealed class Node
     {
-      public Aabb Aabb;
+      public BoundingBox BoundingBox;
       public Node[] Children = new Node[8];  // Note: We could also use ushort indices and store all nodes in one list.
       public List<T> Items = new List<T>();
     }
@@ -54,24 +54,24 @@ namespace DigitalRise.Geometry.Partitioning
     //--------------------------------------------------------------
 
 
-    public Aabb? MinimumRootAabb
+    public BoundingBox? MinimumRootBoundingBox
     {
-      get { return _minimumRootAabb; }
+      get { return _minimumRootBoundingBox; }
       set
       {
-        if (value != _minimumRootAabb)
+        if (value != _minimumRootBoundingBox)
         {
-          _minimumRootAabb = value;
+          _minimumRootBoundingBox = value;
 
-          if (_minimumRootAabb.HasValue)
+          if (_minimumRootBoundingBox.HasValue)
           {
-            if (!IsContained(Aabb, _minimumRootAabb.Value))
+            if (!IsContained(BoundingBox, _minimumRootBoundingBox.Value))
               Invalidate();
           }
         }
       }
     }
-    private Aabb? _minimumRootAabb;
+    private BoundingBox? _minimumRootBoundingBox;
 
 
     public float MinimumCellSize { get; set; }
@@ -82,8 +82,8 @@ namespace DigitalRise.Geometry.Partitioning
     #region Creation & Cleanup
     //--------------------------------------------------------------
 
-    public Octree(Func<T, Aabb> getAabb)
-      : base(getAabb)
+    public Octree(Func<T, BoundingBox> getBoundingBox)
+      : base(getBoundingBox)
     {
     }
     #endregion
@@ -93,7 +93,7 @@ namespace DigitalRise.Geometry.Partitioning
     #region Methods
     //--------------------------------------------------------------
 
-    public override IEnumerable<T> GetOverlaps(Aabb aabb)
+    public override IEnumerable<T> GetOverlaps(BoundingBox aabb)
     {
       Update(false, null);
 
@@ -107,11 +107,11 @@ namespace DigitalRise.Geometry.Partitioning
       {
         var node = stack.Pop();
 
-        if (GeometryHelper.HaveContact(node.Aabb, aabb))
+        if (GeometryHelper.HaveContact(node.BoundingBox, aabb))
         {
           foreach (var item in node.Items)
           {
-            if (GeometryHelper.HaveContact(GetAabbForItem(item), aabb))
+            if (GeometryHelper.HaveContact(GetBoundingBoxForItem(item), aabb))
               yield return item;
           }
 
@@ -133,45 +133,45 @@ namespace DigitalRise.Geometry.Partitioning
       if (Count == 0)
       {
         Root = null;
-        Aabb = new Aabb();
+        BoundingBox = new BoundingBox();
         if (EnableSelfOverlaps)
           SelfOverlaps.Clear();
         return;
       }
 
-      var aabbs = new Aabb[Count];
-      aabbs[0] = GetAabbForItem(Items[0]);
-      Aabb = aabbs[0];
+      var aabbs = new BoundingBox[Count];
+      aabbs[0] = GetBoundingBoxForItem(Items[0]);
+      BoundingBox = aabbs[0];
       for (int i = 1; i < Count; i++)
       {
-        aabbs[i] = GetAabbForItem(Items[i]);
-        Aabb.Grow(aabbs[i]);
+        aabbs[i] = GetBoundingBoxForItem(Items[i]);
+        BoundingBox.Grow(aabbs[i]);
       }
 
-      if (MinimumRootAabb.HasValue)
-        Aabb.Grow(MinimumRootAabb.Value);
+      if (MinimumRootBoundingBox.HasValue)
+        BoundingBox.Grow(MinimumRootBoundingBox.Value);
 
 
-      Root = new Node { Aabb = Aabb, };
+      Root = new Node { BoundingBox = BoundingBox, };
 
       for (int i = 0; i < Items.Count; i++)
       {
         var item = Items[i];
         var node = Root;
-        var nodeAabb = Aabb;
-        var itemAabb = aabbs[i];
+        var nodeBoundingBox = BoundingBox;
+        var itemBoundingBox = aabbs[i];
 
-        while (IsContained(nodeAabb, itemAabb))
+        while (IsContained(nodeBoundingBox, itemBoundingBox))
         {
           int childIndex = -1;
-          Aabb childNodeAabb = new Aabb();
+          BoundingBox childNodeBoundingBox = new BoundingBox();
 
-          if (nodeAabb.Extent.LargestComponent() >= 2 * MinimumCellSize)
+          if (nodeBoundingBox.Extent().LargestComponent() >= 2 * MinimumCellSize)
           {
             for (int j = 0; j < 8; j++)
             {
-              childNodeAabb = CreateChildAabb(nodeAabb, j);
-              if (IsContained(childNodeAabb, itemAabb))
+              childNodeBoundingBox = CreateChildBoundingBox(nodeBoundingBox, j);
+              if (IsContained(childNodeBoundingBox, itemBoundingBox))
               {
                 childIndex = j;
                 break;
@@ -188,7 +188,7 @@ namespace DigitalRise.Geometry.Partitioning
           {
             if (node.Children[childIndex] == null)
             {
-              node.Children[childIndex] = new Node { Aabb = childNodeAabb, };
+              node.Children[childIndex] = new Node { BoundingBox = childNodeBoundingBox, };
             }
 
             node = node.Children[childIndex];
@@ -201,9 +201,9 @@ namespace DigitalRise.Geometry.Partitioning
         for (int i = 0; i < Items.Count; i++)
         {
           var item = Items[i];
-          var itemAabb = aabbs[i];
+          var itemBoundingBox = aabbs[i];
 
-          foreach (var touchedItem in GetOverlaps(itemAabb))
+          foreach (var touchedItem in GetOverlaps(itemBoundingBox))
           {
             if (Comparer.Equals(item, touchedItem))
               continue;
@@ -221,15 +221,15 @@ namespace DigitalRise.Geometry.Partitioning
       }
     }
 
-    private bool IsContained(Aabb container, Aabb aabb)
+    private bool IsContained(BoundingBox container, BoundingBox aabb)
     {
       // TODO: What about numerical tolerances?
-      return container.Minimum <= aabb.Minimum && aabb.Maximum <= container.Maximum;
+      return container.Minimum <= aabb.Min && aabb.Max <= container.Maximum;
     }
 
 
 
-    private Aabb CreateChildAabb(Aabb parentAabb, int childIndex)
+    private BoundingBox CreateChildBoundingBox(BoundingBox parentBoundingBox, int childIndex)
     {
       Vector3 offset;
       switch (childIndex % 4)
@@ -246,10 +246,10 @@ namespace DigitalRise.Geometry.Partitioning
       if (childIndex > 3)
         offset.Z = 1;
 
-      var childExtent = parentAabb.Extent * 0.5f;
-      var minimum = parentAabb.Minimum + offset * childExtent;
+      var childExtent = parentBoundingBox.Extent() * 0.5f;
+      var minimum = parentBoundingBox.Min + offset * childExtent;
       var maximum = minimum + childExtent;
-      return new Aabb(minimum, maximum);
+      return new BoundingBox(minimum, maximum);
     }
     #endregion
 

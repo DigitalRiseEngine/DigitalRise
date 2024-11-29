@@ -624,7 +624,7 @@ namespace DigitalRise.Geometry.Collisions.Tests
 
       Shape shape = new SphereShape(1);
       //var meshShape = new TriangleMeshShape(shape.GetMesh(0.01f, 4));
-      //meshShape.Partition = new AabbTree<int>();
+      //meshShape.Partition = new BoundingBoxTree<int>();
       //shape = meshShape;
 
       var geometricObjects = new GeometricObject[numberOfObjects];

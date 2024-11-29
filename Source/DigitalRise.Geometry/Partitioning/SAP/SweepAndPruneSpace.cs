@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using DigitalRise.Collections;
-using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 
@@ -141,17 +140,17 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
       // Update AABB of whole space.
-      UpdateAabb();
+      UpdateBoundingBox();
     }
 
 
     private void AddItem(T item)
     {
       // Add ItemInfo.
-      Aabb aabb = GetAabbForItem(item);
+      BoundingBox aabb = GetBoundingBoxForItem(item);
       ItemInfo itemInfo = new ItemInfo
       {
-        Aabb = aabb,
+        BoundingBox = aabb,
         Item = item,
       };
       _itemInfos.Add(itemInfo);
@@ -164,7 +163,7 @@ namespace DigitalRise.Geometry.Partitioning
         {
           Info = itemInfo,
           IsMax = false,
-          Position = aabb.Minimum.GetComponentByIndex(axisIndex)
+          Position = aabb.Min.GetComponentByIndex(axisIndex)
         };
 
         // Maximum edge
@@ -172,7 +171,7 @@ namespace DigitalRise.Geometry.Partitioning
         {
           Info = itemInfo,
           IsMax = true,
-          Position = aabb.Maximum.GetComponentByIndex(axisIndex)
+          Position = aabb.Max.GetComponentByIndex(axisIndex)
         };
 
         // Append at the end of the edge list.
@@ -202,8 +201,8 @@ namespace DigitalRise.Geometry.Partitioning
     private void UpdateItem(ItemInfo itemInfo)
     {
       // Get new AABB.
-      Aabb aabb = GetAabbForItem(itemInfo.Item);
-      itemInfo.Aabb = aabb;
+      BoundingBox aabb = GetBoundingBoxForItem(itemInfo.Item);
+      itemInfo.BoundingBox = aabb;
 
       // Update edge lists.
       for (int axisIndex = 0; axisIndex < 3; axisIndex++)
@@ -211,8 +210,8 @@ namespace DigitalRise.Geometry.Partitioning
         List<Edge> edgeList = _edges[axisIndex];
 
         // New positions of the min/max edges.
-        float newMinEdgePosition = aabb.Minimum.GetComponentByIndex(axisIndex);
-        float newMaxEdgePosition = aabb.Maximum.GetComponentByIndex(axisIndex);
+        float newMinEdgePosition = aabb.Min.GetComponentByIndex(axisIndex);
+        float newMaxEdgePosition = aabb.Max.GetComponentByIndex(axisIndex);
 
         // Old indices of the edges.
         int oldMinEdgeIndex = itemInfo.MinEdgeIndices[axisIndex];
@@ -298,12 +297,12 @@ namespace DigitalRise.Geometry.Partitioning
     /// <summary>
     /// Updates the AABB of the whole spatial partition.
     /// </summary>
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
       if (Count == 0)
       {
         // AABB is undefined.
-        Aabb = new Aabb();
+        BoundingBox = new BoundingBox();
       }
       else
       {
@@ -319,7 +318,7 @@ namespace DigitalRise.Geometry.Partitioning
           _edges[1][maxEdgeIndex].Position,
           _edges[2][maxEdgeIndex].Position);
 
-        Aabb = new Aabb(minimum, maximum);
+        BoundingBox = new BoundingBox(minimum, maximum);
       }
     }
 
@@ -567,6 +566,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       return true;
     }
-    #endregion
-  }
+
+		#endregion
+	}
 }

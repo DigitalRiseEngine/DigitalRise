@@ -160,7 +160,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Note: 
       // Uniform scaling is no problem. The scale can be applied anytime in the process.
@@ -175,13 +175,13 @@ namespace DigitalRise.Geometry.Shapes
         // Uniform scaling:
         // Transform the shape to world space and return its AABB.
         var childPose = new Pose(_child.Pose.Position * scale.X, _child.Pose.Orientation);
-        return _child.Shape.GetAabb(scale.X * _child.Scale, pose * childPose);
+        return _child.Shape.GetBoundingBox(scale.X * _child.Scale, pose * childPose);
       }
       else
       {
         // Non-uniform scaling:
         // Get AABB of child, transform the box to world space and return its AABB.
-        return _child.Aabb.GetAabb(scale, pose);
+        return _child.BoundingBox.GetBoundingBox(scale, pose);
 
         // Possible improvement: We can check if child.Pose.Orientation contains no orientation.
         // Then we compute a tighter AABB like in the uniform case.
@@ -232,7 +232,7 @@ namespace DigitalRise.Geometry.Shapes
     protected override TriangleMesh OnGetMesh(float absoluteDistanceThreshold, int iterationLimit)
     {
       // Convert absolute error to relative error.
-      Vector3 extents = GetAabb(Vector3.One, Pose.Identity).Extent;
+      Vector3 extents = GetBoundingBox(Vector3.One, Pose.Identity).Extent();
       float maxExtent = extents.LargestComponent();
       float relativeThreshold = !Numeric.IsZero(maxExtent) 
                                 ? absoluteDistanceThreshold / maxExtent

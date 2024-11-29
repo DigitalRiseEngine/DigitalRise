@@ -190,7 +190,7 @@ namespace DigitalRise.Geometry.Shapes
     //--------------------------------------------------------------
 
     // The cached local space AABB
-    private Aabb _aabbLocal = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+    private BoundingBox _aabbLocal = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
     #endregion
 
 
@@ -319,7 +319,7 @@ namespace DigitalRise.Geometry.Shapes
     #region Methods
     //--------------------------------------------------------------
 
-    internal void Set(Vector3[] vertices, Aabb aabb, Vector3 innerPoint, DirectionalLookupTableUInt16F directionalLookupTable, VertexAdjacency vertexAdjacency)
+    internal void Set(Vector3[] vertices, BoundingBox aabb, Vector3 innerPoint, DirectionalLookupTableUInt16F directionalLookupTable, VertexAdjacency vertexAdjacency)
     {
       _vertices = vertices;
       _aabbLocal = aabb;
@@ -354,10 +354,10 @@ namespace DigitalRise.Geometry.Shapes
     #region ----- Shape -----
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Apply scale and pose to AABB.
-      return _aabbLocal.GetAabb(scale, pose);
+      return _aabbLocal.GetBoundingBox(scale, pose);
     }
 
 
@@ -470,7 +470,7 @@ namespace DigitalRise.Geometry.Shapes
         throw new NotSupportedException("Too many vertices in convex hull. Max. 65534 vertices in convex hull are supported.");
 
       _vertices = (convexHull != null) ? convexHull.Vertices.Select(v => v.Position).ToArray() : new Vector3[0];
-      CacheAabb();
+      CacheBoundingBox();
       CacheInnerPoint();
 
       Debug.Assert(VertexThreshold > 4, "Vertex threshold should be greater than 4.");
@@ -483,9 +483,9 @@ namespace DigitalRise.Geometry.Shapes
     }
 
 
-    private void CacheAabb()
+    private void CacheBoundingBox()
     {
-      _aabbLocal = base.GetAabb(Vector3.One, Pose.Identity);
+      _aabbLocal = base.GetBoundingBox(Vector3.One, Pose.Identity);
     }
 
 

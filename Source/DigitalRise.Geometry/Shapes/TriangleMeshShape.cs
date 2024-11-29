@@ -48,7 +48,7 @@ namespace DigitalRise.Geometry.Shapes
   /// by using an AABB tree:
   /// <code lang="csharp">
   /// <![CDATA[
-  /// myTriangleMeshShape.Partition = new AabbTree<int>();
+  /// myTriangleMeshShape.Partition = new BoundingBoxTree<int>();
   /// ]]>
   /// </code>
   /// </para>
@@ -72,7 +72,7 @@ namespace DigitalRise.Geometry.Shapes
     //--------------------------------------------------------------
 
     // The cached local space AABB
-    internal Aabb _aabbLocal = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+    internal BoundingBox _aabbLocal = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
     #endregion
 
 
@@ -155,7 +155,7 @@ namespace DigitalRise.Geometry.Shapes
           // Clear old partition.
           if (_partition != null)
           {
-            _partition.GetAabbForItem = null;
+            _partition.GetBoundingBoxForItem = null;
             _partition.Clear();
           }
 
@@ -165,7 +165,7 @@ namespace DigitalRise.Geometry.Shapes
           // Fill new partition.
           if (_partition != null)
           {
-            _partition.GetAabbForItem = i => Mesh.GetTriangle(i).Aabb;
+            _partition.GetBoundingBoxForItem = i => Mesh.GetTriangle(i).BoundingBox;
             _partition.Clear();
             int numberOfTriangles = Mesh.NumberOfTriangles;
             for (int i = 0; i < numberOfTriangles; i++)
@@ -231,7 +231,7 @@ namespace DigitalRise.Geometry.Shapes
 
     // The former tree envelope property is not needed anymore. If the AABBs in the
     // spatial partition should have an additional margin, use a partition that supports
-    // this or use a GetAabbForItem method that computes an increased AABB.
+    // this or use a GetBoundingBoxForItem method that computes an increased AABB.
     // public float TreeEnvelope { get; set; }
 
 
@@ -262,12 +262,12 @@ namespace DigitalRise.Geometry.Shapes
       {
         // ----- PCL Profile136 does not support dynamic.
         //dynamic internals = new ExpandoObject();
-        //internals.AabbLocal = _aabbLocal;
+        //internals.BoundingBoxLocal = _aabbLocal;
         //internals.TriangleNeighbors = TriangleNeighbors;
         //return internals;
 
         IDictionary<string, object> internals = new ExpandoObject();
-        internals["AabbLocal"] = _aabbLocal;
+        internals["BoundingBoxLocal"] = _aabbLocal;
         internals["TriangleNeighbors"] = TriangleNeighbors;
         return internals;
       }
@@ -389,10 +389,10 @@ namespace DigitalRise.Geometry.Shapes
       if (partition != null)
       {
         _partition = partition;
-        _partition.GetAabbForItem = i => Mesh.GetTriangle(i).Aabb;
+        _partition.GetBoundingBoxForItem = i => Mesh.GetTriangle(i).BoundingBox;
 
         // ----- Validate spatial partition.
-        // Some spatial partitions, such as the CompressedAabbTree, are pre-initialized when 
+        // Some spatial partitions, such as the CompressedBoundingBoxTree, are pre-initialized when 
         // loaded via content pipeline. Other spatial partitions need to be initialized manually.
         int numberOfTriangles = _mesh.NumberOfTriangles;
         if (_partition.Count != numberOfTriangles)
@@ -438,16 +438,16 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
-      if (Numeric.IsNaN(_aabbLocal.Minimum.X))
+      if (Numeric.IsNaN(_aabbLocal.Min.X))
       {
         // ----- Recompute local cached AABB if it is invalid.
 
         if (Partition == null)
         {
           // ----- No spatial partition.
-          _aabbLocal = new Aabb();
+          _aabbLocal = new BoundingBox();
 
           if (_mesh != null && _mesh.NumberOfTriangles > 0)
           {
@@ -464,7 +464,7 @@ namespace DigitalRise.Geometry.Shapes
                 if (isFirst)
                 {
                   isFirst = false;
-                  _aabbLocal = new Aabb(vertex, vertex);
+                  _aabbLocal = new BoundingBox(vertex, vertex);
                 }
                 else
                 {
@@ -478,12 +478,12 @@ namespace DigitalRise.Geometry.Shapes
         {
           // ----- With spatial partition.
           // Use spatial partition to determine local AABB.
-          _aabbLocal = Partition.Aabb;
+          _aabbLocal = Partition.BoundingBox;
         }
       }
 
       // Apply scale and pose to AABB.
-      return _aabbLocal.GetAabb(scale, pose);
+      return _aabbLocal.GetBoundingBox(scale, pose);
     }
 
 
@@ -566,7 +566,7 @@ namespace DigitalRise.Geometry.Shapes
         throw new ArgumentOutOfRangeException("triangleIndex");
 
       // Set cached AABB to "invalid".
-      _aabbLocal = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+      _aabbLocal = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
 
       // Fill new spatial partition.
       if (_partition != null)

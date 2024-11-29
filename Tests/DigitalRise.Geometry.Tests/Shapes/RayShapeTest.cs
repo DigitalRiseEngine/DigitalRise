@@ -118,9 +118,9 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(new Vector3(0, 0, 0), new Vector3(100, 0, 0)), new RayShape().GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(11, 102, 1003), new Vector3(11, 112, 1003)),
-                     new RayShape(new Vector3(1, 2, 3), new Vector3(0, 1, 0), 10).GetAabb(new Pose(new Vector3(10, 100, 1000),
+      Assert.AreEqual(new BoundingBox(new Vector3(0, 0, 0), new Vector3(100, 0, 0)), new RayShape().GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(11, 102, 1003), new Vector3(11, 112, 1003)),
+                     new RayShape(new Vector3(1, 2, 3), new Vector3(0, 1, 0), 10).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
                                                                          Quaternion.Identity)));
     }
 
@@ -160,8 +160,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(ray.Origin, clone.Origin);
       Assert.AreEqual(ray.Direction, clone.Direction);
       Assert.AreEqual(ray.Length, clone.Length);
-      Assert.AreEqual(ray.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(ray.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(ray.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(ray.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

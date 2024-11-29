@@ -15,7 +15,7 @@ namespace DigitalRise.SceneGraph
 	{
 		None = 0,
 		IsDisposed = 1 << 0,
-		IsAabbDirty = 1 << 1,
+		IsBoundingBoxDirty = 1 << 1,
 		IsScaleWorldDirty = 1 << 2,
 		IsPoseWorldDirty = 1 << 3,
 		HasLastScaleWorld = 1 << 4,

@@ -37,7 +37,7 @@ namespace DigitalRise.Geometry.Shapes
     //--------------------------------------------------------------
 
     // The cached local space AABB
-    private Aabb _aabbLocal = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+    private BoundingBox _aabbLocal = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
 
     // The cached inner point.
     private Vector3 _innerPoint = new Vector3(float.NaN);
@@ -200,14 +200,14 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Recompute local cached AABB if it is invalid.
-      if (Numeric.IsNaN(_aabbLocal.Minimum.X))
-        _aabbLocal = base.GetAabb(Vector3.One, Pose.Identity);
+      if (Numeric.IsNaN(_aabbLocal.Min.X))
+        _aabbLocal = base.GetBoundingBox(Vector3.One, Pose.Identity);
 
       // Apply scale and pose to AABB.
-      return _aabbLocal.GetAabb(scale, pose);
+      return _aabbLocal.GetBoundingBox(scale, pose);
     }
 
 
@@ -292,7 +292,7 @@ namespace DigitalRise.Geometry.Shapes
     protected override void OnChanged(ShapeChangedEventArgs eventArgs)
     {
       // Set cached AABB to "invalid".
-      _aabbLocal = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+      _aabbLocal = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
       _innerPoint = new Vector3(float.NaN);
 
       base.OnChanged(eventArgs);

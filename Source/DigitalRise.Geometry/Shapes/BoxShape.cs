@@ -232,12 +232,12 @@ namespace DigitalRise.Geometry.Shapes
 
 
 		/// <inheritdoc/>
-		public override Aabb GetAabb(Vector3 scale, Pose pose)
+		public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
 		{
 			Vector3 halfExtent = new Vector3(_widthX / 2, _widthY / 2, _widthZ / 2) * MathHelper.Absolute(scale);
 
 			if (pose == Pose.Identity)
-				return new Aabb(-halfExtent, halfExtent);
+				return new BoundingBox(-halfExtent, halfExtent);
 
 			// Get world axes in local space. They are equal to the rows of the orientation matrix.
 			Matrix33F rotationMatrix = pose.Orientation;
@@ -261,7 +261,7 @@ namespace DigitalRise.Geometry.Shapes
 													Vector3.Dot(halfExtent, worldY),
 													Vector3.Dot(halfExtent, worldZ));
 
-			return new Aabb(pose.Position - halfExtentWorld, pose.Position + halfExtentWorld);
+			return new BoundingBox(pose.Position - halfExtentWorld, pose.Position + halfExtentWorld);
 		}
 
 
@@ -503,7 +503,7 @@ namespace DigitalRise.Geometry.Shapes
 
 		public static BoxShape FromBoundingBox(BoundingBox box)
 		{
-			return new BoxShape(box.Volume());
+			return new BoxShape(box.Extent());
 		}
 
 		#endregion

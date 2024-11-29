@@ -120,15 +120,15 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(), new RectangleShape().GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
-                     new RectangleShape().GetAabb(new Pose(new Vector3(10, 100, -13),
+      Assert.AreEqual(new BoundingBox(), new RectangleShape().GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
+                     new RectangleShape().GetBoundingBox(new Pose(new Vector3(10, 100, -13),
                                                                          MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
-      Assert.AreEqual(new Aabb(new Vector3(5, 90, 1000), new Vector3(15, 110, 1000)),
-                     new RectangleShape(10, 20).GetAabb(new Pose(new Vector3(10, 100, 1000),
+      Assert.AreEqual(new BoundingBox(new Vector3(5, 90, 1000), new Vector3(15, 110, 1000)),
+                     new RectangleShape(10, 20).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
                                                                    Quaternion.Identity)));
-      Assert.AreEqual(new Aabb(new Vector3(5, 100, 990), new Vector3(15, 100, 1010)),
-                     new RectangleShape(10, 20).GetAabb(new Pose(new Vector3(10, 100, 1000),
+      Assert.AreEqual(new BoundingBox(new Vector3(5, 100, 990), new Vector3(15, 100, 1010)),
+                     new RectangleShape(10, 20).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
                                                                    MathHelper.CreateRotationX(ConstantsF.PiOver2))));
       // TODO: Test complex rotations.
     }
@@ -184,8 +184,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.IsNotNull(clone);
       Assert.AreEqual(rectangle.WidthX, clone.WidthX);
       Assert.AreEqual(rectangle.WidthY, clone.WidthY);
-      Assert.AreEqual(rectangle.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(rectangle.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(rectangle.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(rectangle.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

@@ -45,11 +45,11 @@ float4 Parameters2;
 #define FadeOutRange Parameters2.w
 
 float4 Parameters3;
-#define ProjectionAabbMin Parameters3.xyz // AABB min for localization. Localization is disabled if min > max.
+#define ProjectionBoundingBoxMin Parameters3.xyz // AABB min for localization. Localization is disabled if min > max.
 #define TextureSize Parameters3.w         // Size of one cube map face in texels.
 
 float4 Parameters4;
-#define ProjectionAabbMax Parameters4.xyz
+#define ProjectionBoundingBoxMax Parameters4.xyz
 #define BlendMode Parameters4.w
 
 float PrecomputedTerm = log2(256 * sqrt(3)); // Precomputed term log2(TextureSize * sqrt(3))
@@ -160,12 +160,12 @@ float3 LocalizeDirection(float3 positionLocal, float3 directionWorld)
   float3 directionLocal = mul(directionWorld, (float3x3)Transform);
   
   // If AABB is invalid (min > max), localization is disabled.
-  if (ProjectionAabbMin.x > ProjectionAabbMax.x)
+  if (ProjectionBoundingBoxMin.x > ProjectionBoundingBoxMax.x)
     return directionLocal;
   
   // Compute ray parameter where ray from position hits the box sides.
-  float3 pMax = (ProjectionAabbMax - positionLocal) / directionLocal;
-  float3 pMin = (ProjectionAabbMin - positionLocal) / directionLocal;
+  float3 pMax = (ProjectionBoundingBoxMax - positionLocal) / directionLocal;
+  float3 pMin = (ProjectionBoundingBoxMin - positionLocal) / directionLocal;
   
   // Get result of positive ray direction, not negative parameters.
   float3 pPos = max(pMin, pMax);

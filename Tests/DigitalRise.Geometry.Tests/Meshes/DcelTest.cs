@@ -294,20 +294,20 @@ namespace DigitalRise.Geometry.Meshes.Tests
       mesh.CutConvex(new Plane(new Vector3(1, 2, 3).Normalized(), 0.6f));
       mesh.CutConvex(new Plane(new Vector3(-2, -3, 1).Normalized(), 0.8f));
 
-      var aabb = mesh.GetAabb();
+      var aabb = mesh.GetBoundingBox();
 
       var skinWidth = 0.3f;
       mesh.ModifyConvex(100, skinWidth);
 
-      var aabb2 = mesh.GetAabb();
+      var aabb2 = mesh.GetBoundingBox();
 
       Assert.IsTrue(mesh.IsConvex());
-      AssertExt.AreNumericallyEqual(aabb.Minimum.X - skinWidth, aabb2.Minimum.X);
-      AssertExt.AreNumericallyEqual(aabb.Minimum.Y - skinWidth, aabb2.Minimum.Y);
-      AssertExt.AreNumericallyEqual(aabb.Minimum.Z - skinWidth, aabb2.Minimum.Z);
-      AssertExt.AreNumericallyEqual(aabb.Maximum.X + skinWidth, aabb2.Maximum.X);
-      AssertExt.AreNumericallyEqual(aabb.Maximum.Y + skinWidth, aabb2.Maximum.Y);
-      AssertExt.AreNumericallyEqual(aabb.Maximum.Z + skinWidth, aabb2.Maximum.Z);
+      AssertExt.AreNumericallyEqual(aabb.Min.X - skinWidth, aabb2.Min.X);
+      AssertExt.AreNumericallyEqual(aabb.Min.Y - skinWidth, aabb2.Min.Y);
+      AssertExt.AreNumericallyEqual(aabb.Min.Z - skinWidth, aabb2.Min.Z);
+      AssertExt.AreNumericallyEqual(aabb.Max.X + skinWidth, aabb2.Max.X);
+      AssertExt.AreNumericallyEqual(aabb.Max.Y + skinWidth, aabb2.Max.Y);
+      AssertExt.AreNumericallyEqual(aabb.Max.Z + skinWidth, aabb2.Max.Z);
     }
   }
 }

@@ -21,13 +21,13 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       public static int NextId;
 
       public int Id;
-      public Aabb Aabb;
+      public BoundingBox BoundingBox;
       public int Group;
 
-      public TestObject(Aabb aabb)
+      public TestObject(BoundingBox aabb)
       {
         Id = NextId++;
-        Aabb = aabb;
+        BoundingBox = aabb;
         Group = RandomHelper.Random.NextInteger(0, 9);
       }
 
@@ -41,26 +41,26 @@ namespace DigitalRise.Geometry.Partitioning.Tests
     List<TestObject> _testObjects = new List<TestObject>();
     List<TestObject> _testObjectsOfPartition2 = new List<TestObject>();
     private ISpatialPartition<int> _partition2; // Second test partition for partition vs. partition tests.
-    private bool _conservativeAabb;
+    private bool _conservativeBoundingBox;
     private bool _conservativeOverlaps;
 
 
-    private static Aabb GetAabbOfTestObject(List<TestObject> testObjects, int id)
+    private static BoundingBox GetBoundingBoxOfTestObject(List<TestObject> testObjects, int id)
     {
       TestObject testObject = testObjects.FirstOrDefault(to => to.Id == id);
-      return (testObject != null) ? testObject.Aabb : new Aabb();      
+      return (testObject != null) ? testObject.BoundingBox : new BoundingBox();      
     }
 
 
-    private Aabb GetAabbOfTestObject(int id)
+    private BoundingBox GetBoundingBoxOfTestObject(int id)
     {
-      return GetAabbOfTestObject(_testObjects, id);
+      return GetBoundingBoxOfTestObject(_testObjects, id);
     }
 
 
-    private Aabb GetAabbOfTestObjectOfPartition2(int id)
+    private BoundingBox GetBoundingBoxOfTestObjectOfPartition2(int id)
     {
-      return GetAabbOfTestObject(_testObjectsOfPartition2, id);
+      return GetBoundingBoxOfTestObject(_testObjectsOfPartition2, id);
     }
 
 
@@ -83,19 +83,19 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       _testObjectsOfPartition2.Clear();
 
       TestObject.NextId = 0;
-      _testObjectsOfPartition2.Add(new TestObject(GetRandomAabb()));
-      _testObjectsOfPartition2.Add(new TestObject(GetRandomAabb()));
-      _testObjectsOfPartition2.Add(new TestObject(GetRandomAabb()));
-      _testObjectsOfPartition2.Add(new TestObject(GetRandomAabb()));
+      _testObjectsOfPartition2.Add(new TestObject(GetRandomBoundingBox()));
+      _testObjectsOfPartition2.Add(new TestObject(GetRandomBoundingBox()));
+      _testObjectsOfPartition2.Add(new TestObject(GetRandomBoundingBox()));
+      _testObjectsOfPartition2.Add(new TestObject(GetRandomBoundingBox()));
 
-      _partition2 = new AabbTree<int>();
-      _partition2.GetAabbForItem = GetAabbOfTestObjectOfPartition2;
+      _partition2 = new BoundingBoxTree<int>();
+      _partition2.GetBoundingBoxForItem = GetBoundingBoxOfTestObjectOfPartition2;
       _partition2.Add(0);
       _partition2.Add(1);
       _partition2.Add(2);
       _partition2.Add(3);
 
-      _conservativeAabb = false;
+      _conservativeBoundingBox = false;
       _conservativeOverlaps = false;
     }
 
@@ -103,64 +103,64 @@ namespace DigitalRise.Geometry.Partitioning.Tests
     [Test]
     public void TestDebugSpatialPartition()
     {
-      TestPartition(new DebugSpatialPartition<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new DebugSpatialPartition<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
-    public void TestAabbTree()
+    public void TestBoundingBoxTree()
     {
-      TestPartition(new AabbTree<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new BoundingBoxTree<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
-    public void TestCompressedAabbTree()
+    public void TestCompressedBoundingBoxTree()
     {
-      _conservativeAabb = true;
+      _conservativeBoundingBox = true;
       _conservativeOverlaps = true;
-      TestPartition(new CompressedAabbTree { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new CompressedBoundingBoxTree { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
     public void TestSAP()
     {
-      TestPartition(new SweepAndPruneSpace<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new SweepAndPruneSpace<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
-    public void TestDynamicAabbTreeWithoutMotionPrediction()
+    public void TestDynamicBoundingBoxTreeWithoutMotionPrediction()
     {
-      _conservativeAabb = true;
+      _conservativeBoundingBox = true;
       _conservativeOverlaps = true;
-      TestPartition(new DynamicAabbTree<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new DynamicBoundingBoxTree<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
-    public void TestDynamicAabbTreeWithMotionPrediction()
+    public void TestDynamicBoundingBoxTreeWithMotionPrediction()
     {
-      _conservativeAabb = true;
+      _conservativeBoundingBox = true;
       _conservativeOverlaps = true;
-      TestPartition(new DynamicAabbTree<int> { GetAabbForItem = GetAabbOfTestObject, EnableMotionPrediction = true });
+      TestPartition(new DynamicBoundingBoxTree<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject, EnableMotionPrediction = true });
     }
 
 
     [Test]
     public void TestDualPartition()
     {
-      _conservativeAabb = true;
+      _conservativeBoundingBox = true;
       _conservativeOverlaps = true;
-      TestPartition(new DualPartition<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new DualPartition<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
     [Test]
-    public void TestAdaptiveAabbTree()
+    public void TestAdaptiveBoundingBoxTree()
     {
-      TestPartition(new AdaptiveAabbTree<int> { GetAabbForItem = GetAabbOfTestObject });
+      TestPartition(new AdaptiveBoundingBoxTree<int> { GetBoundingBoxForItem = GetBoundingBoxOfTestObject });
     }
 
 
@@ -172,12 +172,12 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       partition.EnableSelfOverlaps = true;
       Assert.AreEqual(0, partition.GetOverlaps().Count());
       Assert.AreEqual(0, partition.GetOverlaps(0).Count());
-      Assert.AreEqual(0, partition.GetOverlaps(new Aabb()).Count());
+      Assert.AreEqual(0, partition.GetOverlaps(new BoundingBox()).Count());
       Assert.AreEqual(0, partition.GetOverlaps(_partition2).Count());
       Assert.AreEqual(0, partition.GetOverlaps(Vector3.One, Pose.Identity, _partition2, Vector3.One, Pose.Identity).Count());
 
 
-      var testObject = new TestObject(new Aabb(new Vector3(10), new Vector3(10)));
+      var testObject = new TestObject(new BoundingBox(new Vector3(10), new Vector3(10)));
       _testObjects.Add(testObject);
       partition.Add(testObject.Id);
 
@@ -202,7 +202,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
         // Update partition. From time to time rebuild all.
         // For the above tests update should have been called automatically!
         partition.Update(i % 10 == 9);
-        TestAabb(partition);
+        TestBoundingBox(partition);
 
         var dice100 = RandomHelper.Random.Next(0, 100);
         if (dice100 < 2)
@@ -237,7 +237,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
           int addCount = RandomHelper.Random.NextInteger(1, 4);
           for (int k = 0; k < addCount; k++)
           {
-            var newObj = new TestObject(GetRandomAabb());
+            var newObj = new TestObject(GetRandomBoundingBox());
             _testObjects.Add(newObj);
             partition.Add(newObj.Id);
           }
@@ -250,7 +250,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
           {
             var index = RandomHelper.Random.NextInteger(0, partition.Count - 1);
             var obj = _testObjects[index];
-            obj.Aabb = GetRandomAabb();
+            obj.BoundingBox = GetRandomBoundingBox();
             partition.Invalidate(obj.Id);
           }
         }
@@ -282,69 +282,69 @@ namespace DigitalRise.Geometry.Partitioning.Tests
     }
 
 
-    private Aabb GetRandomAabb()
+    private BoundingBox GetRandomBoundingBox()
     {
       var point = RandomHelper.Random.NextVector3(0, 100);
       var point2 = RandomHelper.Random.NextVector3(0, 100);
-      var newAabb = new Aabb(point, point);
-      newAabb.Grow(point2);
-      return newAabb;
+      var newBoundingBox = new BoundingBox(point, point);
+      newBoundingBox.Grow(point2);
+      return newBoundingBox;
     }
 
 
-    private void TestAabb(ISpatialPartition<int> partition)
+    private void TestBoundingBox(ISpatialPartition<int> partition)
     {
       if (_testObjects.Count == 0)
         return;
 
       // Compute desired result.
-      var desiredAabb = _testObjects[0].Aabb;
-      _testObjects.ForEach(obj => desiredAabb.Grow(obj.Aabb));
+      var desiredBoundingBox = _testObjects[0].BoundingBox;
+      _testObjects.ForEach(obj => desiredBoundingBox.Grow(obj.BoundingBox));
 
       // The AABB of the spatial partition can be slightly bigger.
-      // E.g. the CompressedAabbTree adds a margin to avoid divisions by zero.
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Minimum.X));
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Minimum.Y));
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Minimum.Z));
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Maximum.X));
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Maximum.Y));
-      Assert.IsTrue(Numeric.IsFinite(partition.Aabb.Maximum.Z));
+      // E.g. the CompressedBoundingBoxTree adds a margin to avoid divisions by zero.
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Min.X));
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Min.Y));
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Min.Z));
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Max.X));
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Max.Y));
+      Assert.IsTrue(Numeric.IsFinite(partition.BoundingBox.Max.Z));
 
-      if (_conservativeAabb)
+      if (_conservativeBoundingBox)
       {
         // AABB can be bigger than actual objects.
-        Assert.IsTrue(partition.Aabb.Contains(desiredAabb), "Wrong AABB: AABB is too small.");
+        Assert.IsTrue(partition.BoundingBox.Contains(desiredBoundingBox) == ContainmentType.Contains, "Wrong AABB: AABB is too small.");
       }
       else
       {
         // The AABB should be identical.
-        AssertExt.AreNumericallyEqual(desiredAabb.Minimum, partition.Aabb.Minimum);
-        AssertExt.AreNumericallyEqual(desiredAabb.Maximum, partition.Aabb.Maximum);        
+        AssertExt.AreNumericallyEqual(desiredBoundingBox.Min, partition.BoundingBox.Min);
+        AssertExt.AreNumericallyEqual(desiredBoundingBox.Max, partition.BoundingBox.Max);        
       }
     }
 
 
     private void TestGetOverlaps0(ISpatialPartition<int> partition)
     {
-      var aabb = GetRandomAabb();
+      var aabb = GetRandomBoundingBox();
 
       // Compute desired result.
       var desiredResults = new List<int>();
       foreach (var testObject in _testObjects)
       {
-        if (GeometryHelper.HaveContact(aabb, testObject.Aabb))
+        if (GeometryHelper.HaveContact(aabb, testObject.BoundingBox))
           desiredResults.Add(testObject.Id);
       }
 
       var results = partition.GetOverlaps(aabb).ToList();
-      CompareResults(desiredResults, results, "GetOverlaps(Aabb) returns different number of results.");
+      CompareResults(desiredResults, results, "GetOverlaps(BoundingBox) returns different number of results.");
     }
 
 
     private void TestGetOverlaps1(ISpatialPartition<int> partition)
     {
       // Temporarily add random test object.
-      var randomTestObject = new TestObject(GetRandomAabb());
+      var randomTestObject = new TestObject(GetRandomBoundingBox());
       _testObjects.Add(randomTestObject);
 
       // Compute desired result.
@@ -355,7 +355,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
           continue;
 
         if (partition.Filter == null || partition.Filter.Filter(new Pair<int>(randomTestObject.Id, testObject.Id)))
-          if (GeometryHelper.HaveContact(randomTestObject.Aabb, testObject.Aabb))
+          if (GeometryHelper.HaveContact(randomTestObject.BoundingBox, testObject.BoundingBox))
             desiredResults.Add(testObject.Id);
       }
 
@@ -368,8 +368,8 @@ namespace DigitalRise.Geometry.Partitioning.Tests
 
     private void TestGetOverlaps2(ISpatialPartition<int> partition)
     {
-      var aabb = GetRandomAabb();
-      var ray = new Ray(aabb.Minimum, aabb.Extent.Normalized(), aabb.Extent.Length());
+      var aabb = GetRandomBoundingBox();
+      var ray = new Ray(aabb.Min, aabb.Extent().Normalized(), aabb.Extent().Length());
 
       ray.Direction = RandomHelper.Random.NextVector3(-1, 1).Normalized();
 
@@ -377,7 +377,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
       var desiredResults = new List<int>();
       foreach (var testObject in _testObjects)
       {
-        if (GeometryHelper.HaveContact(testObject.Aabb, ray))
+        if (GeometryHelper.HaveContact(testObject.BoundingBox, ray))
           desiredResults.Add(testObject.Id);
       }
 
@@ -401,7 +401,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
           var b = _testObjects[j];
           if (a != b)
             if (partition.Filter == null || partition.Filter.Filter(new Pair<int>(a.Id, b.Id)))
-              if (GeometryHelper.HaveContact(a.Aabb, b.Aabb))
+              if (GeometryHelper.HaveContact(a.BoundingBox, b.BoundingBox))
                 desiredResults.Add(new Pair<int>(a.Id, b.Id));
         }
       }
@@ -426,7 +426,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
         foreach (var b in _testObjectsOfPartition2)
         {
           if (partition.Filter == null || partition.Filter.Filter(new Pair<int>(a.Id, b.Id)))
-            if (GeometryHelper.HaveContact(a.Aabb, b.Aabb))
+            if (GeometryHelper.HaveContact(a.BoundingBox, b.BoundingBox))
               desiredResults.Add(new Pair<int>(a.Id, b.Id));
         }
       }
@@ -439,7 +439,7 @@ namespace DigitalRise.Geometry.Partitioning.Tests
     private void TestGetOverlaps5(ISpatialPartition<int> partition)
     {
       // Get random pose for _partition2
-      var pose = new Pose(GetRandomAabb().Center, RandomHelper.Random.NextQuaternion());
+      var pose = new Pose(GetRandomBoundingBox().Center(), RandomHelper.Random.NextQuaternion());
       var scale = RandomHelper.Random.NextVector3(0.1f, 3f);
 
       // Compute desired result.
@@ -450,12 +450,12 @@ namespace DigitalRise.Geometry.Partitioning.Tests
         {
           if (partition.Filter == null || partition.Filter.Filter(new Pair<int>(a.Id, b.Id)))
           {
-            var aabbB = b.Aabb;
+            var aabbB = b.BoundingBox;
             aabbB.Scale(scale);
-            var boxB = aabbB.Extent;
-            var poseB = pose * new Pose(aabbB.Center);
+            var boxB = aabbB.Extent();
+            var poseB = pose * new Pose(aabbB.Center());
 
-            if (GeometryHelper.HaveContact(a.Aabb, boxB, poseB, true))
+            if (GeometryHelper.HaveContact(a.BoundingBox, boxB, poseB, true))
               desiredResults.Add(new Pair<int>(a.Id, b.Id));
           }
         }

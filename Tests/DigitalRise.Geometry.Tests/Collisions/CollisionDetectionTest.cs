@@ -74,44 +74,44 @@ namespace DigitalRise.Geometry.Collisions.Tests
 
 
     [Test]
-    public void HaveAabbContact()
+    public void HaveBoundingBoxContact()
     {
-      Assert.IsTrue(_collisionDetection.HaveAabbContact(_objectA, _objectA));
-      Assert.IsTrue(_collisionDetection.HaveAabbContact(_objectA, _objectB));
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(_objectA, _objectC));
+      Assert.IsTrue(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectA));
+      Assert.IsTrue(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectC));
 
       _collisionDetection.CollisionFilter = new CollisionFilter();
       ((CollisionFilter) _collisionDetection.CollisionFilter).Set(_objectA, _objectB, false);
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(_objectA, _objectB));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
 
       ((CollisionFilter) _collisionDetection.CollisionFilter).Set(_objectA, _objectB, true);
-      Assert.IsTrue(_collisionDetection.HaveAabbContact(_objectA, _objectB));
+      Assert.IsTrue(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
 
       _collisionDetection.CollisionFilter = null;
-      Assert.IsTrue(_collisionDetection.HaveAabbContact(_objectA, _objectB));
+      Assert.IsTrue(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
 
       _objectA.Enabled = false;
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(_objectA, _objectB));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
 
       _objectA.Enabled = true;
       _objectB.Enabled = false;
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(_objectA, _objectB));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(_objectA, _objectB));
     }
 
 
     [Test]
     [ExpectedException(typeof(ArgumentNullException))]
-    public void HaveAabbContactException()
+    public void HaveBoundingBoxContactException()
     {
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(null, _objectA));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(null, _objectA));
     }
 
 
     [Test]
     [ExpectedException(typeof(ArgumentNullException))]
-    public void HaveAabbContactException2()
+    public void HaveBoundingBoxContactException2()
     {
-      Assert.IsFalse(_collisionDetection.HaveAabbContact(_objectA, null));
+      Assert.IsFalse(_collisionDetection.HaveBoundingBoxContact(_objectA, null));
     }
 
 

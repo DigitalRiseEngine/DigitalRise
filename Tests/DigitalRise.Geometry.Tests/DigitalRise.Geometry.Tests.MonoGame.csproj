@@ -13,9 +13,9 @@
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MNTestSdkVersion)" />
-  </ItemGroup>  
+  </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.csproj" />
+    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.MonoGame.csproj" />
   </ItemGroup>
 </Project>

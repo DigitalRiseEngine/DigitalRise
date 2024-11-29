@@ -137,7 +137,7 @@ namespace DigitalRise.Geometry.Collisions.Tests
             var b = domain.CollisionObjects[k];
 
             bool contained = domain.InternalBroadPhase.CandidatePairs.Contains(a, b);
-            bool haveContact = GeometryHelper.HaveContact(a.GeometricObject.Aabb, b.GeometricObject.Aabb);
+            bool haveContact = GeometryHelper.HaveContact(a.GeometricObject.BoundingBox, b.GeometricObject.BoundingBox);
             //if (contained != haveContact)
               //Debugger.Break();
             Assert.AreEqual(contained, haveContact);
@@ -187,7 +187,7 @@ namespace DigitalRise.Geometry.Collisions.Tests
             var b = domain.CollisionObjects[k];
 
             Assert.AreEqual(domain.InternalBroadPhase.CandidatePairs.Contains(a, b),
-                            GeometryHelper.HaveContact(a.GeometricObject.Aabb, b.GeometricObject.Aabb));
+                            GeometryHelper.HaveContact(a.GeometricObject.BoundingBox, b.GeometricObject.BoundingBox));
           }
         }
 

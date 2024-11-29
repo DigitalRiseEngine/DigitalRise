@@ -87,7 +87,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms.Tests
       meshA.Add(new Triangle(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0)), false);      
       var meshShapeA = new TriangleMeshShape();
       meshShapeA.Mesh = meshA;
-      meshShapeA.Partition = new AabbTree<int>();
+      meshShapeA.Partition = new BoundingBoxTree<int>();
       ((GeometricObject)a.GeometricObject).Shape = meshShapeA;
 
       CollisionObject b = new CollisionObject();
@@ -95,7 +95,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms.Tests
       meshB.Add(new Triangle(new Vector3(2, 0, 0), new Vector3(2, 0, 1), new Vector3(3, 0, 0)), false);
       TriangleMeshShape meshShapeB = new TriangleMeshShape();
       meshShapeB.Mesh = meshB;
-      meshShapeB.Partition = new AabbTree<int>();
+      meshShapeB.Partition = new BoundingBoxTree<int>();
       ((GeometricObject)b.GeometricObject).Shape = meshShapeB;
       ((GeometricObject)b.GeometricObject).Pose = new Pose(new Vector3(-2, 0, 0));
 

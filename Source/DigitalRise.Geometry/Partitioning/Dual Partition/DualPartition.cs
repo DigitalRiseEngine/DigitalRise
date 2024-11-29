@@ -34,6 +34,7 @@ using DigitalRise.Collections;
 using DigitalRise.Geometry.Collisions;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -50,7 +51,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// <see cref="SweepAndPruneSpace{T}"/>.
   /// </para>
   /// <para>
-  /// By default, two spatial partitions of type <see cref="DynamicAabbTree{T}"/> are used (with
+  /// By default, two spatial partitions of type <see cref="DynamicBoundingBoxTree{T}"/> are used (with
   /// settings optimized for the static and dynamic case).
   /// </para>
   /// </remarks>
@@ -58,9 +59,9 @@ namespace DigitalRise.Geometry.Partitioning
   public partial class DualPartition<T> : BasePartition<T>, ISupportBroadPhase<T>, ISupportFrustumCulling<T>
   {
     // TODO: The DualPartition<T> is not as efficient as the btDbvtBroadphase.
-    // Create a DualDynamicAabbTree<T> where the static and dynamic partitions are
-    // of type DynamicAabbTree<T>:
-    // - DualDynamicAabbTree<T> and DynamicAabbTree<T> should not derive from BasePartition<T>. 
+    // Create a DualDynamicBoundingBoxTree<T> where the static and dynamic partitions are
+    // of type DynamicBoundingBoxTree<T>:
+    // - DualDynamicBoundingBoxTree<T> and DynamicBoundingBoxTree<T> should not derive from BasePartition<T>. 
     // - If an item is invalidated, immediately check whether it is in the dynamic partition.
     //   If motion prediction is enabled and the AABB is still within the expanded AABB nothing
     //   needs to be done!
@@ -69,7 +70,7 @@ namespace DigitalRise.Geometry.Partitioning
     //   partition. UpdateSelfOverlaps only adds overlaps. Perform a partial cleanup per frame
     //   to remove invalid overlaps.
     //   The static and dynamic partition do not have to track self-overlaps 
-    //   (EnableSelfOverlaps = false). All checks are done in the DualDynamicAabbTree<T>.
+    //   (EnableSelfOverlaps = false). All checks are done in the DualDynamicBoundingBoxTree<T>.
     // - Create a custom collection for SelfOverlaps: HashSet<T> does not have an indexer and 
     //   is therefore not suited for partial cleanups!
 
@@ -164,12 +165,12 @@ namespace DigitalRise.Geometry.Partitioning
     /// 
     /// <summary>
     /// Initializes a new instance of the <see cref="DualPartition{T}"/> class which uses two
-    /// <see cref="DynamicAabbTree{T}"/> partitions.
+    /// <see cref="DynamicBoundingBoxTree{T}"/> partitions.
     /// </summary>
     public DualPartition()
       : this(
           // Static partition
-          new DynamicAabbTree<T>
+          new DynamicBoundingBoxTree<T>
           {
             OptimizationPerFrame = 0.01f,
             EnableMotionPrediction = false,
@@ -177,7 +178,7 @@ namespace DigitalRise.Geometry.Partitioning
           },
 
           // Dynamic partition
-          new DynamicAabbTree<T>
+          new DynamicBoundingBoxTree<T>
           {
             OptimizationPerFrame = 0.00f,
             EnableMotionPrediction = true,
@@ -268,10 +269,10 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    internal override void OnGetAabbForItemChanged()
+    internal override void OnGetBoundingBoxForItemChanged()
     {
-      StaticPartition.GetAabbForItem = GetAabbForItem;
-      DynamicPartition.GetAabbForItem = GetAabbForItem;
+      StaticPartition.GetBoundingBoxForItem = GetBoundingBoxForItem;
+      DynamicPartition.GetBoundingBoxForItem = GetBoundingBoxForItem;
     }
 
 
@@ -365,7 +366,7 @@ namespace DigitalRise.Geometry.Partitioning
       StaticPartition.Update(forceRebuild);
       DynamicPartition.Update(forceRebuild);
 
-      UpdateAabb();
+      UpdateBoundingBox();
       UpdateBroadPhase();
       UpdateSelfOverlaps();
     }
@@ -382,19 +383,19 @@ namespace DigitalRise.Geometry.Partitioning
     /// <summary>
     /// Updates the AABB of the spatial partition.
     /// </summary>
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
       bool staticPartitionValid = (StaticPartition.Count > 0);
       bool dynamicPartitionValid = (DynamicPartition.Count > 0);
 
       if (staticPartitionValid && dynamicPartitionValid)
-        Aabb = Aabb.Merge(StaticPartition.Aabb, DynamicPartition.Aabb);
+        BoundingBox = BoundingBox.CreateMerged(StaticPartition.BoundingBox, DynamicPartition.BoundingBox);
       else if (staticPartitionValid)
-        Aabb = StaticPartition.Aabb;
+        BoundingBox = StaticPartition.BoundingBox;
       else if (dynamicPartitionValid)
-        Aabb = DynamicPartition.Aabb;
+        BoundingBox = DynamicPartition.BoundingBox;
       else
-        Aabb = new Aabb();
+        BoundingBox = new BoundingBox();
     }
 
 

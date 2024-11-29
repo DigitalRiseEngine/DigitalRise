@@ -179,13 +179,13 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       Vector3 worldStart = pose.ToWorldPosition(_start * scale);
       Vector3 worldEnd = pose.ToWorldPosition(_end * scale);
       Vector3 minimum = MathHelper.Min(worldStart, worldEnd);
       Vector3 maximum = MathHelper.Max(worldStart, worldEnd);
-      return new Aabb(minimum, maximum);
+      return new BoundingBox(minimum, maximum);
     }
 
 

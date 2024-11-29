@@ -10,6 +10,7 @@ using DigitalRise.Geometry;
 using DigitalRise.Geometry.Collisions;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Linq;
+using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
@@ -506,16 +507,16 @@ namespace DigitalRise.SceneGraph
 		/// the subtree is empty.
 		/// </returns>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-		public static Aabb? GetSubtreeAabb(this SceneNode sceneNode)
+		public static BoundingBox? GetSubtreeBoundingBox(this SceneNode sceneNode)
 		{
 			if (sceneNode == null)
 				return null;
 
-			Aabb? aabb = null;
-			if (GetSubtreeAabbInternal(sceneNode, ref aabb))
+			BoundingBox? aabb = null;
+			if (GetSubtreeBoundingBoxInternal(sceneNode, ref aabb))
 			{
 				// The extent of subtree is infinite in one or more dimensions.
-				aabb = new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+				aabb = new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
 			}
 
 			return aabb;
@@ -535,7 +536,7 @@ namespace DigitalRise.SceneGraph
 		/// <see langword="true"/> if the extent of the current subtree is infinite in one or more 
 		/// dimensions; otherwise, <see langword="false"/> if the subtree is empty or has finite size.
 		/// </returns>
-		internal static bool GetSubtreeAabbInternal(SceneNode sceneNode, ref Aabb? aabb)
+		internal static bool GetSubtreeBoundingBoxInternal(SceneNode sceneNode, ref BoundingBox? aabb)
 		{
 			Debug.Assert(sceneNode != null, "sceneNode must not be null.");
 
@@ -545,14 +546,18 @@ namespace DigitalRise.SceneGraph
 			if (!(sceneNode.Shape is EmptyShape))
 			{
 				if (aabb.HasValue)
-					aabb.Value.Grow(sceneNode.Aabb);
+				{
+					var box = aabb.Value;
+					box.Grow(sceneNode.BoundingBox);
+					aabb = box;
+				}
 				else
-					aabb = sceneNode.Aabb;
+					aabb = sceneNode.BoundingBox;
 			}
 
 			if (sceneNode.Children != null)
 				foreach (var childNode in sceneNode.Children)
-					if (GetSubtreeAabbInternal(childNode, ref aabb))
+					if (GetSubtreeBoundingBoxInternal(childNode, ref aabb))
 						return true;
 
 			return false;

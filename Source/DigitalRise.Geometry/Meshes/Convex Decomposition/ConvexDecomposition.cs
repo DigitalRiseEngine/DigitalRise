@@ -490,9 +490,9 @@ namespace DigitalRise.Geometry.Meshes
         island.Triangles = new[] { triangle };
         island.Vertices = triangle.Vertices;
 
-        island.Aabb = new Aabb(triangle.Vertices[0], triangle.Vertices[0]);
-        island.Aabb.Grow(triangle.Vertices[1]);
-        island.Aabb.Grow(triangle.Vertices[2]);
+        island.BoundingBox = new BoundingBox(triangle.Vertices[0], triangle.Vertices[0]);
+        island.BoundingBox.Grow(triangle.Vertices[1]);
+        island.BoundingBox.Grow(triangle.Vertices[2]);
 
         triangle.Island = island;
 
@@ -576,7 +576,7 @@ namespace DigitalRise.Geometry.Meshes
           foreach (var triangle in bestLink.IslandB.Triangles)
             triangle.Island = bestLink.IslandA;
           bestLink.IslandA.Triangles = bestLink.IslandA.Triangles.Union(bestLink.IslandB.Triangles).ToArray();
-          bestLink.IslandA.Aabb = bestLink.Aabb;
+          bestLink.IslandA.BoundingBox = bestLink.BoundingBox;
           bestLink.IslandA.Vertices = bestLink.Vertices;
           bestLink.IslandA.ConvexHullBuilder = bestLink.ConvexHullBuilder;
 

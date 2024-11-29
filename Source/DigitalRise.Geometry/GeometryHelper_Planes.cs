@@ -246,13 +246,13 @@ namespace DigitalRise.Geometry
     /// AABB is completely behind the plane in the negative half-space.
     /// </remarks>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabb, Plane plane)
+    public static bool HaveContact(BoundingBox aabb, Plane plane)
     {
       // Get support point of AABB nearest to the plane.
       Vector3 support = new Vector3(
-        plane.Normal.X > 0 ? aabb.Minimum.X : aabb.Maximum.X,
-        plane.Normal.Y > 0 ? aabb.Minimum.Y : aabb.Maximum.Y,
-        plane.Normal.Z > 0 ? aabb.Minimum.Z : aabb.Maximum.Z);
+        plane.Normal.X > 0 ? aabb.Min.X : aabb.Max.X,
+        plane.Normal.Y > 0 ? aabb.Min.Y : aabb.Max.Y,
+        plane.Normal.Z > 0 ? aabb.Min.Z : aabb.Max.Z);
 
       float projectedLength = Vector3.Dot(support, plane.Normal);
       return projectedLength <= plane.DistanceFromOrigin;

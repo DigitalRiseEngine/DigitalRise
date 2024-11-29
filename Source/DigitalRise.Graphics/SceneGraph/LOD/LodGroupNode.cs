@@ -252,12 +252,12 @@ namespace DigitalRise.SceneGraph.LOD
 				return;
 
 			// Traverse LODs and calculate AABB.
-			Aabb? aabb = null;
+			BoundingBox? aabb = null;
 			bool isInfinite = false;
 			Levels.SetPose(Pose.Identity);     // AABB has to be relative to local space!
 			Levels.SetScale(Vector3.One);     // AABB has to be relative to local space!
 			foreach (var lod in Levels)
-				isInfinite |= SceneHelper.GetSubtreeAabbInternal(lod.Node, ref aabb);
+				isInfinite |= SceneHelper.GetSubtreeBoundingBoxInternal(lod.Node, ref aabb);
 			Levels.SetPose(PoseWorld);
 			Levels.SetScale(ScaleWorld);
 
@@ -284,12 +284,12 @@ namespace DigitalRise.SceneGraph.LOD
 		/// </summary>
 		/// <param name="aabb">The AABB.</param>
 		/// <returns>A box or transformed box that matches the specified AABB.</returns>
-		private Shape GetBoundingShape(Aabb aabb)
+		private Shape GetBoundingShape(BoundingBox aabb)
 		{
 			// The AABB of the LOD is real world size including scaling. We have to undo
 			// the scale because this LodGroupNode also applies the same scale.
-			var unscaledCenter = aabb.Center / ScaleWorld;
-			var unscaledExtent = aabb.Extent / ScaleWorld;
+			var unscaledCenter = aabb.Center() / ScaleWorld;
+			var unscaledExtent = aabb.Extent() / ScaleWorld;
 
 			// Get existing shape objects to avoid unnecessary memory allocation.
 			BoxShape boxShape;

@@ -128,21 +128,21 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       if (scale.X == scale.Y && scale.Y == scale.Z)
       {
         // Uniform scaling.
         Vector3 halfExtent = new Vector3(_radius * Math.Abs(scale.X));
-        return new Aabb(pose.Position - halfExtent, pose.Position + halfExtent);
+        return new BoundingBox(pose.Position - halfExtent, pose.Position + halfExtent);
       }
       else
       {
         // Non-uniform scaling.
         // TODO: This can be optimized because the shape is symmetric about its origin. 
-        // base.GetAabb() shoots in all 6 directions, but we can shoot in only 3 directions 
+        // base.GetBoundingBox() shoots in all 6 directions, but we can shoot in only 3 directions 
         // and mirror the result. - Same can be done for Capsule, Cylinder, ...
-        return base.GetAabb(scale, pose);
+        return base.GetBoundingBox(scale, pose);
       }
     }
 

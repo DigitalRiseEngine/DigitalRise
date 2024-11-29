@@ -361,54 +361,54 @@ namespace DigitalRise.Geometry
     /// </summary>
     /// <param name="aabb">The AABB.</param>
     /// <param name="point">The point.</param>
-    /// <param name="pointOnAabb">
+    /// <param name="pointOnBoundingBox">
     /// The point on or in <paramref name="aabb"/> that is closest to <paramref name="point"/>.
     /// </param>
     /// <returns>
     /// <see langword="true"/> if the <paramref name="aabb"/> and <paramref name="point"/> have 
-    /// contact (<paramref name="pointOnAabb"/> is identical to <paramref name="point"/>); 
+    /// contact (<paramref name="pointOnBoundingBox"/> is identical to <paramref name="point"/>); 
     /// otherwise, <see langword="false"/>.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool GetClosestPoint(Aabb aabb, Vector3 point, out Vector3 pointOnAabb)
+    public static bool GetClosestPoint(BoundingBox aabb, Vector3 point, out Vector3 pointOnBoundingBox)
     {
       // Short version: Fast when using SIMD instructions.
-      //pointOnAabb = point;
-      //pointOnAabb = MathHelper.Max(pointOnAabb, aabb.Minimum);
-      //pointOnAabb = MathHelper.Min(pointOnAabb, aabb.Maximum);
-      //return (point == pointOnAabb);
+      //pointOnBoundingBox = point;
+      //pointOnBoundingBox = MathHelper.Max(pointOnBoundingBox, aabb.Min);
+      //pointOnBoundingBox = MathHelper.Min(pointOnBoundingBox, aabb.Max);
+      //return (point == pointOnBoundingBox);
 
       bool haveContact = true;
-      pointOnAabb = point;
-      if (pointOnAabb.X < aabb.Minimum.X)
+      pointOnBoundingBox = point;
+      if (pointOnBoundingBox.X < aabb.Min.X)
       {
-        pointOnAabb.X = aabb.Minimum.X;
+        pointOnBoundingBox.X = aabb.Min.X;
         haveContact = false;
       }
-      else if (pointOnAabb.X > aabb.Maximum.X)
+      else if (pointOnBoundingBox.X > aabb.Max.X)
       {
-        pointOnAabb.X = aabb.Maximum.X;
+        pointOnBoundingBox.X = aabb.Max.X;
         haveContact = false;
       }
-      if (pointOnAabb.Y < aabb.Minimum.Y)
+      if (pointOnBoundingBox.Y < aabb.Min.Y)
       {
-        pointOnAabb.Y = aabb.Minimum.Y;
+        pointOnBoundingBox.Y = aabb.Min.Y;
         haveContact = false;
       }
-      else if (pointOnAabb.Y > aabb.Maximum.Y)
+      else if (pointOnBoundingBox.Y > aabb.Max.Y)
       {
-        pointOnAabb.Y = aabb.Maximum.Y;
+        pointOnBoundingBox.Y = aabb.Max.Y;
         haveContact = false;
       }
-      if (pointOnAabb.Z < aabb.Minimum.Z)
+      if (pointOnBoundingBox.Z < aabb.Min.Z)
       {
-        pointOnAabb.Z = aabb.Minimum.Z;
+        pointOnBoundingBox.Z = aabb.Min.Z;
         haveContact = false;
       }
-      else if (pointOnAabb.Z > aabb.Maximum.Z)
+      else if (pointOnBoundingBox.Z > aabb.Max.Z)
       {
-        pointOnAabb.Z = aabb.Maximum.Z;
+        pointOnBoundingBox.Z = aabb.Max.Z;
         haveContact = false;
       }
 
@@ -431,7 +431,7 @@ namespace DigitalRise.Geometry
     /// The distance between the two AABBs. 0 if the AABB are touching or intersecting.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static float GetDistance(Aabb aabbA, Aabb aabbB)
+    public static float GetDistance(BoundingBox aabbA, BoundingBox aabbB)
     {
       return (float)Math.Sqrt(GetDistanceSquared(aabbA, aabbB));
     }
@@ -445,40 +445,40 @@ namespace DigitalRise.Geometry
     /// <returns>
     /// The squared distance between the two AABBs.
     /// </returns>
-    internal static float GetDistanceSquared(Aabb aabbA, Aabb aabbB)
+    internal static float GetDistanceSquared(BoundingBox aabbA, BoundingBox aabbB)
     {
       float distanceSquared = 0;
 
-      if (aabbA.Minimum.X > aabbB.Maximum.X)
+      if (aabbA.Min.X > aabbB.Max.X)
       {
-        float delta = aabbA.Minimum.X - aabbB.Maximum.X;
+        float delta = aabbA.Min.X - aabbB.Max.X;
         distanceSquared += delta * delta;
       }
-      else if (aabbB.Minimum.X > aabbA.Maximum.X)
+      else if (aabbB.Min.X > aabbA.Max.X)
       {
-        float delta = aabbB.Minimum.X - aabbA.Maximum.X;
-        distanceSquared += delta * delta;
-      }
-
-      if (aabbA.Minimum.Y > aabbB.Maximum.Y)
-      {
-        float delta = aabbA.Minimum.Y - aabbB.Maximum.Y;
-        distanceSquared += delta * delta;
-      }
-      else if (aabbB.Minimum.Y > aabbA.Maximum.Y)
-      {
-        float delta = aabbB.Minimum.Y - aabbA.Maximum.Y;
+        float delta = aabbB.Min.X - aabbA.Max.X;
         distanceSquared += delta * delta;
       }
 
-      if (aabbA.Minimum.Z > aabbB.Maximum.Z)
+      if (aabbA.Min.Y > aabbB.Max.Y)
       {
-        float delta = aabbA.Minimum.Z - aabbB.Maximum.Z;
+        float delta = aabbA.Min.Y - aabbB.Max.Y;
         distanceSquared += delta * delta;
       }
-      else if (aabbB.Minimum.Z > aabbA.Maximum.Z)
+      else if (aabbB.Min.Y > aabbA.Max.Y)
       {
-        float delta = aabbB.Minimum.Z - aabbA.Maximum.Z;
+        float delta = aabbB.Min.Y - aabbA.Max.Y;
+        distanceSquared += delta * delta;
+      }
+
+      if (aabbA.Min.Z > aabbB.Max.Z)
+      {
+        float delta = aabbA.Min.Z - aabbB.Max.Z;
+        distanceSquared += delta * delta;
+      }
+      else if (aabbB.Min.Z > aabbA.Max.Z)
+      {
+        float delta = aabbB.Min.Z - aabbA.Max.Z;
         distanceSquared += delta * delta;
       }
 
@@ -622,16 +622,16 @@ namespace DigitalRise.Geometry
     /// <see langword="true"/> if the AABBs overlap; otherwise <see langword="false"/>.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabbA, Aabb aabbB)
+    public static bool HaveContact(BoundingBox aabbA, BoundingBox aabbB)
     {
       // Note: The following check is safe if one AABB is undefined (NaN).
       // Do not change the comparison operator!
-      return aabbA.Minimum.X <= aabbB.Maximum.X
-             && aabbA.Maximum.X >= aabbB.Minimum.X
-             && aabbA.Minimum.Y <= aabbB.Maximum.Y
-             && aabbA.Maximum.Y >= aabbB.Minimum.Y
-             && aabbA.Minimum.Z <= aabbB.Maximum.Z
-             && aabbA.Maximum.Z >= aabbB.Minimum.Z;
+      return aabbA.Min.X <= aabbB.Max.X
+             && aabbA.Max.X >= aabbB.Min.X
+             && aabbA.Min.Y <= aabbB.Max.Y
+             && aabbA.Max.Y >= aabbB.Min.Y
+             && aabbA.Min.Z <= aabbB.Max.Z
+             && aabbA.Max.Z >= aabbB.Min.Z;
     }
 
 
@@ -645,16 +645,16 @@ namespace DigitalRise.Geometry
     /// <see langword="false"/>.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabb, Vector3 point)
+    public static bool HaveContact(BoundingBox aabb, Vector3 point)
     {
       // Note: The following check is safe if one AABB is undefined (NaN).
       // Do not change the comparison operator!
-      return aabb.Minimum.X <= point.X
-             && aabb.Maximum.X >= point.X
-             && aabb.Minimum.Y <= point.Y
-             && aabb.Maximum.Y >= point.Y
-             && aabb.Minimum.Z <= point.Z
-             && aabb.Maximum.Z >= point.Z;
+      return aabb.Min.X <= point.X
+             && aabb.Max.X >= point.X
+             && aabb.Min.Y <= point.Y
+             && aabb.Max.Y >= point.Y
+             && aabb.Min.Z <= point.Z
+             && aabb.Max.Z >= point.Z;
     }
 
 
@@ -680,17 +680,17 @@ namespace DigitalRise.Geometry
     /// <see langword="false"/> if the object are separated.
     /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public static bool HaveContact(Aabb aabb, Vector3 boxExtent, Pose boxPose, bool makeEdgeTests)
+    public static bool HaveContact(BoundingBox aabb, Vector3 boxExtent, Pose boxPose, bool makeEdgeTests)
     {
       Debug.Assert(boxExtent.IsGreaterOrEqual(Vector3.Zero), "Box extent must be positive.");
 
       // The following variables are in local space of a centered AABB.
-      Vector3 cB = boxPose.Position - aabb.Center;            // Center of box.
+      Vector3 cB = boxPose.Position - aabb.Center();            // Center of box.
       Matrix33F mB = boxPose.Orientation;                      // Orientation matrix of box.
       Matrix33F aMB = Matrix33F.Absolute(mB);                  // Absolute of mB.
 
       // Half extent vectors of AABB and box
-      Vector3 eA = 0.5f * aabb.Extent;
+      Vector3 eA = 0.5f * aabb.Extent();
       Vector3 eB = 0.5f * boxExtent;
 
       // ----- Separating Axis tests

@@ -43,19 +43,19 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     //[Test]
-    //public void GetAabb()
+    //public void GetBoundingBox()
     //{
-    //  Assert.AreEqual(new Aabb(), new ConvexHullOfPoints().GetAabb(Pose.Identity));
-    //  Assert.AreEqual(new Aabb(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
-    //                 new ConvexHullOfPoints().GetAabb(new Pose(new Vector3(10, 100, -13),
+    //  Assert.AreEqual(new BoundingBox(), new ConvexHullOfPoints().GetBoundingBox(Pose.Identity));
+    //  Assert.AreEqual(new BoundingBox(new Vector3(10, 100, -13), new Vector3(10, 100, -13)),
+    //                 new ConvexHullOfPoints().GetBoundingBox(new Pose(new Vector3(10, 100, -13),
     //                                                                     MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
-    //  Assert.AreEqual(new Aabb(new Vector3(11, 102, 1003), new Vector3(11, 102, 1003)),
-    //                 new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetAabb(new Pose(new Vector3(10, 100, 1000),
+    //  Assert.AreEqual(new BoundingBox(new Vector3(11, 102, 1003), new Vector3(11, 102, 1003)),
+    //                 new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetBoundingBox(new Pose(new Vector3(10, 100, 1000),
     //                                                                     Quaternion.Identity)));
     //  Quaternion rotation = MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f);
     //  Vector3 worldPos = rotation.Rotate(new Vector3(1, 2, 3)) + new Vector3(10, 100, 1000);
-    //  AssertExt.AreNumericallyEqual(worldPos, new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetAabb(new Pose(new Vector3(10, 100, 1000), rotation)).Minimum);
-    //  AssertExt.AreNumericallyEqual(worldPos, new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetAabb(new Pose(new Vector3(10, 100, 1000), rotation)).Maximum);
+    //  AssertExt.AreNumericallyEqual(worldPos, new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetBoundingBox(new Pose(new Vector3(10, 100, 1000), rotation)).Minimum);
+    //  AssertExt.AreNumericallyEqual(worldPos, new ConvexHullOfPoints(new Vector3(1, 2, 3)).GetBoundingBox(new Pose(new Vector3(10, 100, 1000), rotation)).Maximum);
     //}
 
 
@@ -149,8 +149,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
         Assert.AreEqual(((PointShape)compositeShape.Children[i].Shape).Position, ((PointShape)clone.Children[i].Shape).Position);
       }
 
-      Assert.AreEqual(compositeShape.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(compositeShape.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(compositeShape.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(compositeShape.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 
@@ -166,10 +166,10 @@ namespace DigitalRise.Geometry.Shapes.Tests
         compositeShape.Children.Add(geometry);
       }
 
-      CloneWithPartition(compositeShape, new AabbTree<int>());
-      CloneWithPartition(compositeShape, new AdaptiveAabbTree<int>());
-      CloneWithPartition(compositeShape, new CompressedAabbTree());
-      CloneWithPartition(compositeShape, new DynamicAabbTree<int>());
+      CloneWithPartition(compositeShape, new BoundingBoxTree<int>());
+      CloneWithPartition(compositeShape, new AdaptiveBoundingBoxTree<int>());
+      CloneWithPartition(compositeShape, new CompressedBoundingBoxTree());
+      CloneWithPartition(compositeShape, new DynamicBoundingBoxTree<int>());
       CloneWithPartition(compositeShape, new SweepAndPruneSpace<int>());
     }
 

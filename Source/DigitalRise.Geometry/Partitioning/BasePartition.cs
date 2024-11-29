@@ -29,18 +29,18 @@ namespace DigitalRise.Geometry.Partitioning
   // </para>
   // <para>
   // <strong>AABB Computation of Items:</strong> When creating an instance of an 
-  // <see cref="BasePartition{T}"/> a callback that computes the <see cref="Shapes.Aabb"/> for
+  // <see cref="BasePartition{T}"/> a callback that computes the <see cref="Shapes.BoundingBox"/> for
   // a given item must be specified. The spatial partition does not know how to compute the 
-  // positions and extents of the items. The <see cref="GetAabbForItem"/> delegate is used to 
-  // compute an <see cref="Shapes.Aabb"/>s for each item. The computed <see cref="Shapes.Aabb"/> is 
+  // positions and extents of the items. The <see cref="GetBoundingBoxForItem"/> delegate is used to 
+  // compute an <see cref="Shapes.BoundingBox"/>s for each item. The computed <see cref="Shapes.BoundingBox"/> is 
   // used to define the spatial properties of an item. For a single item the method must always 
-  // return the same <see cref="Aabb"/>. If the AABB of an item has changed (e.g. the item has 
+  // return the same <see cref="BoundingBox"/>. If the AABB of an item has changed (e.g. the item has 
   // moved or changed shape), <see cref="Invalidate(T)"/> must be called.
   // </para>
   // <para>
   // <strong>Notes to Inheritors:</strong> This abstract class can be used as a base class for 
   // <see cref="ISpatialPartition{T}"/>. Derived classes must implement the methods 
-  // <see cref="GetOverlaps(DigitalRise.Geometry.Shapes.Aabb)"/> and <see cref="OnUpdate"/>. This
+  // <see cref="GetOverlaps(DigitalRise.Geometry.Shapes.BoundingBox)"/> and <see cref="OnUpdate"/>. This
   // class provides basic implementations for all other methods. For better performance it is
   // recommended that derived classes override the other <strong>GetOverlaps</strong> methods. 
   // (Note: Do not forget to automatically call <see cref="Update"/> in the 
@@ -92,7 +92,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// Gets the axis-aligned bounding box (AABB) that contains all items.
     /// </summary>
     /// <value>The axis-aligned bounding box (AABB) that contains all items.</value>
-    public Aabb Aabb
+    public BoundingBox BoundingBox
     {
       get
       {
@@ -104,7 +104,7 @@ namespace DigitalRise.Geometry.Partitioning
         _aabb = value;
       }
     }
-    private Aabb _aabb;
+    private BoundingBox _aabb;
 
 
     /// <summary>
@@ -175,18 +175,18 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    public Func<T, Aabb> GetAabbForItem
+    public Func<T, BoundingBox> GetBoundingBoxForItem
     {
-      get { return _getAabbForItem; }
+      get { return _getBoundingBoxForItem; }
       set
       {
-        _getAabbForItem = value;
+        _getBoundingBoxForItem = value;
 
-        // Call virtual method OnGetAabbForItemChanged() to notify derived classes.
-        OnGetAabbForItemChanged();
+        // Call virtual method OnGetBoundingBoxForItemChanged() to notify derived classes.
+        OnGetBoundingBoxForItemChanged();
       }
     }
-    private Func<T, Aabb> _getAabbForItem;
+    private Func<T, BoundingBox> _getBoundingBoxForItem;
 
 
     /// <summary>
@@ -348,7 +348,7 @@ namespace DigitalRise.Geometry.Partitioning
     {
       EnableSelfOverlaps = source.EnableSelfOverlaps;
       Filter = source.Filter;
-      GetAabbForItem = source.GetAabbForItem;
+      GetBoundingBoxForItem = source.GetBoundingBoxForItem;
     }
     #endregion
 
@@ -657,7 +657,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// only the invalidated parts.
     /// </param>
     /// <exception cref="GeometryException">
-    /// Cannot update spatial partition. The property <see cref="GetAabbForItem"/> is not set.
+    /// Cannot update spatial partition. The property <see cref="GetBoundingBoxForItem"/> is not set.
     /// </exception>
     public void Update(bool forceRebuild)
     {
@@ -670,7 +670,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// by derived classes instead of <see cref="Update(bool)"/>!
     /// </summary>
     /// <exception cref="GeometryException">
-    /// Cannot update spatial partition. The property <see cref="GetAabbForItem"/> is not set.
+    /// Cannot update spatial partition. The property <see cref="GetBoundingBoxForItem"/> is not set.
     /// </exception>
     internal void UpdateInternal()
     {
@@ -693,7 +693,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// per frame.
     /// </param>
     /// <exception cref="GeometryException">
-    /// Cannot update spatial partition. The property <see cref="GetAabbForItem"/> is not set.
+    /// Cannot update spatial partition. The property <see cref="GetBoundingBoxForItem"/> is not set.
     /// </exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
     private void Update(bool forceRebuild, bool isInternalUpdate)
@@ -716,8 +716,8 @@ namespace DigitalRise.Geometry.Partitioning
       if (!forceRebuild && !_isInvalid && !_needsRebuild && isInternalUpdate)
         return;
 
-      if (GetAabbForItem == null)
-        throw new GeometryException("Cannot build spatial partition. The property GetAabbForItem of the spatial partition is not set.");
+      if (GetBoundingBoxForItem == null)
+        throw new GeometryException("Cannot build spatial partition. The property GetBoundingBoxForItem of the spatial partition is not set.");
 
       lock (_syncRoot)
       {
@@ -727,7 +727,7 @@ namespace DigitalRise.Geometry.Partitioning
           if (!isInternalUpdate)
           {
             // Special update where Items collection was not changed, but
-            // DynamicAabbTree wants to optimize itself.
+            // DynamicBoundingBoxTree wants to optimize itself.
             OnUpdate();
           }
 
@@ -747,8 +747,8 @@ namespace DigitalRise.Geometry.Partitioning
           bool rebuild = forceRebuild || _needsRebuild;
 
           // Set invalid aabb.
-          _aabb = new Aabb(Vector3.One, Vector3.Zero);
-          Debug.Assert(_aabb.Minimum.IsGreaterThen(_aabb.Maximum));
+          _aabb = new BoundingBox(Vector3.One, Vector3.Zero);
+          Debug.Assert(_aabb.Min.IsGreaterThen(_aabb.Max));
 
           EnsureSet(ref _addedItems);
           EnsureSet(ref _removedItems);
@@ -780,8 +780,8 @@ namespace DigitalRise.Geometry.Partitioning
           ClearSet(ref _invalidItems);
           _invalidateAll = false;
 
-          if (_aabb.Minimum.X > _aabb.Maximum.X)
-            UpdateAabb();
+          if (_aabb.Min.X > _aabb.Max.X)
+            UpdateBoundingBox();
 
           _isInvalid = false;
           _needsRebuild = false;
@@ -801,22 +801,22 @@ namespace DigitalRise.Geometry.Partitioning
 
       foreach (var item in items)
       {
-        var aabb = GetAabbForItem(item);
+        var aabb = GetBoundingBoxForItem(item);
 
         // Check for NaN.
-        if (Numeric.IsNaN(aabb.Extent.X) || Numeric.IsNaN(aabb.Extent.Y) || Numeric.IsNaN(aabb.Extent.Z))
+        if (Numeric.IsNaN(aabb.Extent().X) || Numeric.IsNaN(aabb.Extent().Y) || Numeric.IsNaN(aabb.Extent().Z))
           throw new GeometryException("Cannot build spatial partition because the AABB of an item is NaN.");
       }
     }
 
 
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
       int numberOfItems = Items.Count;
       if (numberOfItems == 0)
       {
         // AABB is undefined.
-        Aabb = new Aabb();
+        BoundingBox = new BoundingBox();
       }
       else
       {
@@ -825,13 +825,13 @@ namespace DigitalRise.Geometry.Partitioning
 
         // Start with AABB of first item.
         enumerator.MoveNext();
-        Aabb aabb = GetAabbForItem(enumerator.Current);
+        BoundingBox aabb = GetBoundingBoxForItem(enumerator.Current);
 
         // Grow AABB.
         while (enumerator.MoveNext())
-          aabb.Grow(GetAabbForItem(enumerator.Current));
+          aabb.Grow(GetBoundingBoxForItem(enumerator.Current));
 
-        Aabb = aabb;
+        BoundingBox = aabb;
       }
     }
 
@@ -867,9 +867,9 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <summary>
-    /// Called when the property <see cref="GetAabbForItem"/> has changed.
+    /// Called when the property <see cref="GetBoundingBoxForItem"/> has changed.
     /// </summary>
-    internal virtual void OnGetAabbForItemChanged()
+    internal virtual void OnGetBoundingBoxForItemChanged()
     {
       // This method was added because DualPartition<T> needs to propagate the change to its 
       // internal partitions.
@@ -922,7 +922,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// </description>
     /// </item>
     /// <item>
-    /// <description>The <see cref="Aabb"/> is invalid!</description>
+    /// <description>The <see cref="BoundingBox"/> is invalid!</description>
     /// </item>
     /// <item>
     /// <description>
@@ -939,8 +939,8 @@ namespace DigitalRise.Geometry.Partitioning
     /// <list type="bullet">
     /// <item>
     /// <description>
-    /// The new <see cref="Aabb"/> for the whole partition must be computed. (If this is not done 
-    /// the <see cref="BasePartition{T}"/> will compute the new <see cref="Aabb"/> 
+    /// The new <see cref="BoundingBox"/> for the whole partition must be computed. (If this is not done 
+    /// the <see cref="BasePartition{T}"/> will compute the new <see cref="BoundingBox"/> 
     /// automatically, but this is slower.)
     /// </description>
     /// </item>

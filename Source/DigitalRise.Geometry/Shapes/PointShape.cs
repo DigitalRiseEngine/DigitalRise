@@ -134,11 +134,11 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Note: Compute AABB in world space
       Vector3 position = pose.ToWorldPosition(scale * _position);
-      return new Aabb(position, position);
+      return new BoundingBox(position, position);
     }
 
 

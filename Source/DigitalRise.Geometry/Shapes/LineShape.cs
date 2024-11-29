@@ -196,7 +196,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // Note: Compute AABB in world space.
       Vector3 direction = pose.ToWorldDirection(_direction * scale);
@@ -224,7 +224,7 @@ namespace DigitalRise.Geometry.Shapes
         maximum.Z = pointOnLine.Z;
       }
 
-      return new Aabb(minimum, maximum);
+      return new BoundingBox(minimum, maximum);
     }
 
 

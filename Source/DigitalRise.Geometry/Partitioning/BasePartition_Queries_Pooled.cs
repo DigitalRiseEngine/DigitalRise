@@ -27,7 +27,7 @@ namespace DigitalRise.Geometry.Partitioning
         var enumerable = Pool.Obtain();
         enumerable._partition = partition;
         enumerable._item = item;
-        Aabb aabb = partition.GetAabbForItem(item);
+        BoundingBox aabb = partition.GetBoundingBoxForItem(item);
         enumerable._enumerator = partition.GetOverlaps(aabb).GetEnumerator();
         return enumerable;
       }
@@ -75,11 +75,11 @@ namespace DigitalRise.Geometry.Partitioning
         enumerable._rayDirectionInverse = new Vector3(1 / ray.Direction.X,
                                                        1 / ray.Direction.Y,
                                                        1 / ray.Direction.Z);
-        enumerable._epsilon = Numeric.EpsilonF * (1 + partition.Aabb.Extent.Length);
+        enumerable._epsilon = Numeric.EpsilonF * (1 + partition.BoundingBox.Extent().Length);
 
-        Aabb rayAabb = new Aabb(ray.Origin, ray.Origin);
-        rayAabb.Grow(ray.Origin + ray.Direction * ray.Length);
-        enumerable._enumerator = partition.GetOverlaps(rayAabb).GetEnumerator();
+        BoundingBox rayBoundingBox = new BoundingBox(ray.Origin, ray.Origin);
+        rayBoundingBox.Grow(ray.Origin + ray.Direction * ray.Length);
+        enumerable._enumerator = partition.GetOverlaps(rayBoundingBox).GetEnumerator();
         return enumerable;
       }
 
@@ -88,7 +88,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_enumerator.MoveNext())
         {
           var candidate = _enumerator.Current;
-          if (GeometryHelper.HaveContact(_partition.GetAabbForItem(candidate), _ray.Origin, _rayDirectionInverse, _ray.Length, _epsilon))
+          if (GeometryHelper.HaveContact(_partition.GetBoundingBoxForItem(candidate), _ray.Origin, _rayDirectionInverse, _ray.Length, _epsilon))
           {
             current = candidate;
             return true;
@@ -121,7 +121,7 @@ namespace DigitalRise.Geometry.Partitioning
         var enumerable = Pool.Obtain();
         enumerable._partition = partition;
         enumerable._otherPartition = otherPartition;
-        enumerable._candidates = partition.GetOverlaps(otherPartition.Aabb).GetEnumerator();
+        enumerable._candidates = partition.GetOverlaps(otherPartition.BoundingBox).GetEnumerator();
         return enumerable;
       }
 
@@ -134,8 +134,8 @@ namespace DigitalRise.Geometry.Partitioning
             if (_candidates.MoveNext())
             {
               var candidate = _candidates.Current;
-              Aabb candidateAabb = _partition.GetAabbForItem(candidate);
-              _otherCandidates = _otherPartition.GetOverlaps(candidateAabb).GetEnumerator();
+              BoundingBox candidateBoundingBox = _partition.GetBoundingBoxForItem(candidate);
+              _otherCandidates = _otherPartition.GetOverlaps(candidateBoundingBox).GetEnumerator();
             }
             else
             {
@@ -211,8 +211,8 @@ namespace DigitalRise.Geometry.Partitioning
             if (_candidates.MoveNext())
             {
               var candidate = _candidates.Current;
-              var aabb = _partition.GetAabbForItem(candidate);
-              aabb = aabb.GetAabb(_scale, _toOther);
+              var aabb = _partition.GetBoundingBoxForItem(candidate);
+              aabb = aabb.GetBoundingBox(_scale, _toOther);
               aabb.Scale(_otherScaleInverse);
               _otherCandidates = _otherPartition.GetOverlaps(aabb).GetEnumerator();
             }

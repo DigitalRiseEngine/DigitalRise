@@ -3,6 +3,7 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -11,34 +12,34 @@ namespace DigitalRise.Geometry.Partitioning
   /// Represents a binary node of an AABB tree.
   /// </summary>
   /// <typeparam name="T">The type of item stored in the tree.</typeparam>
-  internal interface IAabbTreeNode<T>
+  internal interface IBoundingBoxTreeNode<T>
   {
     /// <summary>
     /// Gets or sets the AABB of this node which contains the current subtree.
     /// </summary>
     /// <value>The AABB of this node which contains the current subtree.</value>
-    Aabb Aabb { get; set; }
+    BoundingBox BoundingBox { get; set; }
 
 
     /// <summary>
     /// Gets or sets the left child node.
     /// </summary>
     /// <value>The left child node. (Or <see langword="null"/> if the node is a leaf node.)</value>
-    IAabbTreeNode<T> LeftChild { get; set; }
+    IBoundingBoxTreeNode<T> LeftChild { get; set; }
 
 
     /// <summary>
     /// Gets or sets the right child node.
     /// </summary>
     /// <value>The right child node. (Or <see langword="null"/> if the node is a leaf node.)</value>
-    IAabbTreeNode<T> RightChild { get; set; }
+    IBoundingBoxTreeNode<T> RightChild { get; set; }
 
 
     /// <summary>
     /// Gets the parent node.
     /// </summary>
     /// <value>The parent node. (Or <see langword="null"/> if the node is a leaf node.)</value>
-    IAabbTreeNode<T> Parent { get; }
+    IBoundingBoxTreeNode<T> Parent { get; }
 
 
     /// <summary>

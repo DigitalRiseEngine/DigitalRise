@@ -384,13 +384,13 @@ namespace DigitalRise.Rendering.Debugging
 			}
 			else
 			{
-				var aabb = new Aabb(new Vector3(left, bottom, -far), new Vector3(right, top, -near));
-				pose.Position += pose.ToWorldDirection(aabb.Center);
+				var aabb = new BoundingBox(new Vector3(left, bottom, -far), new Vector3(right, top, -near));
+				pose.Position += pose.ToWorldDirection(aabb.Center());
 
 				job.Type = PrimitiveJobType.Box;
 				job.Pose = pose;
 				job.Color = color;
-				job.Size.Extent = aabb.Extent;
+				job.Size.Extent = aabb.Extent();
 			}
 
 			_primitives.Add(job);

@@ -275,7 +275,7 @@ namespace DigitalRise.Geometry.Meshes
 
       // Compute AABB and determine dominant axes.
       int i0, i1, i2;
-      Vector3 extent = GetAabb(vertices, numberOfVertices).Extent;
+      Vector3 extent = GetBoundingBox(vertices, numberOfVertices).Extent();
       if (extent.X >= extent.Y && extent.X >= extent.Z)
       {
         i0 = 0;
@@ -332,9 +332,9 @@ namespace DigitalRise.Geometry.Meshes
 
 
     // Computes the AABB of the polygon.
-    private static Aabb GetAabb(Vector3[] vertices, int numberOfVertices)
+    private static BoundingBox GetBoundingBox(Vector3[] vertices, int numberOfVertices)
     {
-      Aabb aabb = new Aabb(vertices[0], vertices[0]);
+      BoundingBox aabb = new BoundingBox(vertices[0], vertices[0]);
       for (int i = 1; i < numberOfVertices; i++)
         aabb.Grow(vertices[i]);
 

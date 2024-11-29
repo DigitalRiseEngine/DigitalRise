@@ -201,7 +201,7 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       Vector3 halfExtent = new Vector3(_widthX / 2, _widthY / 2, 0) * MathHelper.Absolute(scale);
 
@@ -227,7 +227,7 @@ namespace DigitalRise.Geometry.Shapes
                                               Vector3.Dot(halfExtent, worldY),
                                               Vector3.Dot(halfExtent, worldZ));
 
-      return new Aabb(pose.Position - halfExtentWorld, pose.Position + halfExtentWorld);
+      return new BoundingBox(pose.Position - halfExtentWorld, pose.Position + halfExtentWorld);
     }
 
 

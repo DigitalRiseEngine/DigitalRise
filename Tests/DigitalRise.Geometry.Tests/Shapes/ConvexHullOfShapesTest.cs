@@ -95,8 +95,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
         Assert.AreEqual(((PointShape)convexHullOfShapes.Children[i].Shape).Position, ((PointShape)clone.Children[i].Shape).Position);
       }
 
-      Assert.AreEqual(convexHullOfShapes.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(convexHullOfShapes.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(convexHullOfShapes.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(convexHullOfShapes.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
   }
 }

@@ -45,7 +45,7 @@ namespace DigitalRise.Geometry.Shapes
   /// can be improved by using an AABB tree:
   /// <code lang="csharp">
   /// <![CDATA[
-  /// myCompositeShape.Partition = new AabbTree<int>();
+  /// myCompositeShape.Partition = new BoundingBoxTree<int>();
   /// ]]>
   /// </code>
   /// </para>
@@ -135,7 +135,7 @@ namespace DigitalRise.Geometry.Shapes
           // Clear old partition.
           if (_partition != null)
           {
-            _partition.GetAabbForItem = null;
+            _partition.GetBoundingBoxForItem = null;
             _partition.Clear();
           }
 
@@ -145,7 +145,7 @@ namespace DigitalRise.Geometry.Shapes
           // Fill new partition.
           if (_partition != null)
           {
-            _partition.GetAabbForItem = i => Children[i].Aabb;
+            _partition.GetBoundingBoxForItem = i => Children[i].BoundingBox;
             _partition.Clear();
             int numberOfChildren = Children.Count;
             for (int i = 0; i < numberOfChildren; i++)
@@ -190,10 +190,10 @@ namespace DigitalRise.Geometry.Shapes
       if (partition != null)
       {
         _partition = partition;
-        _partition.GetAabbForItem = i => Children[i].Aabb;
+        _partition.GetBoundingBoxForItem = i => Children[i].BoundingBox;
 
         // ----- Validate spatial partition.
-        // Some spatial partitions, such as the CompressedAabbTree, are pre-initialized when 
+        // Some spatial partitions, such as the CompressedBoundingBoxTree, are pre-initialized when 
         // loaded via content pipeline. Other spatial partitions need to be initialized manually.
         int numberOfChildren = Children.Count;
         if (_partition.Count != numberOfChildren)
@@ -237,22 +237,22 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
       // If we have a spatial partition, we can use the AABB of the whole spatial partition to 
       // quickly get an approximate AABB.
       if (Partition != null)
       {
         // Get AABB of spatial partition and compute the AABB in world space.
-        return Partition.Aabb.GetAabb(scale, pose);
+        return Partition.BoundingBox.GetBoundingBox(scale, pose);
       }
 
       // No children? - Return arbitrary AABB.
       var numberOfGeometries = Children.Count;
       if (numberOfGeometries == 0)
-        return new Aabb(pose.Position, pose.Position);
+        return new BoundingBox(pose.Position, pose.Position);
 
-      // See also comments in TransformShape.GetAabb().
+      // See also comments in TransformShape.GetBoundingBox().
 
       if (scale.X == scale.Y && scale.Y == scale.Z)
       {
@@ -265,12 +265,12 @@ namespace DigitalRise.Geometry.Shapes
         Pose childPose = new Pose(child.Pose.Position * scale.X, child.Pose.Orientation);
 
         // Get child aabb in final space.
-        Aabb aabb = child.Shape.GetAabb(scale.X * child.Scale, pose * childPose);
+        BoundingBox aabb = child.Shape.GetBoundingBox(scale.X * child.Scale, pose * childPose);
         for (int i = 1; i < numberOfGeometries; i++)
         {
           child = Children[i];
           childPose = new Pose(child.Pose.Position * scale.X, child.Pose.Orientation);
-          aabb.Grow(child.Shape.GetAabb(scale.X * child.Scale, pose * childPose));
+          aabb.Grow(child.Shape.GetBoundingBox(scale.X * child.Scale, pose * childPose));
         }
 
         return aabb;
@@ -278,12 +278,12 @@ namespace DigitalRise.Geometry.Shapes
       else
       {
         // Get AABB of children in the parent space without scale.
-        Aabb aabb = Children[0].Aabb;
+        BoundingBox aabb = Children[0].BoundingBox;
         for (int i = 1; i < numberOfGeometries; i++)
-          aabb.Grow(Children[i].Aabb);
+          aabb.Grow(Children[i].BoundingBox);
 
         // Now, from this compute an AABB in world space.
-        return aabb.GetAabb(scale, pose);
+        return aabb.GetBoundingBox(scale, pose);
       }
     }
 
@@ -399,7 +399,7 @@ namespace DigitalRise.Geometry.Shapes
     protected override TriangleMesh OnGetMesh(float absoluteDistanceThreshold, int iterationLimit)
     {
       // Convert absolute error to relative error.
-      float maxExtent = GetAabb(Vector3.One, Pose.Identity).Extent.LargestComponent();
+      float maxExtent = GetBoundingBox(Vector3.One, Pose.Identity).Extent().LargestComponent();
       float relativeThreshold = !Numeric.IsZero(maxExtent)
                                 ? absoluteDistanceThreshold / maxExtent
                                 : Numeric.EpsilonF;

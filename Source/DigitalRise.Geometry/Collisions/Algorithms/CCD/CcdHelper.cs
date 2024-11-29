@@ -2,7 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
-using DigitalRise.Geometry.Shapes;
+using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 
 namespace DigitalRise.Geometry.Collisions.Algorithms
@@ -39,9 +39,9 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
     internal static void GetBoundingSphere(IGeometricObject geometricObject, out float radius, out Vector3 center)
     {
       // Get sphere from AABB.
-      Aabb aabb = geometricObject.Aabb;
-      center = aabb.Center;
-      radius = aabb.Extent.Length() * 0.5f;
+      BoundingBox aabb = geometricObject.BoundingBox;
+      center = aabb.Center();
+      radius = aabb.Extent().Length() * 0.5f;
     }
 
 

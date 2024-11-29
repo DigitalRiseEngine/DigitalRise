@@ -1323,19 +1323,19 @@ namespace DigitalRise.Rendering.Debugging
 		/// If set to <see langword="true"/> the object is drawn over the graphics scene 
 		/// (depth-test disabled).
 		/// </param>
-		public void DrawAabb(Aabb aabb, Pose pose, Color color, bool drawOverScene)
+		public void DrawBoundingBox(BoundingBox aabb, Pose pose, Color color, bool drawOverScene)
 		{
 			if (!Enabled)
 				return;
 
-			Vector3 corner0 = pose.ToWorldPosition(new Vector3(aabb.Minimum.X, aabb.Minimum.Y, aabb.Maximum.Z));
-			Vector3 corner1 = pose.ToWorldPosition(new Vector3(aabb.Maximum.X, aabb.Minimum.Y, aabb.Maximum.Z));
-			Vector3 corner2 = pose.ToWorldPosition(aabb.Maximum);
-			Vector3 corner3 = pose.ToWorldPosition(new Vector3(aabb.Minimum.X, aabb.Maximum.Y, aabb.Maximum.Z));
-			Vector3 corner4 = pose.ToWorldPosition(aabb.Minimum);
-			Vector3 corner5 = pose.ToWorldPosition(new Vector3(aabb.Maximum.X, aabb.Minimum.Y, aabb.Minimum.Z));
-			Vector3 corner6 = pose.ToWorldPosition(new Vector3(aabb.Maximum.X, aabb.Maximum.Y, aabb.Minimum.Z));
-			Vector3 corner7 = pose.ToWorldPosition(new Vector3(aabb.Minimum.X, aabb.Maximum.Y, aabb.Minimum.Z));
+			Vector3 corner0 = pose.ToWorldPosition(new Vector3(aabb.Min.X, aabb.Min.Y, aabb.Max.Z));
+			Vector3 corner1 = pose.ToWorldPosition(new Vector3(aabb.Max.X, aabb.Min.Y, aabb.Max.Z));
+			Vector3 corner2 = pose.ToWorldPosition(aabb.Max);
+			Vector3 corner3 = pose.ToWorldPosition(new Vector3(aabb.Min.X, aabb.Max.Y, aabb.Max.Z));
+			Vector3 corner4 = pose.ToWorldPosition(aabb.Min);
+			Vector3 corner5 = pose.ToWorldPosition(new Vector3(aabb.Max.X, aabb.Min.Y, aabb.Min.Z));
+			Vector3 corner6 = pose.ToWorldPosition(new Vector3(aabb.Max.X, aabb.Max.Y, aabb.Min.Z));
+			Vector3 corner7 = pose.ToWorldPosition(new Vector3(aabb.Min.X, aabb.Max.Y, aabb.Min.Z));
 
 			DrawLine(corner0, corner1, color, drawOverScene);
 			DrawLine(corner1, corner2, color, drawOverScene);
@@ -1364,7 +1364,7 @@ namespace DigitalRise.Rendering.Debugging
 		/// If set to <see langword="true"/> the object is drawn over the graphics scene (depth-test 
 		/// disabled).
 		/// </param>
-		public void DrawAabbs(IEnumerable<IGeometricObject> geometricObjects, Color? color, bool drawOverScene)
+		public void DrawBoundingBoxs(IEnumerable<IGeometricObject> geometricObjects, Color? color, bool drawOverScene)
 		{
 			if (!Enabled || geometricObjects == null)
 				return;
@@ -1372,7 +1372,7 @@ namespace DigitalRise.Rendering.Debugging
 			foreach (var geometricObject in geometricObjects)
 			{
 				Color geoColor = color ?? GraphicsHelper.GetUniqueColor(geometricObject);
-				DrawAabb(geometricObject.Aabb, Pose.Identity, geoColor, drawOverScene);
+				DrawBoundingBox(geometricObject.BoundingBox, Pose.Identity, geoColor, drawOverScene);
 			}
 		}
 

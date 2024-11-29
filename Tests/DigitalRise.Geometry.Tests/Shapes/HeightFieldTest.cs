@@ -122,12 +122,12 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(new Vector3(0, -100, 0), new Vector3(1000, 0, 1000)), 
-                      new HeightField().GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(1000, -101, 2000), new Vector3(1100, 5, 2200)), 
-                      _field.GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(0, -1, 0), new Vector3(10, 5, 20)), 
-                      new HeightField(0, 0, 10, 20, _samples, 3, 8) { Depth = 0 }.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(0, -100, 0), new Vector3(1000, 0, 1000)), 
+                      new HeightField().GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(1000, -101, 2000), new Vector3(1100, 5, 2200)), 
+                      _field.GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(0, -1, 0), new Vector3(10, 5, 20)), 
+                      new HeightField(0, 0, 10, 20, _samples, 3, 8) { Depth = 0 }.GetBoundingBox(Pose.Identity));
 
       // Now with pose.
       Quaternion rotation = MathHelper.CreateRotationX(0.2f);
@@ -135,11 +135,11 @@ namespace DigitalRise.Geometry.Shapes.Tests
       _field.Depth = 0;
       var box = new TransformedShape(
         new GeometricObject(new BoxShape(100, 6, 200), new Pose(new Vector3(1050, 2, 2100))));
-      AssertExt.AreNumericallyEqual(box.GetAabb(pose).Minimum, _field.GetAabb(pose).Minimum);
+      AssertExt.AreNumericallyEqual(box.GetBoundingBox(pose).Min, _field.GetBoundingBox(pose).Min);
       _field.Depth = 4;
       box = new TransformedShape(
         new GeometricObject(new BoxShape(100, 10, 200), new Pose(new Vector3(1000, 0, 2000))));
-      AssertExt.AreNumericallyEqual(box.GetAabb(pose).Minimum + rotation.Rotate(new Vector3(50, 0, 100)), _field.GetAabb(pose).Minimum);
+      AssertExt.AreNumericallyEqual(box.GetBoundingBox(pose).Min + rotation.Rotate(new Vector3(50, 0, 100)), _field.GetBoundingBox(pose).Min);
     }
 
 
@@ -165,14 +165,14 @@ namespace DigitalRise.Geometry.Shapes.Tests
       
       // Check if returned values do not contain NaN.
       Assert.IsTrue(Numeric.IsFinite(heightField.InnerPoint.Y));
-      Assert.IsTrue(Numeric.IsFinite(heightField.GetAabb(Pose.Identity).Extent.Length()));
+      Assert.IsTrue(Numeric.IsFinite(heightField.GetBoundingBox(Pose.Identity).Extent().Length()));
     }
 
 
     [Test]
     public void InnerPoint()
     {
-      var aabb = _field.GetAabb(Pose.Identity);
+      var aabb = _field.GetBoundingBox(Pose.Identity);
       Assert.IsTrue(GeometryHelper.HaveContact(aabb, _field.InnerPoint));
       Assert.IsTrue(_field.InnerPoint.Y < _field.GetHeight(_field.InnerPoint.X, _field.InnerPoint.Z));
     }
@@ -194,8 +194,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(heightField.Depth, clone.Depth);
       Assert.AreEqual(heightField.NumberOfSamplesX, clone.NumberOfSamplesX);
       Assert.AreEqual(heightField.NumberOfSamplesZ, clone.NumberOfSamplesZ);
-      Assert.AreEqual(heightField.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(heightField.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(heightField.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(heightField.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

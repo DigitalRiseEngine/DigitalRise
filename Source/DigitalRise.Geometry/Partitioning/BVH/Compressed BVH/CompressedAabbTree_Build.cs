@@ -5,11 +5,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class CompressedAabbTree
+  partial class CompressedBoundingBoxTree
   {
     /// <summary>
     /// Gets or sets the threshold that determines when a bottom-up tree build method is used.
@@ -24,7 +25,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// less optimal. Bottom-up methods are slower but produce more balanced trees. 
     /// </para>
     /// <para>
-    /// The <see cref="CompressedAabbTree"/> uses a mixed approach: It starts with a top-down
+    /// The <see cref="CompressedBoundingBoxTree"/> uses a mixed approach: It starts with a top-down
     /// approach. When the number of nodes for an internal subtree is less than or equal to 
     /// <see cref="BottomUpBuildThreshold"/> it uses a bottom-up method for the subtree.
     /// </para>
@@ -50,15 +51,15 @@ namespace DigitalRise.Geometry.Partitioning
     /// Builds the AABB tree.
     /// </summary>
     /// <exception cref="GeometryException">
-    /// Cannot build AABB tree. The property <see cref="GetAabbForItem"/> of the spatial partition
+    /// Cannot build AABB tree. The property <see cref="GetBoundingBoxForItem"/> of the spatial partition
     /// is not set.
     /// </exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
     private void Build()
     {
-      Debug.Assert(_items != null && _items.Count > 0, "Build should not be called for empty CompressedAabbTree.");
-      if (GetAabbForItem == null)
-        throw new GeometryException("Cannot build AABB tree. The property GetAabbForItem of the spatial partition is not set.");
+      Debug.Assert(_items != null && _items.Count > 0, "Build should not be called for empty CompressedBoundingBoxTree.");
+      if (GetBoundingBoxForItem == null)
+        throw new GeometryException("Cannot build AABB tree. The property GetBoundingBoxForItem of the spatial partition is not set.");
 
       if (_items.Count == 1)
       {
@@ -66,13 +67,13 @@ namespace DigitalRise.Geometry.Partitioning
         int item = _items[0];
 
         // Determine AABB of spatial partition and prepare factors for quantization.
-        Aabb aabb = GetAabbForItem(item);
+        BoundingBox aabb = GetBoundingBoxForItem(item);
         SetQuantizationValues(aabb);
 
         // Create node.
         Node node = new Node();
         node.Item = _items[0];
-        SetAabb(ref node, _aabb);
+        SetBoundingBox(ref node, _aabb);
 
         _nodes = new[] { node };
         _numberOfItems = 1;
@@ -80,22 +81,22 @@ namespace DigitalRise.Geometry.Partitioning
       else
       {
         // Default case: Several items. (Data is stored in the leaves.)
-        // First create a normal AabbTree<int> which is then compressed.
+        // First create a normal BoundingBoxTree<int> which is then compressed.
         _numberOfItems = _items.Count;
 
-        List<IAabbTreeNode<int>> leaves = DigitalRise.ResourcePools<IAabbTreeNode<int>>.Lists.Obtain();
+        List<IBoundingBoxTreeNode<int>> leaves = DigitalRise.ResourcePools<IBoundingBoxTreeNode<int>>.Lists.Obtain();
         for (int i = 0; i < _numberOfItems; i++)
         {
           int item = _items[i];
-          Aabb aabb = GetAabbForItem(item);
-          leaves.Add(new AabbTree<int>.Node { Aabb = aabb, Item = item });
+          BoundingBox aabb = GetBoundingBoxForItem(item);
+          leaves.Add(new BoundingBoxTree<int>.Node { BoundingBox = aabb, Item = item });
         }
 
         // Build tree.
-        AabbTree<int>.Node root = (AabbTree<int>.Node)AabbTreeBuilder.Build(leaves, () => new AabbTree<int>.Node(), BottomUpBuildThreshold);
+        BoundingBoxTree<int>.Node root = (BoundingBoxTree<int>.Node)BoundingBoxTreeBuilder.Build(leaves, () => new BoundingBoxTree<int>.Node(), BottomUpBuildThreshold);
 
         // Set AABB of spatial partition and prepare the factors for quantization.
-        SetQuantizationValues(root.Aabb);
+        SetQuantizationValues(root.BoundingBox);
 
         // Compress AABB tree.
         var nodes = DigitalRise.ResourcePools<Node>.Lists.Obtain();
@@ -103,7 +104,7 @@ namespace DigitalRise.Geometry.Partitioning
         _nodes = nodes.ToArray();
 
         // Recycle temporary lists.
-        DigitalRise.ResourcePools<IAabbTreeNode<int>>.Lists.Recycle(leaves);
+        DigitalRise.ResourcePools<IBoundingBoxTreeNode<int>>.Lists.Recycle(leaves);
         DigitalRise.ResourcePools<Node>.Lists.Recycle(nodes);
       }
 
@@ -118,14 +119,14 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="compressedNodes">The list of compressed AABB nodes.</param>
     /// <param name="uncompressedNode">The root of the uncompressed AABB tree.</param>
-    private void CompressTree(List<Node> compressedNodes, AabbTree<int>.Node uncompressedNode)
+    private void CompressTree(List<Node> compressedNodes, BoundingBoxTree<int>.Node uncompressedNode)
     {
       if (uncompressedNode.IsLeaf)
       {
         // Compress leaf node.
         Node node = new Node();
         node.Item = uncompressedNode.Item;
-        SetAabb(ref node, uncompressedNode.Aabb);
+        SetBoundingBox(ref node, uncompressedNode.BoundingBox);
         compressedNodes.Add(node);
       }
       else
@@ -133,7 +134,7 @@ namespace DigitalRise.Geometry.Partitioning
         // Node is internal node.
         int currentIndex = compressedNodes.Count;
         Node node = new Node();
-        SetAabb(ref node, uncompressedNode.Aabb);
+        SetBoundingBox(ref node, uncompressedNode.BoundingBox);
         compressedNodes.Add(node);
 
         // Compress child nodes.
@@ -150,9 +151,9 @@ namespace DigitalRise.Geometry.Partitioning
     private void Refit()
     {
       // Compute new unquantized AABBs.
-      Aabb[] buffer = new Aabb[_nodes.Length];
+      BoundingBox[] buffer = new BoundingBox[_nodes.Length];
       int count = 0;
-      ComputeAabbs(buffer, 0, ref count);
+      ComputeBoundingBoxs(buffer, 0, ref count);
 
       // Update AABB of spatial partition and prepare the factors for quantization.
       SetQuantizationValues(buffer[0]);
@@ -161,13 +162,13 @@ namespace DigitalRise.Geometry.Partitioning
       for (int i = 0; i < _nodes.Length; i++)
       {
         Node node = _nodes[i];
-        SetAabb(ref node, buffer[i]);
+        SetBoundingBox(ref node, buffer[i]);
         _nodes[i] = node;
       }
     }
 
 
-    private void ComputeAabbs(Aabb[] buffer, int index, ref int count)
+    private void ComputeBoundingBoxs(BoundingBox[] buffer, int index, ref int count)
     {
       // Increment the counter for each node visited.
       count++;
@@ -176,17 +177,17 @@ namespace DigitalRise.Geometry.Partitioning
       if (node.IsLeaf)
       {
         // Store unquantized AABB of leaf node.
-        buffer[index] = GetAabbForItem(node.Item);
+        buffer[index] = GetBoundingBoxForItem(node.Item);
       }
       else
       {
         // Compute AABB of child nodes.
         int leftIndex = index + 1;
-        ComputeAabbs(buffer, leftIndex, ref count);
+        ComputeBoundingBoxs(buffer, leftIndex, ref count);
 
         int rightIndex = count;
-        ComputeAabbs(buffer, rightIndex, ref count);
-        buffer[index] = Aabb.Merge(buffer[leftIndex], buffer[rightIndex]);
+        ComputeBoundingBoxs(buffer, rightIndex, ref count);
+        buffer[index] = BoundingBox.CreateMerged(buffer[leftIndex], buffer[rightIndex]);
       }
     }
   }

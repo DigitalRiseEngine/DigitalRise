@@ -29,9 +29,9 @@ namespace DigitalRise.Data.Meshes.Description
 		public float Scale { get; set; }
 		public bool GenerateTangentFrames { get; set; }
 		public bool SwapWindingOrder { get; set; }
-		public bool AabbEnabled { get; set; }
-		public Vector3 AabbMinimum { get; set; }
-		public Vector3 AabbMaximum { get; set; }
+		public bool BoundingBoxEnabled { get; set; }
+		public Vector3 BoundingBoxMinimum { get; set; }
+		public Vector3 BoundingBoxMaximum { get; set; }
 		public bool PremultiplyVertexColors { get; set; }
 		public List<MeshDescription> Meshes { get; set; }
 		public AnimationDescription Animation { get; set; }
@@ -95,13 +95,13 @@ namespace DigitalRise.Data.Meshes.Description
 			modelDescription.PremultiplyVertexColors = (bool?)modelElement.Attribute("PremultiplyVertexColors") ?? true;
 			modelDescription.MaxDistance = (float?)modelElement.Attribute("MaxDistance") ?? 0.0f;
 
-			var aabbMinimumAttribute = modelElement.Attribute("AabbMinimum");
-			var aabbMaximumAttribute = modelElement.Attribute("AabbMaximum");
+			var aabbMinimumAttribute = modelElement.Attribute("BoundingBoxMinimum");
+			var aabbMaximumAttribute = modelElement.Attribute("BoundingBoxMaximum");
 			if (aabbMinimumAttribute != null && aabbMaximumAttribute != null)
 			{
-				modelDescription.AabbEnabled = true;
-				modelDescription.AabbMinimum = aabbMinimumAttribute.ToVector3(Vector3.Zero);
-				modelDescription.AabbMaximum = aabbMaximumAttribute.ToVector3(Vector3.One);
+				modelDescription.BoundingBoxEnabled = true;
+				modelDescription.BoundingBoxMinimum = aabbMinimumAttribute.ToVector3(Vector3.Zero);
+				modelDescription.BoundingBoxMaximum = aabbMaximumAttribute.ToVector3(Vector3.One);
 			}
 
 			// Mesh elements.

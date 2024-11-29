@@ -147,10 +147,10 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
               // ----- Boolean or Contact Query
 
               // Heuristic: Test large BVH vs. small BVH.
-              Aabb aabbOfA = geometricObjectA.Aabb;
-              Aabb aabbOfB = geometricObjectB.Aabb;
-              float largestExtentA = aabbOfA.Extent.LargestComponent();
-              float largestExtentB = aabbOfB.Extent.LargestComponent();
+              BoundingBox aabbOfA = geometricObjectA.BoundingBox;
+              BoundingBox aabbOfB = geometricObjectB.BoundingBox;
+              float largestExtentA = aabbOfA.Extent().LargestComponent();
+              float largestExtentB = aabbOfB.Extent().LargestComponent();
               IEnumerable<Pair<int>> overlaps;
               bool overlapsSwapped = largestExtentA < largestExtentB;
               if (overlapsSwapped)
@@ -221,7 +221,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             #region ----- Composite with BVH vs. * -----
 
             // Compute AABB of B in local space of the CompositeShape.
-            Aabb aabbBInA = geometricObjectB.Shape.GetAabb(
+            BoundingBox aabbBInA = geometricObjectB.Shape.GetBoundingBox(
               scaleB, geometricObjectA.Pose.Inverse * geometricObjectB.Pose);
 
             // Apply inverse scaling to do the AABB checks in the unscaled local space of A.
@@ -276,7 +276,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
           #region ----- Composite vs. *-----
 
           // Compute AABB of B in local space of the composite.
-          Aabb aabbBInA = geometricObjectB.Shape.GetAabb(scaleB, geometricObjectA.Pose.Inverse * geometricObjectB.Pose);
+          BoundingBox aabbBInA = geometricObjectB.Shape.GetBoundingBox(scaleB, geometricObjectA.Pose.Inverse * geometricObjectB.Pose);
           
           // Apply inverse scaling to do the AABB checks in the unscaled local space of A.
           aabbBInA.Scale(Vector3.One / scaleA);
@@ -296,7 +296,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
             // For closest points where we have not found a contact yet, we have to search
             // all children.
             if ((type == CollisionQueryType.ClosestPoints && !contactSet.HaveContact)
-                || GeometryHelper.HaveContact(aabbBInA, child.Shape.GetAabb(child.Scale, child.Pose)))
+                || GeometryHelper.HaveContact(aabbBInA, child.Shape.GetBoundingBox(child.Scale, child.Pose)))
             {
               // TODO: We could compute the minDistance of the child AABB and the AABB of the
               // other shape. If the minDistance is greater than the current closestPairDistance

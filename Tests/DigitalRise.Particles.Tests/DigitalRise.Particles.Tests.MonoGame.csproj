@@ -17,6 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\DigitalRise.Particles\DigitalRise.Particles.MonoGame.csproj" />
-    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.csproj" />
+    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.MonoGame.csproj" />
   </ItemGroup>
 </Project>

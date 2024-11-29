@@ -117,7 +117,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
         1 / rayUnscaled.Direction.Y,
         1 / rayUnscaled.Direction.Z);
 
-        float epsilon = Numeric.EpsilonF * (1 + meshObject.Aabb.Extent.Length());
+        float epsilon = Numeric.EpsilonF * (1 + meshObject.BoundingBox.Extent().Length());
 
         int numberOfTriangles = triangleMesh.NumberOfTriangles;
         for (int i = 0; i < numberOfTriangles; i++)
@@ -127,7 +127,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
           // Make ray vs AABB check first. We could skip this because the ray vs. triangle test
           // is also fast. But experiments (ray vs sphere mesh) have shown that making an 
           // additional ray vs. AABB test first makes the worst case more than 20% faster.
-          if (GeometryHelper.HaveContact(triangle.Aabb, rayUnscaled.Origin, rayUnscaledDirectionInverse, rayUnscaled.Length, epsilon))
+          if (GeometryHelper.HaveContact(triangle.BoundingBox, rayUnscaled.Origin, rayUnscaledDirectionInverse, rayUnscaled.Length, epsilon))
           {
             AddContact(contactSet, swapped, type, ref rayWorld, ref ray, ref triangle, i, ref meshPose, ref meshScale, isTwoSided);
 

@@ -168,9 +168,9 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       line.Scale(ref lineScale);
 
       // Step 1: Get any bounding sphere that encloses the other object.
-      Aabb aabb = otherGeometricObject.Aabb;
-      Vector3 center = (aabb.Minimum + aabb.Maximum) / 2;
-      float radius = (aabb.Maximum - aabb.Minimum).Length();  // A large safe radius. (Exact size does not matter.)
+      BoundingBox aabb = otherGeometricObject.BoundingBox;
+      Vector3 center = (aabb.Min + aabb.Max) / 2;
+      float radius = (aabb.Max - aabb.Min).Length();  // A large safe radius. (Exact size does not matter.)
 
       // Step 2: Get the closest point of line vs. center. 
       // All computations in local space of the line.

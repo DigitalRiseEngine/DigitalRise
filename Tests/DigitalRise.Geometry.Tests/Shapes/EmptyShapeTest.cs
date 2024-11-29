@@ -14,9 +14,9 @@ namespace DigitalRise.Geometry.Shapes.Tests
     [Test]
     public void GetAxisAlignedBoundingBox()
     {
-      Assert.AreEqual(new Aabb(), Shape.Empty.GetAabb(Pose.Identity));
-      Assert.AreEqual(new Aabb(new Vector3(11, 12, -13), new Vector3(11, 12, -13)),
-                      Shape.Empty.GetAabb(new Pose(new Vector3(11, 12, -13), MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
+      Assert.AreEqual(new BoundingBox(), Shape.Empty.GetBoundingBox(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(11, 12, -13), new Vector3(11, 12, -13)),
+                      Shape.Empty.GetBoundingBox(new Pose(new Vector3(11, 12, -13), MathHelper.CreateRotation(new Vector3(1, 1, 1), 0.7f))));
     }
 
 
@@ -26,8 +26,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       var emptyShape = Shape.Empty;
       var clone = emptyShape.Clone() as EmptyShape;
       Assert.IsNotNull(clone);
-      Assert.AreEqual(emptyShape.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(emptyShape.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(emptyShape.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(emptyShape.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

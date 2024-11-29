@@ -835,13 +835,13 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabb()
+    public void HaveContactBoundingBox()
     {
-      var aabb1 = new Aabb(new Vector3(10, 10, 10), new Vector3(10, 10, 10));
-      var aabb2 = new Aabb(new Vector3(10, 10, 10), new Vector3(20, 20, 20));
-      var aabb3 = new Aabb(new Vector3(30, 10, 10), new Vector3(40, 20, 20));
-      var aabbInf = new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
-      var aabbNaN = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+      var aabb1 = new BoundingBox(new Vector3(10, 10, 10), new Vector3(10, 10, 10));
+      var aabb2 = new BoundingBox(new Vector3(10, 10, 10), new Vector3(20, 20, 20));
+      var aabb3 = new BoundingBox(new Vector3(30, 10, 10), new Vector3(40, 20, 20));
+      var aabbInf = new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+      var aabbNaN = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
       Assert.IsTrue(GeometryHelper.HaveContact(aabb1, aabb1));
       Assert.IsTrue(GeometryHelper.HaveContact(aabb1, aabbInf));
       Assert.IsTrue(GeometryHelper.HaveContact(aabbInf, aabbInf));
@@ -860,14 +860,14 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabbPoint()
+    public void HaveContactBoundingBoxPoint()
     {
       var p = new Vector3(10, 10, 10);
-      var aabb1 = new Aabb(new Vector3(10, 10, 10), new Vector3(10, 10, 10));
-      var aabb2 = new Aabb(new Vector3(10, 10, 10), new Vector3(20, 20, 20));
-      var aabb3 = new Aabb(new Vector3(30, 10, 10), new Vector3(40, 20, 20));
-      var aabbInf = new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
-      var aabbNaN = new Aabb(new Vector3(float.NaN), new Vector3(float.NaN));
+      var aabb1 = new BoundingBox(new Vector3(10, 10, 10), new Vector3(10, 10, 10));
+      var aabb2 = new BoundingBox(new Vector3(10, 10, 10), new Vector3(20, 20, 20));
+      var aabb3 = new BoundingBox(new Vector3(30, 10, 10), new Vector3(40, 20, 20));
+      var aabbInf = new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+      var aabbNaN = new BoundingBox(new Vector3(float.NaN), new Vector3(float.NaN));
       Assert.IsTrue(GeometryHelper.HaveContact(aabb1, p));
       Assert.IsTrue(GeometryHelper.HaveContact(aabb2, p));
       Assert.IsFalse(GeometryHelper.HaveContact(aabb3, p));
@@ -878,10 +878,10 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabbBox2()
+    public void HaveContactBoundingBoxBox2()
     {
       var box = new Vector3(1, 1, 1);
-      var aabb = new Aabb(new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
+      var aabb = new BoundingBox(new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
 
       Assert.IsTrue(GeometryHelper.HaveContact(aabb, box, new Pose(new Vector3(0, 0, 0)), true));
       Assert.IsTrue(GeometryHelper.HaveContact(aabb, box, new Pose(new Vector3(1, 0, 0)), true));
@@ -904,9 +904,9 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabbRay()
+    public void HaveContactBoundingBoxRay()
     {
-      var aabb = new Aabb(new Vector3(-1), new Vector3(1));
+      var aabb = new BoundingBox(new Vector3(-1), new Vector3(1));
 
       Assert.AreEqual(false, GeometryHelper.HaveContact(aabb, new Ray(new Vector3(-2, 2, 0), new Vector3(1, 0, 0), 10)));
       Assert.AreEqual(true, GeometryHelper.HaveContact(aabb, new Ray(new Vector3(-2, 0, 0), new Vector3(1, 0, 0), 10)));
@@ -944,9 +944,9 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabbRayFast()
+    public void HaveContactBoundingBoxRayFast()
     {
-      var aabb = new Aabb(new Vector3(-1), new Vector3(1));
+      var aabb = new BoundingBox(new Vector3(-1), new Vector3(1));
 
       Assert.AreEqual(false, GeometryHelper.HaveContactFast(aabb, new Ray(new Vector3(-2, 2, 0), new Vector3(1, 0, 0), 10)));
       Assert.AreEqual(true, GeometryHelper.HaveContactFast(aabb, new Ray(new Vector3(-2, 0, 0), new Vector3(1, 0, 0), 10)));
@@ -985,99 +985,99 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void HaveContactAabbMovingAabb()
+    public void HaveContactBoundingBoxMovingBoundingBox()
     {
       Assert.IsTrue(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0), new Vector3(1)),
-        new Aabb(new Vector3(0), new Vector3(1)),
+        new BoundingBox(new Vector3(0), new Vector3(1)),
+        new BoundingBox(new Vector3(0), new Vector3(1)),
         new Vector3(0, 0, 0)));
 
       Assert.IsFalse(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0), new Vector3(1)),
-        new Aabb(new Vector3(2), new Vector3(3)),
+        new BoundingBox(new Vector3(0), new Vector3(1)),
+        new BoundingBox(new Vector3(2), new Vector3(3)),
         new Vector3(0, 0, 0)));
 
       Assert.IsFalse(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-        new Aabb(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
+        new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+        new BoundingBox(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
         new Vector3(0, 0, 0)));
 
       Assert.IsTrue(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-        new Aabb(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
+        new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+        new BoundingBox(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
         new Vector3(2, 0, 0)));
 
       Assert.IsFalse(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-        new Aabb(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
+        new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+        new BoundingBox(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
         new Vector3(0, 2, 0)));
 
       Assert.IsFalse(GeometryHelper.HaveContact(
-        new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-        new Aabb(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
+        new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+        new BoundingBox(new Vector3(-2, 0, 0), new Vector3(-1, 1, 1)),
         new Vector3(-2, 0, 0)));
 
       Assert.IsTrue(GeometryHelper.HaveContact(
-              new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-              new Aabb(new Vector3(3 - 0.1f, 1, 0), new Vector3(4, 2, 1)),
+              new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+              new BoundingBox(new Vector3(3 - 0.1f, 1, 0), new Vector3(4, 2, 1)),
               new Vector3(-2, -2, 0)));
 
       Assert.IsFalse(GeometryHelper.HaveContact(
-              new Aabb(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
-              new Aabb(new Vector3(3 + 0.1f, 1, 0), new Vector3(4, 2, 1)),
+              new BoundingBox(new Vector3(0, 0, 0), new Vector3(1, 1, 1)),
+              new BoundingBox(new Vector3(3 + 0.1f, 1, 0), new Vector3(4, 2, 1)),
               new Vector3(-2, -2, 0)));
 
     }
 
 
     [Test]
-    public void GetClosestPointAabbPoint()
+    public void GetClosestPointBoundingBoxPoint()
     {
-      Aabb aabb = new Aabb(new Vector3(1, 2, 3), new Vector3(4, 5, 6));
+      BoundingBox aabb = new BoundingBox(new Vector3(1, 2, 3), new Vector3(4, 5, 6));
 
       // Touching corner contacts.
-      TestGetClosestPointAabbPoint(aabb, new Vector3(1, 2, 3), new Vector3(1, 2, 3), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(1, 2, 6), new Vector3(1, 2, 6), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(1, 5, 3), new Vector3(1, 5, 3), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(1, 5, 6), new Vector3(1, 5, 6), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(4, 2, 3), new Vector3(4, 2, 3), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(4, 2, 6), new Vector3(4, 2, 6), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(4, 5, 3), new Vector3(4, 5, 3), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(4, 5, 6), new Vector3(4, 5, 6), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(1, 2, 3), new Vector3(1, 2, 3), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(1, 2, 6), new Vector3(1, 2, 6), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(1, 5, 3), new Vector3(1, 5, 3), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(1, 5, 6), new Vector3(1, 5, 6), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(4, 2, 3), new Vector3(4, 2, 3), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(4, 2, 6), new Vector3(4, 2, 6), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(4, 5, 3), new Vector3(4, 5, 3), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(4, 5, 6), new Vector3(4, 5, 6), true);
 
       // Touching face contacts.
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 2, 4), new Vector3(2, 2, 4), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 4), new Vector3(2, 3, 4), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 5, 4), new Vector3(2, 5, 4), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(1, 3, 4), new Vector3(1, 3, 4), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 3), new Vector3(2, 3, 3), true);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 6), new Vector3(2, 3, 6), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 2, 4), new Vector3(2, 2, 4), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 4), new Vector3(2, 3, 4), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 5, 4), new Vector3(2, 5, 4), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(1, 3, 4), new Vector3(1, 3, 4), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 3), new Vector3(2, 3, 3), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 6), new Vector3(2, 3, 6), true);
 
       // Intersection
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 4), new Vector3(2, 3, 4), true);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 4), new Vector3(2, 3, 4), true);
 
       // Separated contacts
-      TestGetClosestPointAabbPoint(aabb, new Vector3(0, 0, 0), new Vector3(1, 2, 3), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(10, 10, 10), new Vector3(4, 5, 6), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(0, 0, 0), new Vector3(1, 2, 3), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(10, 10, 10), new Vector3(4, 5, 6), false);
 
       // Separated contacts (in Voronoi regions of faces).
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 1, 4), new Vector3(2, 2, 4), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(5, 3, 4), new Vector3(4, 3, 4), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 7, 4), new Vector3(2, 5, 4), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(-1, 3, 4), new Vector3(1, 3, 4), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 2), new Vector3(2, 3, 3), false);
-      TestGetClosestPointAabbPoint(aabb, new Vector3(2, 3, 7), new Vector3(2, 3, 6), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 1, 4), new Vector3(2, 2, 4), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(5, 3, 4), new Vector3(4, 3, 4), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 7, 4), new Vector3(2, 5, 4), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(-1, 3, 4), new Vector3(1, 3, 4), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 2), new Vector3(2, 3, 3), false);
+      TestGetClosestPointBoundingBoxPoint(aabb, new Vector3(2, 3, 7), new Vector3(2, 3, 6), false);
 
       // We could also check separated contacts in the Voronoi regions of the edges and corners.
       // But this should be enough.
     }
 
 
-    private void TestGetClosestPointAabbPoint(Aabb aabb, Vector3 point, Vector3 expectedPoint, bool expectedResult)
+    private void TestGetClosestPointBoundingBoxPoint(BoundingBox aabb, Vector3 point, Vector3 expectedPoint, bool expectedResult)
     {
-      Vector3 pointOnAabb;
-      bool result = GeometryHelper.GetClosestPoint(aabb, point, out pointOnAabb);
-      Assert.AreEqual(expectedPoint, pointOnAabb);
+      Vector3 pointOnBoundingBox;
+      bool result = GeometryHelper.GetClosestPoint(aabb, point, out pointOnBoundingBox);
+      Assert.AreEqual(expectedPoint, pointOnBoundingBox);
       Assert.AreEqual(expectedResult, result);
     }
 

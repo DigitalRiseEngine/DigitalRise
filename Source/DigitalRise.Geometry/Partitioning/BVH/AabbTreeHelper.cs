@@ -13,7 +13,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// <summary>
   /// Provides extension methods for working with AABB trees.
   /// </summary>
-  internal static class AabbTreeHelper
+  internal static class BoundingBoxTreeHelper
   {
     /// <summary>
     /// Gets the ancestors of the given node.
@@ -27,7 +27,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentNullException">
     /// <paramref name="node"/> is <see langword="null"/>.
     /// </exception>
-    public static IEnumerable<IAabbTreeNode<T>> GetAncestors<T>(this IAabbTreeNode<T> node)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetAncestors<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetAncestors(node, n => n.Parent);
     }
@@ -42,7 +42,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentNullException">
     /// <paramref name="node"/> is <see langword="null"/>.
     /// </exception>
-    public static IEnumerable<IAabbTreeNode<T>> GetChildren<T>(this IAabbTreeNode<T> node)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetChildren<T>(this IBoundingBoxTreeNode<T> node)
     {
       if (node == null)
         throw new ArgumentNullException("node");
@@ -51,7 +51,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private static IEnumerable<IAabbTreeNode<T>> GetChildrenImpl<T>(IAabbTreeNode<T> node)
+    private static IEnumerable<IBoundingBoxTreeNode<T>> GetChildrenImpl<T>(IBoundingBoxTreeNode<T> node)
     {
       if (node.IsLeaf)
         yield break;
@@ -79,7 +79,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// This method can be used to traverse a tree in depth-first order (pre-order).
     /// </remarks>
-    public static IEnumerable<IAabbTreeNode<T>> GetDescendants<T>(this IAabbTreeNode<T> node)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetDescendants<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetDescendants(node, GetChildrenImpl);
     }
@@ -102,7 +102,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// This method can be used to traverse a tree in either depth-first order (pre-order) or in 
     /// breadth-first order (level-order).
     /// </remarks>
-    public static IEnumerable<IAabbTreeNode<T>> GetDescendants<T>(this IAabbTreeNode<T> node, bool depthFirst)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetDescendants<T>(this IBoundingBoxTreeNode<T> node, bool depthFirst)
     {
       return TreeHelper.GetDescendants(node, GetChildrenImpl, depthFirst);
     }
@@ -129,7 +129,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <remarks>
     /// This method can be used to traverse a tree in depth-first order (pre-order).
     /// </remarks>
-    public static IEnumerable<IAabbTreeNode<T>> GetSubtree<T>(this IAabbTreeNode<T> node)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetSubtree<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetSubtree(node, GetChildrenImpl);
     }
@@ -156,7 +156,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// This method can be used to traverse a tree in either depth-first order (pre-order) or in 
     /// breadth-first order (also known as level-order).
     /// </remarks>
-    public static IEnumerable<IAabbTreeNode<T>> GetSubtree<T>(this IAabbTreeNode<T> node, bool depthFirst)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetSubtree<T>(this IBoundingBoxTreeNode<T> node, bool depthFirst)
     {
       return TreeHelper.GetSubtree(node, GetChildrenImpl, depthFirst);
     }
@@ -171,7 +171,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentNullException">
     /// <paramref name="node"/> is <see langword="null"/>.
     /// </exception>
-    public static IEnumerable<IAabbTreeNode<T>> GetLeaves<T>(this IAabbTreeNode<T> node)
+    public static IEnumerable<IBoundingBoxTreeNode<T>> GetLeaves<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetLeaves(node, GetChildrenImpl);
     }
@@ -190,7 +190,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentNullException">
     /// <paramref name="node"/> is <see langword="null"/>.
     /// </exception>
-    public static int GetDepth<T>(this IAabbTreeNode<T> node)
+    public static int GetDepth<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetDepth(node, n => node.Parent);
     }
@@ -209,7 +209,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <exception cref="ArgumentNullException">
     /// <paramref name="node"/> is <see langword="null"/>.
     /// </exception>
-    public static int GetHeight<T>(this IAabbTreeNode<T> node)
+    public static int GetHeight<T>(this IBoundingBoxTreeNode<T> node)
     {
       return TreeHelper.GetHeight(node, GetChildrenImpl);
     }
@@ -224,11 +224,11 @@ namespace DigitalRise.Geometry.Partitioning
     /// A value that indicates the proximity between <paramref name="first"/> and 
     /// <paramref name="second"/>. (A smaller value means a closer proximity.)
     /// </returns>
-    private static float GetProximity(Aabb first, Aabb second)
+    private static float GetProximity(BoundingBox first, BoundingBox second)
     {
       // Compute same norm as in Bullet. (2 * Manhattan distance between the centers 
       // of the AABBs.)
-      Vector3 distance = (first.Minimum + first.Maximum) - (second.Minimum + second.Maximum);
+      Vector3 distance = (first.Min + first.Max) - (second.Min + second.Max);
       return Math.Abs(distance.X) + Math.Abs(distance.Y) + Math.Abs(distance.Z);
     }
 
@@ -243,7 +243,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// 0 if <paramref name="first"/> is closest; otherwise 1 if <paramref name="second"/> is 
     /// closest.
     /// </returns>
-    public static int SelectClosest(Aabb reference, Aabb first, Aabb second)
+    public static int SelectClosest(BoundingBox reference, BoundingBox first, BoundingBox second)
     {
       float proximity0 = GetProximity(reference, first);
       float proximity1 = GetProximity(reference, second);

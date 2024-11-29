@@ -63,7 +63,7 @@ namespace DigitalRise.Geometry.Meshes
     // Possible improvements:
     // - Use 64 bit.
     // - Transform input data into a unit cube.
-    // - Use AabbTree to speed up support mapping of point clouds.
+    // - Use BoundingBoxTree to speed up support mapping of point clouds.
     // - For collinearity test: If result is not accurate enough, repeat computation with 
     //   custom high precision data types (e.g. Googol).
     // - Use topology tests and concavity tests to make sure that the faces visible from a point
@@ -168,12 +168,12 @@ namespace DigitalRise.Geometry.Meshes
       #region ----- Convert to Unit Cube -----
       {
         // Get AABB of existing and new points.
-        var aabb = new Aabb(pointList[0], pointList[0]);
+        var aabb = new BoundingBox(pointList[0], pointList[0]);
         foreach (var v in _mesh.Vertices)
           aabb.Grow(v.Position);
         foreach (var p in pointList)
           aabb.Grow(p);
-        var extent = aabb.Extent;
+        var extent = aabb.Extent();
 
         if (!Numeric.IsFinite(extent.X) || !Numeric.IsFinite(extent.Y) || !Numeric.IsFinite(extent.Z))
           throw new GeometryException("Cannot build convex hull because the input positions are invalid (e.g. NaN or infinity).");
@@ -186,8 +186,8 @@ namespace DigitalRise.Geometry.Meshes
         if (Numeric.IsZero(extent.Z))
           extent.Z = 1;
 
-        toUnitCube = Matrix44F.CreateScale(2 / extent.X, 2 / extent.Y, 2 / extent.Z) * Matrix44F.CreateTranslation(-aabb.Center);
-        fromUnitCube = Matrix44F.CreateTranslation(aabb.Center) * Matrix44F.CreateScale(extent / 2);
+        toUnitCube = Matrix44F.CreateScale(2 / extent.X, 2 / extent.Y, 2 / extent.Z) * Matrix44F.CreateTranslation(-aabb.Center());
+        fromUnitCube = Matrix44F.CreateTranslation(aabb.Center()) * Matrix44F.CreateScale(extent / 2);
 
         foreach (var v in _mesh.Vertices)
           v.Position = toUnitCube.TransformPosition(v.Position);

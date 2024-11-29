@@ -422,8 +422,8 @@ namespace DigitalRise.SceneGraph.Scenes
 			}
 
 			// Check for NaN.
-			Aabb aabb = node.Shape.GetAabb();
-			if (Numeric.IsNaN(aabb.Extent.X) || Numeric.IsNaN(aabb.Extent.Y) || Numeric.IsNaN(aabb.Extent.Z))
+			BoundingBox aabb = node.Shape.GetBoundingBox();
+			if (Numeric.IsNaN(aabb.Extent().X) || Numeric.IsNaN(aabb.Extent().Y) || Numeric.IsNaN(aabb.Extent().Z))
 			{
 				var message =
 				  string.Format(
@@ -437,7 +437,7 @@ namespace DigitalRise.SceneGraph.Scenes
 			// Check for infinity. (Only some shapes are infinite per definition.)
 			if (!(node.Shape is InfiniteShape) && !(node.Shape is PlaneShape) && !(node.Shape is LineShape))
 			{
-				if (!Numeric.IsFinite(aabb.Extent.X) || !Numeric.IsFinite(aabb.Extent.Y) || !Numeric.IsFinite(aabb.Extent.Z))
+				if (!Numeric.IsFinite(aabb.Extent().X) || !Numeric.IsFinite(aabb.Extent().Y) || !Numeric.IsFinite(aabb.Extent().Z))
 				{
 					var message =
 					  string.Format(
@@ -977,7 +977,7 @@ namespace DigitalRise.SceneGraph.Scenes
 						if (collisionObject.Enabled)
 						{
 							//if (collisionObject.GeometricObject.Shape is PlaneShape
-							//    && !HaveAabbPlaneContact(referenceNode, collisionObject))
+							//    && !HaveBoundingBoxPlaneContact(referenceNode, collisionObject))
 							//  continue;
 
 							var sceneNode = collisionObject.GeometricObject as SceneNode;

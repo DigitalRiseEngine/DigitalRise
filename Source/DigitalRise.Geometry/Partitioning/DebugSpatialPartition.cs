@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DigitalRise.Collections;
-using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -38,9 +38,9 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    public override IEnumerable<T> GetOverlaps(Aabb aabb)
+    public override IEnumerable<T> GetOverlaps(BoundingBox aabb)
     {
-      return Items.Where(item => GeometryHelper.HaveContact(GetAabbForItem(item), aabb));
+      return Items.Where(item => GeometryHelper.HaveContact(GetBoundingBoxForItem(item), aabb));
     }
 
 
@@ -57,18 +57,18 @@ namespace DigitalRise.Geometry.Partitioning
         while (outerEnumerator.MoveNext())
         {
           T item = outerEnumerator.Current;
-          Aabb aabb = GetAabbForItem(item);
+          BoundingBox aabb = GetBoundingBoxForItem(item);
 
           // Duplicate struct enumerator at current position.
           HashSet<T>.Enumerator innerEnumerator = outerEnumerator;
           while (innerEnumerator.MoveNext())
           {
             T otherItem = innerEnumerator.Current;
-            Aabb otherAabb = GetAabbForItem(otherItem);
+            BoundingBox otherBoundingBox = GetBoundingBoxForItem(otherItem);
 
             Pair<T> overlap = new Pair<T>(item, otherItem);
             if (Filter == null || Filter.Filter(overlap))
-              if (GeometryHelper.HaveContact(aabb, otherAabb))
+              if (GeometryHelper.HaveContact(aabb, otherBoundingBox))
                 SelfOverlaps.Add(overlap);
           }
         }
@@ -77,12 +77,12 @@ namespace DigitalRise.Geometry.Partitioning
         //for (int i = 0; i < Items.Count; i++)
         //{
         //  var itemI = Items[i];
-        //  var aabbI = GetAabbForItem(itemI);
+        //  var aabbI = GetBoundingBoxForItem(itemI);
 
         //  for (int j = i + 1; j < Items.Count; j++)
         //  {
         //    var itemJ = Items[j];
-        //    var aabbJ = GetAabbForItem(itemJ);
+        //    var aabbJ = GetBoundingBoxForItem(itemJ);
 
         //    var overlap = new Pair<T>(itemI, itemJ);
         //    if (Filter == null || Filter.Filter(overlap))

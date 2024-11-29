@@ -11,23 +11,23 @@ using DigitalRise.Mathematics.Algebra;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class AdaptiveAabbTree<T>
+  partial class AdaptiveBoundingBoxTree<T>
   {
     // ReSharper disable StaticFieldInGenericType
     private sealed class GetOverlapsWithPartitionWork : PooledEnumerable<Pair<T>>
     {
       private static readonly ResourcePool<GetOverlapsWithPartitionWork> Pool = new ResourcePool<GetOverlapsWithPartitionWork>(() => new GetOverlapsWithPartitionWork(), x => x.Initialize(), null);
-      private AdaptiveAabbTree<T> _partition;
+      private AdaptiveBoundingBoxTree<T> _partition;
       private ISpatialPartition<T> _otherPartition;
       private IEnumerator<Node> _leafNodes;
       private IEnumerator<T> _otherCandidates;
 
-      public static IEnumerable<Pair<T>> Create(AdaptiveAabbTree<T> partition, ISpatialPartition<T> otherPartition)
+      public static IEnumerable<Pair<T>> Create(AdaptiveBoundingBoxTree<T> partition, ISpatialPartition<T> otherPartition)
       {
         var enumerable = Pool.Obtain();
         enumerable._partition = partition;
         enumerable._otherPartition = otherPartition;
-        enumerable._leafNodes = partition.GetLeafNodes(otherPartition.Aabb).GetEnumerator();
+        enumerable._leafNodes = partition.GetLeafNodes(otherPartition.BoundingBox).GetEnumerator();
         return enumerable;
       }
 
@@ -40,7 +40,7 @@ namespace DigitalRise.Geometry.Partitioning
             if (_leafNodes.MoveNext())
             {
               var leaf = _leafNodes.Current;
-              _otherCandidates = _otherPartition.GetOverlaps(leaf.Aabb).GetEnumerator();
+              _otherCandidates = _otherPartition.GetOverlaps(leaf.BoundingBox).GetEnumerator();
             }
             else
             {
@@ -85,10 +85,10 @@ namespace DigitalRise.Geometry.Partitioning
     private sealed class GetOverlapsWithTreeWork : PooledEnumerable<Pair<T>>
     {
       private static readonly ResourcePool<GetOverlapsWithTreeWork> Pool = new ResourcePool<GetOverlapsWithTreeWork>(() => new GetOverlapsWithTreeWork(), x => x.Initialize(), null);
-      private AdaptiveAabbTree<T> _partition;
+      private AdaptiveBoundingBoxTree<T> _partition;
       private readonly Stack<Pair<Node, Node>> _stack = new Stack<Pair<Node, Node>>();
 
-      public static IEnumerable<Pair<T>> Create(AdaptiveAabbTree<T> partition, AdaptiveAabbTree<T> otherPartition)
+      public static IEnumerable<Pair<T>> Create(AdaptiveBoundingBoxTree<T> partition, AdaptiveBoundingBoxTree<T> otherPartition)
       {
         var enumerable = Pool.Obtain();
         enumerable._partition = partition;
@@ -117,7 +117,7 @@ namespace DigitalRise.Geometry.Partitioning
               _stack.Push(new Pair<Node, Node>(nodeA.LeftChild, nodeA.LeftChild));
             }
           }
-          else if (GeometryHelper.HaveContact(nodeA.Aabb, nodeB.Aabb))
+          else if (GeometryHelper.HaveContact(nodeA.BoundingBox, nodeB.BoundingBox))
           {
             if (!nodeA.IsLeaf)
             {
@@ -175,7 +175,7 @@ namespace DigitalRise.Geometry.Partitioning
     private sealed class GetOverlapsWithTransformedPartitionWork : PooledEnumerable<Pair<T>>
     {
       private static readonly ResourcePool<GetOverlapsWithTransformedPartitionWork> Pool = new ResourcePool<GetOverlapsWithTransformedPartitionWork>(() => new GetOverlapsWithTransformedPartitionWork(), x => x.Initialize(), null);
-      private AdaptiveAabbTree<T> _partition;
+      private AdaptiveBoundingBoxTree<T> _partition;
       private ISpatialPartition<T> _otherPartition;
       private IEnumerator<Node> _leafNodes;
       private IEnumerator<T> _otherCandidates;
@@ -183,7 +183,7 @@ namespace DigitalRise.Geometry.Partitioning
       private Vector3 _otherScaleInverse;
       private Pose _toOther;
 
-      public static IEnumerable<Pair<T>> Create(AdaptiveAabbTree<T> partition,
+      public static IEnumerable<Pair<T>> Create(AdaptiveBoundingBoxTree<T> partition,
         ISpatialPartition<T> otherPartition, IEnumerable<Node> leafNodes,
         ref Vector3 scale, ref Vector3 otherScaleInverse, ref Pose toOther)
       {
@@ -206,7 +206,7 @@ namespace DigitalRise.Geometry.Partitioning
             if (_leafNodes.MoveNext())
             {
               var leaf = _leafNodes.Current;
-              Aabb aabb = leaf.Aabb.GetAabb(_scale, _toOther);
+              BoundingBox aabb = leaf.BoundingBox.GetBoundingBox(_scale, _toOther);
               aabb.Scale(_otherScaleInverse);
               _otherCandidates = _otherPartition.GetOverlaps(aabb).GetEnumerator();
             }
@@ -253,13 +253,13 @@ namespace DigitalRise.Geometry.Partitioning
     private sealed class GetOverlapsWithTransformedTreeWork : PooledEnumerable<Pair<T>>
     {
       private static readonly ResourcePool<GetOverlapsWithTransformedTreeWork> Pool = new ResourcePool<GetOverlapsWithTransformedTreeWork>(() => new GetOverlapsWithTransformedTreeWork(), x => x.Initialize(), null);
-      private AdaptiveAabbTree<T> _partition;
+      private AdaptiveBoundingBoxTree<T> _partition;
       private readonly Stack<Pair<Node, Node>> _stack = new Stack<Pair<Node, Node>>();
       private Vector3 _scaleA;
       private Vector3 _scaleB;
       private Pose _bToA;
 
-      public static IEnumerable<Pair<T>> Create(AdaptiveAabbTree<T> partition, AdaptiveAabbTree<T> otherPartition,
+      public static IEnumerable<Pair<T>> Create(AdaptiveBoundingBoxTree<T> partition, AdaptiveBoundingBoxTree<T> otherPartition,
         ref Vector3 scaleA, ref Vector3 scaleB, ref Pose bToA)
       {
         var enumerable = Pool.Obtain();
@@ -282,7 +282,7 @@ namespace DigitalRise.Geometry.Partitioning
           nodeA.IsActive = true;
           nodeB.IsActive = true;
 
-          if (HaveAabbContact(nodeA, _scaleA, nodeB, _scaleB, _bToA))
+          if (HaveBoundingBoxContact(nodeA, _scaleA, nodeB, _scaleB, _bToA))
           {
             if (!nodeA.IsLeaf)
             {

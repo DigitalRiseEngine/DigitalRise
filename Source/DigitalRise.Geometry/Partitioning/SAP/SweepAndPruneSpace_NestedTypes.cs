@@ -3,7 +3,7 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System.Collections.ObjectModel;
-using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -52,7 +52,7 @@ namespace DigitalRise.Geometry.Partitioning
       /// <summary>
       /// The cached AABB. (Note: This is redundant because this info is also stored in the edges).
       /// </summary>
-      public Aabb Aabb;
+      public BoundingBox BoundingBox;
 
 
       /// <summary>

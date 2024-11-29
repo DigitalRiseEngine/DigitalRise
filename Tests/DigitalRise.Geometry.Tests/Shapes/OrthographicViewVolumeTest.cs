@@ -13,13 +13,13 @@ namespace DigitalRise.Geometry.Shapes.Tests
   public class OrthographicViewVolumeTest
   {
     [Test]
-    public void AabbTest()
+    public void BoundingBoxTest()
     {
       OrthographicViewVolume viewVolume = new OrthographicViewVolume();
       viewVolume.Set(-1, 1, -1, 1, 2, 5);
-      Aabb aabb = viewVolume.GetAabb(Pose.Identity);
-      Assert.AreEqual(new Vector3(-1, -1, -5), aabb.Minimum);
-      Assert.AreEqual(new Vector3(1, 1, -2), aabb.Maximum);
+      BoundingBox aabb = viewVolume.GetBoundingBox(Pose.Identity);
+      Assert.AreEqual(new Vector3(-1, -1, -5), aabb.Min);
+      Assert.AreEqual(new Vector3(1, 1, -2), aabb.Max);
     }
 
 
@@ -175,8 +175,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(orthographicViewVolume.Far, clone.Far);
       Assert.AreEqual(orthographicViewVolume.FieldOfViewX, clone.FieldOfViewX);
       Assert.AreEqual(orthographicViewVolume.FieldOfViewY, clone.FieldOfViewY);
-      Assert.AreEqual(orthographicViewVolume.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(orthographicViewVolume.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(orthographicViewVolume.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(orthographicViewVolume.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using DigitalRise.Collections;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -12,7 +13,7 @@ namespace DigitalRise.Geometry.Partitioning
   partial class SweepAndPruneSpace<T>
   {
     /// <inheritdoc/>
-    public override IEnumerable<T> GetOverlaps(Aabb aabb)
+    public override IEnumerable<T> GetOverlaps(BoundingBox aabb)
     {
       // Make sure we are up-to-date.
       UpdateInternal();
@@ -34,7 +35,7 @@ namespace DigitalRise.Geometry.Partitioning
       for (int i = 0; i < numberOfEdgesPerAxis; i++)
       {
         var edge = edgesX[i];
-        if (edge.Position <= aabb.Maximum.X)
+        if (edge.Position <= aabb.Max.X)
         {
           if (!edge.IsMax)                    // Crossed Min edge --> new overlap.
             overlapCandidates.Add(edge.Info);
@@ -50,7 +51,7 @@ namespace DigitalRise.Geometry.Partitioning
       for (int i = 0; i < numberOfEdgesPerAxis; i++)
       {
         var edge = edgesX[i];
-        if (edge.Position < aabb.Minimum.X)
+        if (edge.Position < aabb.Min.X)
         {
           if (edge.IsMax)                       // Crossed Max edge --> remove overlap.
             overlapCandidates.Remove(edge.Info);
@@ -65,7 +66,7 @@ namespace DigitalRise.Geometry.Partitioning
 #if !POOL_ENUMERABLES
       foreach (var candidate in overlapCandidates)
       {
-        if (GeometryHelper.HaveContact(candidate.Aabb, aabb))
+        if (GeometryHelper.HaveContact(candidate.BoundingBox, aabb))
           yield return candidate.Item;
       }
 
@@ -83,11 +84,11 @@ namespace DigitalRise.Geometry.Partitioning
       // ReSharper disable StaticFieldInGenericType
       private static readonly ResourcePool<GetOverlapsWork> Pool = new ResourcePool<GetOverlapsWork>(() => new GetOverlapsWork(), x => x.Initialize(), null);
       // ReSharper restore StaticFieldInGenericType
-      private Aabb _aabb;
+      private BoundingBox _aabb;
       private HashSet<ItemInfo> _candidates;
       private HashSet<ItemInfo>.Enumerator _enumerator;
 
-      public static IEnumerable<T> Create(HashSet<ItemInfo> candidates, ref Aabb aabb)
+      public static IEnumerable<T> Create(HashSet<ItemInfo> candidates, ref BoundingBox aabb)
       {
         var enumerable = Pool.Obtain();
         enumerable._aabb = aabb;
@@ -101,7 +102,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_enumerator.MoveNext())
         {
           ItemInfo candidate = _enumerator.Current;
-          if (GeometryHelper.HaveContact(candidate.Aabb, _aabb))
+          if (GeometryHelper.HaveContact(candidate.BoundingBox, _aabb))
           {
             current = candidate.Item;
             return true;

@@ -13,8 +13,8 @@ namespace DigitalRise.Geometry.Collisions.Tests
     {
       CollisionObject obj = new CollisionObject(new GeometricObject(new SphereShape(0.3f), new Pose(new Vector3(1, 2, 3))));
 
-      Assert.AreEqual(new Aabb(new Vector3(0.7f, 1.7f, 2.7f), new Vector3(1.3f, 2.3f, 3.3f)),
-                      obj.GeometricObject.Aabb);
+      Assert.AreEqual(new BoundingBox(new Vector3(0.7f, 1.7f, 2.7f), new Vector3(1.3f, 2.3f, 3.3f)),
+                      obj.GeometricObject.BoundingBox);
     }
 
 

@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <RootNamespace>DigitalRise.Mathematics.Tests</RootNamespace>
-    <AssemblyName>DigitalRise.Mathematics.Tests</AssemblyName>
+    <RootNamespace>DigitalRise.Common.Tests</RootNamespace>
+    <AssemblyName>DigitalRise.Common.Tests</AssemblyName>
     <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
     <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
   </PropertyGroup>
@@ -17,5 +17,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.MonoGame.csproj" />
-  </ItemGroup>
+  </ItemGroup>  
 </Project>

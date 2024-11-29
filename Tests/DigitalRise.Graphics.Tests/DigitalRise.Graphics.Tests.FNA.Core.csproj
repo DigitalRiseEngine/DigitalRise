@@ -4,20 +4,19 @@
     <OutputType>Library</OutputType>
     <RootNamespace>DigitalRise.Graphics.Tests</RootNamespace>
     <AssemblyName>DigitalRise.Graphics.Tests</AssemblyName>
-    <DefineConstants>$(DefineConstants);MONOGAME;DIRECTX</DefineConstants>
-    <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
+    <DefineConstants>$(DefineConstants);FNA</DefineConstants>
+    <OutputPath>bin\FNA.Core\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
 
     <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MNTestSdkVersion)" />
     <PackageReference Include="Moq" Version="4.20.69" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\DigitalRise.Graphics\DigitalRise.Graphics.MonoGame.DirectX.csproj" />
-    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.MonoGame.csproj" />
+    <ProjectReference Include="..\..\Source\DigitalRise.Graphics\DigitalRise.Graphics.FNA.Core.csproj" />
+    <ProjectReference Include="..\NUnit.Utils\NUnit.Utils.FNA.Core.csproj" />
   </ItemGroup>
 </Project>

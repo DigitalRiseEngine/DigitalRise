@@ -111,7 +111,7 @@ namespace DigitalRise.Geometry.Collisions
     /// <para>
     /// This filter can be used to disable collision detection between selected collision objects.
     /// This filter is ignored in closest-point queries (see <see cref="GetClosestPoints"/> and
-    /// <see cref="UpdateClosestPoints"/>). It is used for <see cref="HaveAabbContact"/>,
+    /// <see cref="UpdateClosestPoints"/>). It is used for <see cref="HaveBoundingBoxContact"/>,
     /// <see cref="HaveContact"/>, <see cref="GetContacts"/> and <see cref="UpdateContacts"/>.
     /// </para>
     /// <para>
@@ -250,7 +250,7 @@ namespace DigitalRise.Geometry.Collisions
     /// <paramref name="objectB"/> is <see langword="null"/>.
     /// </exception>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-    public bool HaveAabbContact(CollisionObject objectA, CollisionObject objectB)
+    public bool HaveBoundingBoxContact(CollisionObject objectA, CollisionObject objectB)
     {
       if (objectA == null)
         throw new ArgumentNullException("objectA");
@@ -265,7 +265,7 @@ namespace DigitalRise.Geometry.Collisions
       }
 
       // AABB test
-      return GeometryHelper.HaveContact(objectA.GeometricObject.Aabb, objectB.GeometricObject.Aabb);
+      return GeometryHelper.HaveContact(objectA.GeometricObject.BoundingBox, objectB.GeometricObject.BoundingBox);
     }
 
 
@@ -287,7 +287,7 @@ namespace DigitalRise.Geometry.Collisions
     public bool HaveContact(CollisionObject objectA, CollisionObject objectB)
     {
       // Broad phase AABB check and collision filtering
-      if (HaveAabbContact(objectA, objectB) == false)
+      if (HaveBoundingBoxContact(objectA, objectB) == false)
         return false;
 
       // Narrow phase
@@ -346,7 +346,7 @@ namespace DigitalRise.Geometry.Collisions
     public ContactSet GetContacts(CollisionObject objectA, CollisionObject objectB)
     {
       // Broad phase AABB check and collision filtering
-      if (HaveAabbContact(objectA, objectB) == false)
+      if (HaveBoundingBoxContact(objectA, objectB) == false)
         return null;
 
       // Narrow phase
@@ -460,7 +460,7 @@ namespace DigitalRise.Geometry.Collisions
         throw new ArgumentNullException("contactSet");
 
       // Broad phase AABB check and collision filtering
-      if (HaveAabbContact(contactSet.ObjectA, contactSet.ObjectB))
+      if (HaveBoundingBoxContact(contactSet.ObjectA, contactSet.ObjectB))
       {
         // Narrow phase
         AlgorithmMatrix[contactSet].UpdateContacts(contactSet, deltaTime);

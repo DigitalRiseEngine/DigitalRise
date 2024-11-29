@@ -51,10 +51,10 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
 		[Test]
-		public void GetAabb()
+		public void GetBoundingBox()
 		{
-			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetAabb(Pose.Identity).Minimum);
-			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetAabb(Pose.Identity).Maximum);
+			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetBoundingBox(Pose.Identity).Min);
+			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetBoundingBox(Pose.Identity).Max);
 
 			TransformedShape t = new TransformedShape
 			{
@@ -65,11 +65,11 @@ namespace DigitalRise.Geometry.Shapes.Tests
 				},
 			};
 
-			Assert.AreEqual(new Vector3(-10, -9, -10), t.GetAabb(Pose.Identity).Minimum);
-			Assert.AreEqual(new Vector3(10, 11, 10), t.GetAabb(Pose.Identity).Maximum);
+			Assert.AreEqual(new Vector3(-10, -9, -10), t.GetBoundingBox(Pose.Identity).Min);
+			Assert.AreEqual(new Vector3(10, 11, 10), t.GetBoundingBox(Pose.Identity).Max);
 
-			Assert.AreEqual(new Vector3(-8, -9, -10), t.GetAabb(new Pose(new Vector3(2, 0, 0))).Minimum);
-			Assert.AreEqual(new Vector3(12, 11, 10), t.GetAabb(new Pose(new Vector3(2, 0, 0))).Maximum);
+			Assert.AreEqual(new Vector3(-8, -9, -10), t.GetBoundingBox(new Pose(new Vector3(2, 0, 0))).Min);
+			Assert.AreEqual(new Vector3(12, 11, 10), t.GetBoundingBox(new Pose(new Vector3(2, 0, 0))).Max);
 		}
 
 
@@ -132,8 +132,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
 			Assert.AreNotSame(pointShape, clone.Child.Shape);
 			Assert.IsTrue(clone.Child.Shape is PointShape);
 			Assert.AreEqual(pointShape.Position, ((PointShape)clone.Child.Shape).Position);
-			Assert.AreEqual(transformedShape.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-			Assert.AreEqual(transformedShape.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+			Assert.AreEqual(transformedShape.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+			Assert.AreEqual(transformedShape.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
 		}
 	}
 }

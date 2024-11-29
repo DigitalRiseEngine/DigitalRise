@@ -497,10 +497,10 @@ namespace DigitalRise.Misc
 
 			// Get AABB in view space.
 			Pose localToViewPose = cameraNode.PoseWorld.Inverse * geometricObject.Pose;
-			Aabb aabb = geometricObject.Shape.GetAabb(geometricObject.Scale, localToViewPose);
+			BoundingBox aabb = geometricObject.Shape.GetBoundingBox(geometricObject.Scale, localToViewPose);
 
 			// Is the AABB in front of the near plane (= totally clipped)?
-			if (aabb.Minimum.Z >= -near)
+			if (aabb.Min.Z >= -near)
 				return new Vector4(0);
 
 			// Does the AABB contain the origin?
@@ -509,32 +509,32 @@ namespace DigitalRise.Misc
 
 			// Project the AABB far face to the near plane.
 			Vector2 min;
-			min.X = aabb.Minimum.X / -aabb.Minimum.Z * near;
-			min.Y = aabb.Minimum.Y / -aabb.Minimum.Z * near;
+			min.X = aabb.Min.X / -aabb.Min.Z * near;
+			min.Y = aabb.Min.Y / -aabb.Min.Z * near;
 			Vector2 max;
-			max.X = aabb.Maximum.X / -aabb.Minimum.Z * near;
-			max.Y = aabb.Maximum.Y / -aabb.Minimum.Z * near;
+			max.X = aabb.Max.X / -aabb.Min.Z * near;
+			max.Y = aabb.Max.Y / -aabb.Min.Z * near;
 
 			// If the AABB z extent overlaps the origin, some results are invalid.
-			if (aabb.Maximum.Z > -Numeric.EpsilonF)
+			if (aabb.Max.Z > -Numeric.EpsilonF)
 			{
-				if (aabb.Minimum.X < 0)
+				if (aabb.Min.X < 0)
 					min.X = left;
-				if (aabb.Maximum.X > 0)
+				if (aabb.Max.X > 0)
 					max.X = right;
-				if (aabb.Minimum.Y < 0)
+				if (aabb.Min.Y < 0)
 					min.Y = bottom;
-				if (aabb.Maximum.Y > 0)
+				if (aabb.Max.Y > 0)
 					max.Y = top;
 			}
 			else
 			{
 				// The AABB near face is also in front. Project AABB near face to near plane
 				// and take the most extreme.
-				min.X = Math.Min(min.X, aabb.Minimum.X / -aabb.Maximum.Z * near);
-				min.Y = Math.Min(min.Y, aabb.Minimum.Y / -aabb.Maximum.Z * near);
-				max.X = Math.Max(max.X, aabb.Maximum.X / -aabb.Maximum.Z * near);
-				max.Y = Math.Max(max.Y, aabb.Maximum.Y / -aabb.Maximum.Z * near);
+				min.X = Math.Min(min.X, aabb.Min.X / -aabb.Max.Z * near);
+				min.Y = Math.Min(min.Y, aabb.Min.Y / -aabb.Max.Z * near);
+				max.X = Math.Max(max.X, aabb.Max.X / -aabb.Max.Z * near);
+				max.Y = Math.Max(max.Y, aabb.Max.Y / -aabb.Max.Z * near);
 			}
 
 			Vector4 bounds;
@@ -581,8 +581,8 @@ namespace DigitalRise.Misc
 				throw new ArgumentNullException("geometricObject");
 
 			// Use bounding sphere of AABB in world space.
-			var aabb = geometricObject.Aabb;
-			float diameter = aabb.Extent.Length();
+			var aabb = geometricObject.BoundingBox;
+			float diameter = aabb.Extent().Length();
 			float width = diameter;
 			float height = diameter;
 
@@ -625,7 +625,7 @@ namespace DigitalRise.Misc
 
 				// Get planar distance from camera to object by projecting the distance
 				// vector onto the look direction.
-				Vector3 cameraToObject = aabb.Center - cameraPosition;
+				Vector3 cameraToObject = aabb.Center() - cameraPosition;
 				float distance = Vector3.Dot(cameraToObject, cameraForward);
 
 				// Assume that object is in front of camera (no frustum culling).

@@ -5,13 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using DigitalRise.Geometry.Shapes;
 using DigitalRise.Linq;
+using DigitalRise.Mathematics;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class AabbTree<T>
+  partial class BoundingBoxTree<T>
   {
     /// <summary>
     /// Gets or sets the threshold that determines when a bottom-up tree build method is used.
@@ -26,7 +27,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// less optimal. Bottom-up methods are slower but produce more balanced trees. 
     /// </para>
     /// <para>
-    /// The <see cref="AabbTree{T}"/> uses a mixed approach: It starts with a top-down approach.
+    /// The <see cref="BoundingBoxTree{T}"/> uses a mixed approach: It starts with a top-down approach.
     /// When the number of nodes for an internal subtree is less than or equal to
     /// <see cref="BottomUpBuildThreshold"/> it uses a bottom-up method for the subtree.
     /// </para>
@@ -72,7 +73,7 @@ namespace DigitalRise.Geometry.Partitioning
         T item = Items.First();
         _root = new Node
         {
-          Aabb = GetAabbForItem(item),
+          BoundingBox = GetBoundingBoxForItem(item),
           Item = item,
         };
         _leaves = new[] { _root };
@@ -83,18 +84,18 @@ namespace DigitalRise.Geometry.Partitioning
         // Default case: Several items. (Data is stored in the leaves.)
 
         // (Fix for Xbox 360: Create a temporary list of leaves and pass the temporary list to the
-        // AabbTreeBuilder. Cannot use the leaves array directly, because, the .NET CF has troubles
+        // BoundingBoxTreeBuilder. Cannot use the leaves array directly, because, the .NET CF has troubles
         // with arrays that are cast to IList<T>.)
-        var leaves = DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Obtain();
+        var leaves = DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Obtain();
 
         foreach (T item in Items)
         {
-          Aabb aabb = GetAabbForItem(item);
-          leaves.Add(new Node { Aabb = aabb, Item = item });
+          BoundingBox aabb = GetBoundingBoxForItem(item);
+          leaves.Add(new Node { BoundingBox = aabb, Item = item });
         }
 
         // Build tree.
-        _root = (Node)AabbTreeBuilder.Build(leaves, () => new Node(), BottomUpBuildThreshold);
+        _root = (Node)BoundingBoxTreeBuilder.Build(leaves, () => new Node(), BottomUpBuildThreshold);
 
         //_root = CompactNodes(_root, null);
         //GC.Collect(0);
@@ -107,7 +108,7 @@ namespace DigitalRise.Geometry.Partitioning
         _height = GetHeight(_root);
 
         // Recycle temporary list.
-        DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Recycle(leaves);
+        DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Recycle(leaves);
       }
     }
 
@@ -119,7 +120,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       var newNode = new Node
       {
-        Aabb = node.Aabb,
+        BoundingBox = node.BoundingBox,
         Item = node.Item,
         Parent = parent
       };
@@ -158,7 +159,7 @@ namespace DigitalRise.Geometry.Partitioning
         // Update leaf AABB if necessary.
         if (invalidItems == null || invalidItems.Contains(node.Item))
         {
-          node.Aabb = GetAabbForItem(node.Item);
+          node.BoundingBox = GetBoundingBoxForItem(node.Item);
           updated = true;
         }
       }
@@ -171,9 +172,9 @@ namespace DigitalRise.Geometry.Partitioning
         if (updated)
         {
           // Update inner AABB.
-          Aabb aabb = node.LeftChild.Aabb;
-          aabb.Grow(node.RightChild.Aabb);
-          node.Aabb = aabb;
+          BoundingBox aabb = node.LeftChild.BoundingBox;
+          aabb.Grow(node.RightChild.BoundingBox);
+          node.BoundingBox = aabb;
         }
       }
 

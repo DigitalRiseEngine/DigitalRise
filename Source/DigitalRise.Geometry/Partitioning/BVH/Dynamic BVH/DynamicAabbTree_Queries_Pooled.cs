@@ -12,16 +12,16 @@ using DigitalRise.Mathematics.Algebra;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class DynamicAabbTree<T>
+  partial class DynamicBoundingBoxTree<T>
   {
     // ReSharper disable StaticFieldInGenericType
     private sealed class GetOverlapsWork : PooledEnumerable<T>
     {
       private static readonly ResourcePool<GetOverlapsWork> Pool = new ResourcePool<GetOverlapsWork>(() => new GetOverlapsWork(), x => x.Initialize(), null);
-      private Aabb _aabb;
+      private BoundingBox _aabb;
       private readonly Stack<Node> _stack = new Stack<Node>();
 
-      public static IEnumerable<T> Create(DynamicAabbTree<T> aabbTree, ref Aabb aabb)
+      public static IEnumerable<T> Create(DynamicBoundingBoxTree<T> aabbTree, ref BoundingBox aabb)
       {
         var enumerable = Pool.Obtain();
         enumerable._aabb = aabb;
@@ -36,7 +36,7 @@ namespace DigitalRise.Geometry.Partitioning
         {
           Node node = _stack.Pop();
 
-          if (GeometryHelper.HaveContact(node.Aabb, _aabb))
+          if (GeometryHelper.HaveContact(node.BoundingBox, _aabb))
           {
             if (node.IsLeaf)
             {
@@ -68,7 +68,7 @@ namespace DigitalRise.Geometry.Partitioning
       private Node _leaf;
       private readonly Stack<Node> _stack = new Stack<Node>();
 
-      public static IEnumerable<T> Create(DynamicAabbTree<T> aabbTree, Node leaf)
+      public static IEnumerable<T> Create(DynamicBoundingBoxTree<T> aabbTree, Node leaf)
       {
         var enumerable = Pool.Obtain();
         enumerable._leaf = leaf;
@@ -82,7 +82,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_stack.Count > 0)
         {
           Node node = _stack.Pop();
-          if (node != _leaf && GeometryHelper.HaveContact(node.Aabb, _leaf.Aabb))
+          if (node != _leaf && GeometryHelper.HaveContact(node.BoundingBox, _leaf.BoundingBox))
           {
             if (node.IsLeaf)
             {
@@ -112,10 +112,10 @@ namespace DigitalRise.Geometry.Partitioning
     private sealed class GetLeafNodesWork : PooledEnumerable<Node>
     {
       private static readonly ResourcePool<GetLeafNodesWork> Pool = new ResourcePool<GetLeafNodesWork>(() => new GetLeafNodesWork(), x => x.Initialize(), null);
-      private Aabb _aabb;
+      private BoundingBox _aabb;
       private readonly Stack<Node> _stack = new Stack<Node>();
 
-      public static IEnumerable<Node> Create(DynamicAabbTree<T> aabbTree, ref Aabb aabb)
+      public static IEnumerable<Node> Create(DynamicBoundingBoxTree<T> aabbTree, ref BoundingBox aabb)
       {
         var enumerable = Pool.Obtain();
         enumerable._aabb = aabb;
@@ -129,7 +129,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_stack.Count > 0)
         {
           Node node = _stack.Pop();
-          if (GeometryHelper.HaveContact(node.Aabb, _aabb))
+          if (GeometryHelper.HaveContact(node.BoundingBox, _aabb))
           {
             if (node.IsLeaf)
             {
@@ -158,17 +158,17 @@ namespace DigitalRise.Geometry.Partitioning
     private sealed class GetOverlapsWithItemWork : PooledEnumerable<T>
     {
       private static readonly ResourcePool<GetOverlapsWithItemWork> Pool = new ResourcePool<GetOverlapsWithItemWork>(() => new GetOverlapsWithItemWork(), x => x.Initialize(), null);
-      private DynamicAabbTree<T> _dynamicAabbTree;
+      private DynamicBoundingBoxTree<T> _dynamicBoundingBoxTree;
       private T _item;
       private IEnumerator<T> _enumerator;
 
-      public static IEnumerable<T> Create(DynamicAabbTree<T> dynamicAabbTree, T item)
+      public static IEnumerable<T> Create(DynamicBoundingBoxTree<T> dynamicBoundingBoxTree, T item)
       {
         var enumerable = Pool.Obtain();
-        enumerable._dynamicAabbTree = dynamicAabbTree;
+        enumerable._dynamicBoundingBoxTree = dynamicBoundingBoxTree;
         enumerable._item = item;
-        Aabb aabb = dynamicAabbTree.GetAabbForItem(item);
-        enumerable._enumerator = dynamicAabbTree.GetOverlaps(aabb).GetEnumerator();
+        BoundingBox aabb = dynamicBoundingBoxTree.GetBoundingBoxForItem(item);
+        enumerable._enumerator = dynamicBoundingBoxTree.GetOverlaps(aabb).GetEnumerator();
         return enumerable;
       }
 
@@ -177,7 +177,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_enumerator.MoveNext())
         {
           T touchedItem = _enumerator.Current;
-          if (_dynamicAabbTree.FilterSelfOverlap(new Pair<T>(touchedItem, _item)))
+          if (_dynamicBoundingBoxTree.FilterSelfOverlap(new Pair<T>(touchedItem, _item)))
           {
             current = touchedItem;
             return true;
@@ -189,7 +189,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       protected override void OnRecycle()
       {
-        _dynamicAabbTree = null;
+        _dynamicBoundingBoxTree = null;
         _enumerator.Dispose();
         _enumerator = null;
         Pool.Recycle(this);
@@ -205,14 +205,14 @@ namespace DigitalRise.Geometry.Partitioning
       private float _epsilon;
       private readonly Stack<Node> _stack = new Stack<Node>();
 
-      public static IEnumerable<T> Create(DynamicAabbTree<T> aabbTree, ref Ray ray)
+      public static IEnumerable<T> Create(DynamicBoundingBoxTree<T> aabbTree, ref Ray ray)
       {
         var enumerable = Pool.Obtain();
         enumerable._ray = ray;
         enumerable._rayDirectionInverse = new Vector3(1 / ray.Direction.X,
                                                        1 / ray.Direction.Y,
                                                        1 / ray.Direction.Z);
-        enumerable._epsilon = Numeric.EpsilonF * (1 + aabbTree.Aabb.Extent.Length);
+        enumerable._epsilon = Numeric.EpsilonF * (1 + aabbTree.BoundingBox.Extent().Length);
         if (aabbTree._root != null)
           enumerable._stack.Push(aabbTree._root);
         return enumerable;
@@ -223,7 +223,7 @@ namespace DigitalRise.Geometry.Partitioning
         while (_stack.Count > 0)
         {
           var node = _stack.Pop();
-          if (GeometryHelper.HaveContact(node.Aabb, _ray.Origin, _rayDirectionInverse, _ray.Length, _epsilon))
+          if (GeometryHelper.HaveContact(node.BoundingBox, _ray.Origin, _rayDirectionInverse, _ray.Length, _epsilon))
           {
             if (node.IsLeaf)
             {
@@ -258,7 +258,7 @@ namespace DigitalRise.Geometry.Partitioning
       private int[] _signs = new int[6];
       private int _inside;
 
-      public static IEnumerable<T> Create(DynamicAabbTree<T> aabbTree, IList<Plane> planes)
+      public static IEnumerable<T> Create(DynamicBoundingBoxTree<T> aabbTree, IList<Plane> planes)
       {
         var enumerable = Pool.Obtain();
         enumerable._planes = planes;
@@ -305,7 +305,7 @@ namespace DigitalRise.Geometry.Partitioning
           {
             if ((mask & j) == 0)
             {
-              var aabb = node.Aabb;
+              var aabb = node.BoundingBox;
               var plane = _planes[i];
               int side = Classify(ref aabb, ref plane, _signs[i]);
               switch (side)

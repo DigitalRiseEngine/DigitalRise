@@ -17,10 +17,10 @@ using Ray = DigitalRise.Geometry.Shapes.Ray;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class CompressedAabbTree
+  partial class CompressedBoundingBoxTree
   {
     /// <inheritdoc/>
-    public IEnumerable<int> GetOverlaps(Aabb aabb)
+    public IEnumerable<int> GetOverlaps(BoundingBox aabb)
     {
       Update(false);
 
@@ -28,7 +28,7 @@ namespace DigitalRise.Geometry.Partitioning
     }
 
 
-    private IEnumerable<int> GetOverlapsImpl(Aabb aabb)
+    private IEnumerable<int> GetOverlapsImpl(BoundingBox aabb)
     {
       // This method avoids the Update() call!
 
@@ -43,7 +43,7 @@ namespace DigitalRise.Geometry.Partitioning
       while (index < _nodes.Length)
       {
         Node node = _nodes[index];
-        bool haveContact = GeometryHelper.HaveContact(GetAabb(node), aabb);
+        bool haveContact = GeometryHelper.HaveContact(GetBoundingBox(node), aabb);
 
         if (haveContact && node.IsLeaf)
           yield return node.Item;
@@ -70,16 +70,16 @@ namespace DigitalRise.Geometry.Partitioning
 
     /// <summary>
     /// Gets the leaf nodes that touch the given AABB. (Same as 
-    /// <see cref="GetOverlaps(Shapes.Aabb)"/> except we directly return the AABB tree node.
+    /// <see cref="GetOverlaps(Shapes.BoundingBox)"/> except we directly return the AABB tree node.
     /// </summary>
     /// <param name="aabb">The axis-aligned bounding box.</param>
     /// <returns>All items that touch the given AABB.</returns>
     /// <remarks>
     /// Filtering (see <see cref="Filter"/>) is not applied.
     /// </remarks>
-    private IEnumerable<Node> GetLeafNodes(Aabb aabb)
+    private IEnumerable<Node> GetLeafNodes(BoundingBox aabb)
     {
-      // Note: This methods is the same as GetOverlaps(Aabb), but instead of returning items we 
+      // Note: This methods is the same as GetOverlaps(BoundingBox), but instead of returning items we 
       // return the nodes directly. This is used in tree vs. tree tests, so we do not have to 
       // recompute the AABBs of each leaf node.
 
@@ -96,7 +96,7 @@ namespace DigitalRise.Geometry.Partitioning
       while (index < _nodes.Length)
       {
         Node node = _nodes[index];
-        bool haveContact = GeometryHelper.HaveContact(GetAabb(node), aabb);
+        bool haveContact = GeometryHelper.HaveContact(GetBoundingBox(node), aabb);
 
         if (haveContact && node.IsLeaf)
           yield return node;
@@ -135,7 +135,7 @@ namespace DigitalRise.Geometry.Partitioning
     public IEnumerable<int> GetOverlaps(int item)
     {
 #if !POOL_ENUMERABLES
-      var aabb = GetAabbForItem(item);
+      var aabb = GetBoundingBoxForItem(item);
 
       foreach (var touchedItem in GetOverlaps(aabb))
       {
@@ -163,7 +163,7 @@ namespace DigitalRise.Geometry.Partitioning
             1 / ray.Direction.Y,
             1 / ray.Direction.Z);
 
-      float epsilon = Numeric.EpsilonF * (1 + Aabb.Extent.Length());
+      float epsilon = Numeric.EpsilonF * (1 + BoundingBox.Extent().Length());
 
       // ----- Stackless traversal of tree:
       // The AABB tree nodes are stored in preorder traversal order. We can visit them in linear
@@ -172,7 +172,7 @@ namespace DigitalRise.Geometry.Partitioning
       while (index < _nodes.Length)
       {
         Node node = _nodes[index];
-        bool haveContact = GeometryHelper.HaveContact(GetAabb(node), ray.Origin, rayDirectionInverse, ray.Length, epsilon);
+        bool haveContact = GeometryHelper.HaveContact(GetBoundingBox(node), ray.Origin, rayDirectionInverse, ray.Length, epsilon);
 
         if (haveContact && node.IsLeaf)
           yield return node.Item;
@@ -212,7 +212,7 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     /// <inheritdoc/>
-    public float GetClosestPointCandidates(Aabb aabb, float maxDistanceSquared, Func<int, float> callback)
+    public float GetClosestPointCandidates(BoundingBox aabb, float maxDistanceSquared, Func<int, float> callback)
     {
       if (callback == null)
         throw new ArgumentNullException("callback");
@@ -229,7 +229,7 @@ namespace DigitalRise.Geometry.Partitioning
 
 
     // Recursive traversal of tree.
-    private void GetClosestPointCandidatesImpl(int index, Aabb aabb, Func<int, float> callback, ref float closestPointDistanceSquared)
+    private void GetClosestPointCandidatesImpl(int index, BoundingBox aabb, Func<int, float> callback, ref float closestPointDistanceSquared)
     {
       // closestPointDistanceSquared == -1 can be returned by callback to abort the query.
       if (closestPointDistanceSquared < 0)
@@ -242,7 +242,7 @@ namespace DigitalRise.Geometry.Partitioning
 
       // If we have a contact, it is not necessary to examine nodes with no AABB contact
       // because they cannot give a closer point pair.
-      if (closestPointDistanceSquared == 0 && !GeometryHelper.HaveContact(GetAabb(node), aabb))
+      if (closestPointDistanceSquared == 0 && !GeometryHelper.HaveContact(GetBoundingBox(node), aabb))
         return;
 
       if (node.IsLeaf)
@@ -268,8 +268,8 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
       // No contact. Use lower bound estimates to search the best nodes first.
-      float minDistanceLeft = GeometryHelper.GetDistanceSquared(GetAabb(leftChild), aabb);
-      float minDistanceRight = GeometryHelper.GetDistanceSquared(GetAabb(rightChild), aabb);
+      float minDistanceLeft = GeometryHelper.GetDistanceSquared(GetBoundingBox(leftChild), aabb);
+      float minDistanceRight = GeometryHelper.GetDistanceSquared(GetBoundingBox(rightChild), aabb);
 
       if (minDistanceLeft < minDistanceRight)
       {

@@ -64,8 +64,8 @@ namespace DigitalRise.Graphics.SceneGraph.Tests
 				//  // Remove orientation - otherwise we get infinite AABB.
 				//  node.PoseLocal = new Pose(node.PoseLocal.Position);
 
-				//  var aabb = node.Aabb;
-				//  var isValid = node.Aabb.Extent.IsNaN;
+				//  var aabb = node.BoundingBox;
+				//  var isValid = node.BoundingBox.Extent.IsNaN;
 				//}
 				else
 					node.Shape = new SphereShape(random.NextFloat(0, 10));

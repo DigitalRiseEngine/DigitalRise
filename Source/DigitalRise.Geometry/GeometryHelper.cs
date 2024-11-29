@@ -417,5 +417,20 @@ namespace DigitalRise.Geometry
     }
     
     #endregion
-  }
+
+        public static BoundingBox GetBoundingBox(this BoundingBox box, Vector3 scale, Pose pose)
+        {
+            var matrix = pose.ToMatrixWithScale(scale);
+
+            return box.Transform(ref matrix);
+        }
+
+		public static BoundingBox GetBoundingBox(this BoundingBox box, Pose pose)
+		{
+            var matrix = (Matrix)pose.ToMatrix44F();
+
+			return box.Transform(ref matrix);
+		}
+
+	}
 }

@@ -18,7 +18,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexHullOfPoints convexHullOfPoints = new ConvexHullOfPoints(Enumerable.Empty<Vector3>());
       Assert.AreEqual(0, convexHullOfPoints.Points.Count);
       Assert.AreEqual(Vector3.Zero, convexHullOfPoints.InnerPoint);
-      Assert.AreEqual(new Aabb(), convexHullOfPoints.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(), convexHullOfPoints.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -29,7 +29,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexHullOfPoints convexHullOfPoints = new ConvexHullOfPoints(new[] { point });
       Assert.AreEqual(1, convexHullOfPoints.Points.Count);
       Assert.AreEqual(point, convexHullOfPoints.InnerPoint);
-      Assert.AreEqual(new Aabb(point, point), convexHullOfPoints.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(point, point), convexHullOfPoints.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -41,7 +41,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexHullOfPoints convexHullOfPoints = new ConvexHullOfPoints(new[] { point0, point1 });
       Assert.AreEqual(2, convexHullOfPoints.Points.Count);
       Assert.AreEqual((point0 + point1) / 2, convexHullOfPoints.InnerPoint);
-      Assert.AreEqual(new Aabb(point0, point1), convexHullOfPoints.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(point0, point1), convexHullOfPoints.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -54,7 +54,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       ConvexHullOfPoints convexHullOfPoints = new ConvexHullOfPoints(new[] { point0, point1, point2 });
       Assert.AreEqual(3, convexHullOfPoints.Points.Count);
       Assert.AreEqual((point0 + point1 + point2) / 3, convexHullOfPoints.InnerPoint);
-      Assert.AreEqual(new Aabb(new Vector3(1, 1, 1), new Vector3(2, 2, 1)), convexHullOfPoints.GetAabb(Pose.Identity));
+      Assert.AreEqual(new BoundingBox(new Vector3(1, 1, 1), new Vector3(2, 2, 1)), convexHullOfPoints.GetBoundingBox(Pose.Identity));
     }
 
 
@@ -103,8 +103,8 @@ namespace DigitalRise.Geometry.Shapes.Tests
       for (int i = 0; i < clone.Points.Count; i++)
         Assert.AreEqual(convexHullOfPoints.Points[i], clone.Points[i]);
 
-      Assert.AreEqual(convexHullOfPoints.GetAabb(Pose.Identity).Minimum, clone.GetAabb(Pose.Identity).Minimum);
-      Assert.AreEqual(convexHullOfPoints.GetAabb(Pose.Identity).Maximum, clone.GetAabb(Pose.Identity).Maximum);
+      Assert.AreEqual(convexHullOfPoints.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
+      Assert.AreEqual(convexHullOfPoints.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
 
 

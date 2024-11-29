@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using DigitalRise.Geometry.Collisions;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Geometry.Partitioning
@@ -17,7 +18,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// <typeparam name="T">The type of item in the spatial partition.</typeparam>
   /// <remarks>
   /// <para>
-  /// The <see cref="AdaptiveAabbTree{T}"/> is based on 
+  /// The <see cref="AdaptiveBoundingBoxTree{T}"/> is based on 
   /// <list type="bullet">
   /// <item>
   /// <description>
@@ -34,14 +35,14 @@ namespace DigitalRise.Geometry.Partitioning
   /// </list>
   /// </para>
   /// <para>
-  /// The <see cref="AdaptiveAabbTree{T}"/> was designed to manage deformable objects efficiently.
+  /// The <see cref="AdaptiveBoundingBoxTree{T}"/> was designed to manage deformable objects efficiently.
   /// It should be used for <see cref="CompositeShape"/>s or <see cref="TriangleMeshShape"/>s when
   /// the contained shapes or triangles are updated at runtime.
   /// </para>
   /// <para>
-  /// <strong><see cref="AdaptiveAabbTree{T}"/> vs. <see cref="DynamicAabbTree{T}"/>:</strong>
-  /// The <see cref="AdaptiveAabbTree{T}"/> and the <see cref="DynamicAabbTree{T}"/> are similar
-  /// data structures. As a general rule, the <see cref="AdaptiveAabbTree{T}"/> should be used if
+  /// <strong><see cref="AdaptiveBoundingBoxTree{T}"/> vs. <see cref="DynamicBoundingBoxTree{T}"/>:</strong>
+  /// The <see cref="AdaptiveBoundingBoxTree{T}"/> and the <see cref="DynamicBoundingBoxTree{T}"/> are similar
+  /// data structures. As a general rule, the <see cref="AdaptiveBoundingBoxTree{T}"/> should be used if
   /// <list type="bullet">
   /// <item>
   /// <description>
@@ -56,7 +57,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// </description>
   /// </item>
   /// </list>
-  /// Whereas the <see cref="DynamicAabbTree{T}"/> should be used if
+  /// Whereas the <see cref="DynamicBoundingBoxTree{T}"/> should be used if
   /// <list type="bullet">
   /// <item>
   /// <description>
@@ -73,9 +74,9 @@ namespace DigitalRise.Geometry.Partitioning
   /// </list>
   /// </para>
   /// <para>
-  /// The <see cref="AdaptiveAabbTree{T}"/> should not be used as the collision detection 
+  /// The <see cref="AdaptiveBoundingBoxTree{T}"/> should not be used as the collision detection 
   /// broad-phase (see <see cref="CollisionDomain.BroadPhase"/>). Whereas, a 
-  /// <see cref="DynamicAabbTree{T}"/> can be used as the collision detection broad-phase.
+  /// <see cref="DynamicBoundingBoxTree{T}"/> can be used as the collision detection broad-phase.
   /// </para>
   /// <para>
   /// However, please note these are just general guidelines. You should always try different 
@@ -92,7 +93,7 @@ namespace DigitalRise.Geometry.Partitioning
   /// </remarks>
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-  public partial class AdaptiveAabbTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>
+  public partial class AdaptiveBoundingBoxTree<T> : BasePartition<T>, ISupportClosestPointQueries<T>
   {
     //--------------------------------------------------------------
     #region Fields
@@ -152,7 +153,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// <inheritdoc/>
     protected override BasePartition<T> CreateInstanceCore()
     {
-      return new AdaptiveAabbTree<T>();
+      return new AdaptiveBoundingBoxTree<T>();
     }
 
 
@@ -197,7 +198,7 @@ namespace DigitalRise.Geometry.Partitioning
       }
 
       // ----- Finally, update AABB and self-overlaps.
-      UpdateAabb();
+      UpdateBoundingBox();
       UpdateSelfOverlaps();
     }
 
@@ -205,9 +206,9 @@ namespace DigitalRise.Geometry.Partitioning
     /// <summary>
     /// Updates the AABB of the spatial partition.
     /// </summary>
-    private void UpdateAabb()
+    private void UpdateBoundingBox()
     {
-      Aabb = (_root != null) ? _root.Aabb : new Aabb();
+      BoundingBox = (_root != null) ? _root.BoundingBox : new BoundingBox();
     }
 
 

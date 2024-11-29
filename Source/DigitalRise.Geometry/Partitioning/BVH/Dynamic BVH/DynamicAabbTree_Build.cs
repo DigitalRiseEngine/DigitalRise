@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace DigitalRise.Geometry.Partitioning
 {
-  partial class DynamicAabbTree<T>
+  partial class DynamicBoundingBoxTree<T>
   {
     /// <summary>
     /// Gets or sets the threshold that determines when a bottom-up tree build method is used.
@@ -26,7 +26,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// less optimal. Bottom-up methods are slower but produce more balanced trees. 
     /// </para>
     /// <para>
-    /// The <see cref="DynamicAabbTree{T}"/> uses a mixed approach: It starts with a top-down
+    /// The <see cref="DynamicBoundingBoxTree{T}"/> uses a mixed approach: It starts with a top-down
     /// approach. When the number of nodes for an internal subtree is less than or equal to
     /// <see cref="BottomUpBuildThreshold"/> it uses a bottom-up method for the subtree.
     /// </para>
@@ -76,7 +76,7 @@ namespace DigitalRise.Geometry.Partitioning
         // AABB tree contains exactly one item. (One leaf, no internal nodes.)
         T item = Items.First();
         _root = Nodes.Obtain();
-        _root.Aabb = GetAabbForItem(item);
+        _root.BoundingBox = GetBoundingBoxForItem(item);
         _root.Item = item;
         _leaves.Add(item, _root);
       }
@@ -86,23 +86,23 @@ namespace DigitalRise.Geometry.Partitioning
         foreach (T item in Items)
         {
           Node node = Nodes.Obtain();
-          node.Aabb = GetAabbForItem(item);
+          node.BoundingBox = GetBoundingBoxForItem(item);
           node.Item = item;
           _leaves.Add(item, node);
         }
 
         // (Fix for Xbox 360: Create a temporary list of leaves and pass the temporary list to the
-        // AabbTreeBuilder. Cannot use the leaves array directly, because, the .NET CF has troubles
+        // BoundingBoxTreeBuilder. Cannot use the leaves array directly, because, the .NET CF has troubles
         // with arrays that are cast to IList<T>.)
-        List<IAabbTreeNode<T>> leaves = DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Obtain();
+        List<IBoundingBoxTreeNode<T>> leaves = DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Obtain();
         foreach (var leaf in _leaves.Values)
           leaves.Add(leaf);
 
         // Build tree.
-        _root = (Node)AabbTreeBuilder.Build(leaves, () => Nodes.Obtain(), BottomUpBuildThreshold);
+        _root = (Node)BoundingBoxTreeBuilder.Build(leaves, () => Nodes.Obtain(), BottomUpBuildThreshold);
 
         // Recycle temporary lists.
-        DigitalRise.ResourcePools<IAabbTreeNode<T>>.Lists.Recycle(leaves);
+        DigitalRise.ResourcePools<IBoundingBoxTreeNode<T>>.Lists.Recycle(leaves);
       }
     }
 
@@ -137,7 +137,7 @@ namespace DigitalRise.Geometry.Partitioning
         // Update leaf AABB if necessary.
         if (invalidItems == null || invalidItems.Contains(node.Item))
         {
-          node.Aabb = GetAabbForItem(node.Item);
+          node.BoundingBox = GetBoundingBoxForItem(node.Item);
           updated = true;
         }
       }
@@ -150,9 +150,9 @@ namespace DigitalRise.Geometry.Partitioning
         if (updated)
         {
           // Update internal AABB.
-          Aabb aabb = node.LeftChild.Aabb;
-          aabb.Grow(node.RightChild.Aabb);
-          node.Aabb = aabb;
+          BoundingBox aabb = node.LeftChild.BoundingBox;
+          aabb.Grow(node.RightChild.BoundingBox);
+          node.BoundingBox = aabb;
         }
       }
 
@@ -179,14 +179,14 @@ namespace DigitalRise.Geometry.Partitioning
         Node sibling = root;
         while (!sibling.IsLeaf)
         {
-          int selection = AabbTreeHelper.SelectClosest(leaf.Aabb, sibling.LeftChild.Aabb, sibling.RightChild.Aabb);
+          int selection = BoundingBoxTreeHelper.SelectClosest(leaf.BoundingBox, sibling.LeftChild.BoundingBox, sibling.RightChild.BoundingBox);
           sibling = (selection == 0) ? sibling.LeftChild : sibling.RightChild;
         }
 
         // Add a new node as the parent of (sibling, leaf).
         Node parent = sibling.Parent;
         Node node = Nodes.Obtain();
-        node.Aabb = Aabb.Merge(sibling.Aabb, leaf.Aabb);
+        node.BoundingBox = BoundingBox.CreateMerged(sibling.BoundingBox, leaf.BoundingBox);
         node.Parent = parent;
         node.LeftChild = sibling;
         node.RightChild = leaf;
@@ -209,8 +209,8 @@ namespace DigitalRise.Geometry.Partitioning
           // Update AABBs of ancestor.
           do
           {
-            if (!parent.Aabb.Contains(node.Aabb))
-              parent.Aabb = Aabb.Merge(parent.LeftChild.Aabb, parent.RightChild.Aabb);
+            if (parent.BoundingBox.Contains(node.BoundingBox) != ContainmentType.Contains)
+              parent.BoundingBox = BoundingBox.CreateMerged(parent.LeftChild.BoundingBox, parent.RightChild.BoundingBox);
             else
               break;
 
@@ -264,9 +264,9 @@ namespace DigitalRise.Geometry.Partitioning
           // Update AABBs of ancestors.
           do
           {
-            Aabb oldAabb = previous.Aabb;
-            previous.Aabb = Aabb.Merge(previous.LeftChild.Aabb, previous.RightChild.Aabb);
-            if (oldAabb != previous.Aabb)
+            BoundingBox oldBoundingBox = previous.BoundingBox;
+            previous.BoundingBox = BoundingBox.CreateMerged(previous.LeftChild.BoundingBox, previous.RightChild.BoundingBox);
+            if (oldBoundingBox != previous.BoundingBox)
               previous = previous.Parent;
             else
               break;
@@ -338,7 +338,7 @@ namespace DigitalRise.Geometry.Partitioning
     /// Updates the node and sets the specified AABB.
     /// </summary>
     /// <param name="node">The node to be updated.</param>
-    /// <param name="newAabb">The new AABB of <paramref name="node"/>.</param>
+    /// <param name="newBoundingBox">The new AABB of <paramref name="node"/>.</param>
     /// <remarks>
     /// <para>
     /// Motion prediction is used to reduce the number of tree updates: If motion prediction is 
@@ -347,26 +347,26 @@ namespace DigitalRise.Geometry.Partitioning
     /// unchanged. See check in <see cref="Invalidate"/>.
     /// </para>
     /// </remarks>
-    private void UpdateLeaf(Node node, Aabb newAabb)
+    private void UpdateLeaf(Node node, BoundingBox newBoundingBox)
     {
-      if (_enableMotionPrediction && GeometryHelper.HaveContact(node.Aabb, newAabb))
+      if (_enableMotionPrediction && GeometryHelper.HaveContact(node.BoundingBox, newBoundingBox))
       {
         // Old AABB overlaps with new AABB. 
         // Let's assume a linear motion.
 
         // Expand AABB by margin and along motion.
-        Vector3 velocity = (newAabb.Center - node.Aabb.Center) * MotionPrediction;
-        Expand(ref newAabb, RelativeMargin);  // Add margin to account for jiggling.
-        Expand(ref newAabb, ref velocity);    // Expand in direction to account for linear motion.
+        Vector3 velocity = (newBoundingBox.Center() - node.BoundingBox.Center()) * MotionPrediction;
+        Expand(ref newBoundingBox, RelativeMargin);  // Add margin to account for jiggling.
+        Expand(ref newBoundingBox, ref velocity);    // Expand in direction to account for linear motion.
 
         // Note: Bullet uses 
         //
-        //   Vector3 delta = newAabb.Minimum - node.Aabb.Minimum;
+        //   Vector3 delta = newBoundingBox.Min - node.BoundingBox.Min;
         //
         // to estimate the direction (positive x or negative x, ...).
         // Then Bullet calculates the velocity as 
         //
-        //   Vector3 velocity = newAabb.Extent / 2 * MotionPrediction;
+        //   Vector3 velocity = newBoundingBox.Extent() / 2 * MotionPrediction;
         //   if (delta.X < 0) velocity.X = -velocity.X;
         //   if (delta.Y < 0) velocity.Y = -velocity.Y;
         //   if (delta.Z < 0) velocity.Z = -velocity.Z;
@@ -382,7 +382,7 @@ namespace DigitalRise.Geometry.Partitioning
         // Do not change the AABB.
       }
 
-      node.Aabb = newAabb;
+      node.BoundingBox = newBoundingBox;
       UpdateLeaf(node);
     }
 
@@ -392,22 +392,22 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="aabb">The AABB to be expanded.</param>
     /// <param name="direction">The direction.</param>
-    private static void Expand(ref Aabb aabb, ref Vector3 direction)
+    private static void Expand(ref BoundingBox aabb, ref Vector3 direction)
     {
       if (direction.X >= 0)
-        aabb.Maximum.X += direction.X;
+        aabb.Max.X += direction.X;
       else
-        aabb.Minimum.X += direction.X;
+        aabb.Min.X += direction.X;
 
       if (direction.Y >= 0)
-        aabb.Maximum.Y += direction.Y;
+        aabb.Max.Y += direction.Y;
       else
-        aabb.Minimum.Y += direction.Y;
+        aabb.Min.Y += direction.Y;
 
       if (direction.Z >= 0)
-        aabb.Maximum.Z += direction.Z;
+        aabb.Max.Z += direction.Z;
       else
-        aabb.Minimum.Z += direction.Z;
+        aabb.Min.Z += direction.Z;
     }
 
 
@@ -416,11 +416,11 @@ namespace DigitalRise.Geometry.Partitioning
     /// </summary>
     /// <param name="aabb">The AABB to be expanded.</param>
     /// <param name="margin">The relative margin.</param>
-    private static void Expand(ref Aabb aabb, float margin)
+    private static void Expand(ref BoundingBox aabb, float margin)
     {
-      Vector3 delta = new Vector3(aabb.Extent.LargestComponent() * margin);
-      aabb.Minimum -= delta;
-      aabb.Maximum += delta;
+      Vector3 delta = new Vector3(aabb.Extent().LargestComponent() * margin);
+      aabb.Min -= delta;
+      aabb.Max += delta;
     }
   }
 }

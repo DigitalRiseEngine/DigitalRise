@@ -21,7 +21,7 @@ namespace DigitalRise.Geometry.Meshes
     public CDTriangle[] Triangles;
 
     // The AABB enclosing all triangles.
-    public Aabb Aabb;
+    public BoundingBox BoundingBox;
 
     // The convex hull vertices.
     public Vector3[] Vertices;

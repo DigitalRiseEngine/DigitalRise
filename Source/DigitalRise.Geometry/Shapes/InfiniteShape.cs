@@ -87,9 +87,9 @@ namespace DigitalRise.Geometry.Shapes
 
 
     /// <inheritdoc/>
-    public override Aabb GetAabb(Vector3 scale, Pose pose)
+    public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
     {
-      return new Aabb(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
+      return new BoundingBox(new Vector3(float.NegativeInfinity), new Vector3(float.PositiveInfinity));
     }
 
 

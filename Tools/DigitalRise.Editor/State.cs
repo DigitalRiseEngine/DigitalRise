@@ -23,7 +23,7 @@ namespace DigitalRise.Editor
 		public Point Size { get; set; }
 		public float TopSplitterPosition { get; set; }
 		public float LeftSplitterPosition { get; set; }
-		public string EditedFile { get; set; }
+		public string Folder { get; set; }
 		public bool ShowGrid { get; set; }
 		public bool DrawBoundingBoxes { get; set; }
 		public bool DrawLightViewFrustum { get; set; }
@@ -68,11 +68,11 @@ namespace DigitalRise.Editor
 			return string.Format("Size = {0}\n" +
 								 "TopSplitter = {1:0.##}\n" +
 								 "LeftSplitter= {2:0.##}\n" +
-								 "EditedFile = {3}",
+								 "Folder = {3}",
 				Size,
 				TopSplitterPosition,
 				LeftSplitterPosition,
-				EditedFile);
+				Folder);
 		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AssetManagementBase;
-using Microsoft.Build.Construction;
 using Microsoft.Xna.Framework.Input;
 using Myra.Graphics2D.UI;
 using Myra.Graphics2D.UI.File;
@@ -21,22 +20,22 @@ namespace DigitalRise.Editor.UI
 		private const string ButtonsPanelId = "_buttonsPanel";
 		private const string ButtonCameraViewId = "_buttonCameraView";
 
-		private string _filePath;
+		private string _folder;
 		private bool _explorerTouchDown = false;
 		private readonly TreeView _treeFileExplorer, _treeFileSolution;
 
-		public string FilePath
+		public string Folder
 		{
-			get => _filePath;
+			get => _folder;
 
 			set
 			{
-				if (value == _filePath)
+				if (value == _folder)
 				{
 					return;
 				}
 
-				_filePath = value;
+				_folder = value;
 				UpdateTitle();
 			}
 		}
@@ -171,14 +170,11 @@ namespace DigitalRise.Editor.UI
 
 			_menuItemOpenSolution.Selected += (s, a) =>
 			{
-				FileDialog dialog = new FileDialog(FileDialogMode.OpenFile)
-				{
-					Filter = "*.sln"
-				};
+				FileDialog dialog = new FileDialog(FileDialogMode.ChooseFolder);
 
-				if (!string.IsNullOrEmpty(_filePath))
+				if (!string.IsNullOrEmpty(_folder))
 				{
-					dialog.Folder = Path.GetDirectoryName(_filePath);
+					dialog.Folder = Path.GetDirectoryName(_folder);
 				}
 
 				dialog.Closed += (s, a) =>
@@ -190,7 +186,7 @@ namespace DigitalRise.Editor.UI
 					}
 
 					// "Ok" or Enter
-					LoadSolution(dialog.FilePath);
+					LoadFolder(dialog.FilePath);
 				};
 
 				dialog.ShowModal(Desktop);
@@ -644,79 +640,61 @@ namespace DigitalRise.Editor.UI
 
 		private void UpdateTitle()
 		{
-			var title = string.IsNullOrEmpty(_filePath) ? "DigitalRise.Editor" : _filePath;
+			var title = string.IsNullOrEmpty(_folder) ? "DigitalRise.Editor" : _folder;
 			StudioGame.Instance.Window.Title = title;
 		}
 
-		private void RefreshProject(TreeViewNode projectNode)
+		private static TreeViewNode ProcessNode(ITreeViewNode root, string folder)
 		{
-			projectNode.RemoveAllSubNodes();
-
-			var project = (ProjectInSolution)projectNode.Tag;
-
-			// Scenes
-			var scenesNode = projectNode.AddSubNode(new Label
+			var projectNode = root.AddSubNode(new Label
 			{
-				Text = "Scenes"
+				Text = Path.GetFileName(folder)
 			});
-			scenesNode.IsExpanded = true;
 
-			var folder = Path.GetDirectoryName(project.AbsolutePath);
-			var scenesFolder = Path.Combine(folder, Constants.ScenesFolder);
-			if (Directory.Exists(scenesFolder))
+			projectNode.IsExpanded = true;
+			projectNode.Tag = folder;
+
+			// Add folders
+			var subfolders = Directory.GetDirectories(folder);
+			foreach (var subFolder in subfolders)
 			{
-				var files = Directory.GetFiles(scenesFolder, "*.scene");
-				foreach (var file in files)
+				// Ignore subfolders without scenes
+				if (Directory.GetFiles(subFolder, "*.scene", SearchOption.AllDirectories).Length == 0)
 				{
-					var node = scenesNode.AddSubNode(new Label
-					{
-						Text = Path.GetFileName(file),
-					});
-
-					node.Tag = file;
+					continue;
 				}
+
+				ProcessNode(projectNode, subFolder);
 			}
+
+			// Add scene files
+			var sceneFiles = Directory.GetFiles(folder, "*.scene");
+			foreach (var file in sceneFiles)
+			{
+				var node = projectNode.AddSubNode(new Label
+				{
+					Text = Path.GetFileName(file),
+				});
+
+				node.Tag = file;
+			}
+
+			return projectNode;
 		}
 
-		public void LoadSolution(string path)
+		public void LoadFolder(string path)
 		{
 			try
 			{
 				if (!string.IsNullOrEmpty(path))
 				{
-					var solutionFile = SolutionFile.Parse(path);
-
 					// DR.EffectsSource = new DynamicEffectsSource(Path.GetDirectoryName(path));
 
 					_treeFileSolution.RemoveAllSubNodes();
-					foreach (var project in solutionFile.ProjectsInOrder)
-					{
-						if (project.ProjectType != SolutionProjectType.KnownToBeMSBuildFormat)
-						{
-							continue;
-						}
-
-						var folder = Path.GetDirectoryName(project.AbsolutePath);
-						var markerPath = Path.Combine(folder, Constants.MarkerFile);
-						if (!File.Exists(markerPath))
-						{
-							continue;
-						}
-
-						var label = new Label
-						{
-							Text = project.ProjectName,
-						};
-
-						var projectNode = _treeFileSolution.AddSubNode(label);
-						projectNode.IsExpanded = true;
-						projectNode.Tag = project;
-
-						RefreshProject(projectNode);
-					}
+					ProcessNode(_treeFileSolution, path);
 				}
 
-				_filePath = path;
+				_folder = path;
 				UpdateTitle();
 			}
 			catch (Exception ex)

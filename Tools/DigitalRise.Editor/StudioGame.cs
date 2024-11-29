@@ -91,9 +91,9 @@ namespace DigitalRise.Editor
 				_mainForm._topSplitPane.SetSplitterPosition(0, _state != null ? _state.TopSplitterPosition : 0.75f);
 				_mainForm._leftSplitPane.SetSplitterPosition(0, _state != null ? _state.LeftSplitterPosition : 0.5f);
 
-				if (!string.IsNullOrEmpty(_state.EditedFile))
+				if (!string.IsNullOrEmpty(_state.Folder))
 				{
-					_mainForm.LoadSolution(_state.EditedFile);
+					_mainForm.LoadFolder(_state.Folder);
 				}
 			}
 
@@ -139,7 +139,7 @@ namespace DigitalRise.Editor
 					GraphicsDevice.PresentationParameters.BackBufferHeight),
 				TopSplitterPosition = _mainForm._topSplitPane.GetSplitterPosition(0),
 				LeftSplitterPosition = _mainForm._leftSplitPane.GetSplitterPosition(0),
-				EditedFile = _mainForm.FilePath,
+				Folder = _mainForm.Folder,
 				ShowGrid = DigitalRiseEditorOptions.ShowGrid,
 				/*				DrawBoundingBoxes = DebugSettings.DrawBoundingBoxes,
 								DrawLightViewFrustum = DebugSettings.DrawLightViewFrustrum,*/

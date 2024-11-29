@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <RootNamespace>DigitalRise.Game.Tests</RootNamespace>
-    <AssemblyName>DigitalRise.Game.Tests</AssemblyName>
+    <RootNamespace>DigitalRise.CommandLine.Tests</RootNamespace>
+    <AssemblyName>DigitalRise.CommandLine.Tests</AssemblyName>
     <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
     <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
   </PropertyGroup>

@@ -179,7 +179,7 @@ namespace DigitalRise.Rendering.Billboards
 				effect.ViewInverse.SetValue((Matrix)cameraNode.ViewInverse);
 				effect.ViewProjection.SetValue((Matrix)(cameraNode.Camera.Projection * cameraNode.View));
 				effect.Projection.SetValue(cameraNode.Camera.Projection);
-				effect.CameraPosition.SetValue((Vector3)cameraNode.PoseWorld.Position);
+				effect.CameraPosition.SetValue(cameraNode.PoseWorld.Position);
 				effect.CameraNear.SetValue(cameraNode.Camera.Projection.Near);
 				effect.CameraFar.SetValue(cameraNode.Camera.Projection.Far);
 

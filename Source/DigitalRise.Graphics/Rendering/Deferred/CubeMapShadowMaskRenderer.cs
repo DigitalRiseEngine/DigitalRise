@@ -146,7 +146,7 @@ namespace DigitalRise.Rendering.Deferred
 					// In the shader the parameter JitterResolution contains the division by the jitter map size.
 					shadow.JitterResolution / _jitterMap.Width));
 
-				effect.LightPosition.SetValue((Vector3)cameraNode.PoseWorld.ToLocalPosition(lightNode.PoseWorld.Position));
+				effect.LightPosition.SetValue(cameraNode.PoseWorld.ToLocalPosition(lightNode.PoseWorld.Position));
 
 				effect.ShadowView.SetValue(lightNode.PoseWorld.Inverse * cameraNode.PoseWorld);
 				effect.ShadowMap.SetValue(shadow.ShadowMap);

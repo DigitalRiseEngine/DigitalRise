@@ -205,7 +205,7 @@ namespace DigitalRise.Rendering.Debugging
 					var point = _points[startPointIndex + i];
 
 					// Transform point position to clip space.
-					Vector3 positionWorld = (Vector3)point.Position;
+					Vector3 positionWorld = point.Position;
 					Vector3 positionClip;
 					Vector3.Transform(ref positionWorld, ref wvp, out positionClip);
 					float w = (float)((double)positionWorld.X * wvp.M14 + (double)positionWorld.Y * wvp.M24 + (double)positionWorld.Z * wvp.M34 + wvp.M44);

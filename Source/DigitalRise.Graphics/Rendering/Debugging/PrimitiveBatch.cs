@@ -551,7 +551,7 @@ namespace DigitalRise.Rendering.Debugging
 
 		private void RenderBox(PrimitiveJob job)
 		{
-			Effect.World = Matrix.CreateScale((Vector3)job.Size.Extent) * job.Pose;
+			Effect.World = Matrix.CreateScale(job.Size.Extent) * job.Pose;
 			Effect.CurrentTechnique.Passes[0].Apply();
 
 			if (DrawWireFrame)
@@ -864,7 +864,7 @@ namespace DigitalRise.Rendering.Debugging
 			if (submesh.VertexBuffer == null)
 				return;   // This could happen for shapes without a mesh, like an InfiniteShape.
 
-			Effect.World = (Matrix)matrix * Matrix.CreateScale((Vector3)job.Size.Scale) * job.Pose;
+			Effect.World = (Matrix)matrix * Matrix.CreateScale(job.Size.Scale) * job.Pose;
 			Effect.CurrentTechnique.Passes[0].Apply();
 
 			var originalRasterizerState = graphicsDevice.RasterizerState;
@@ -899,7 +899,7 @@ namespace DigitalRise.Rendering.Debugging
 			job.Model.CopyAbsoluteBoneTransformsTo(_boneTransforms);
 			foreach (var mesh in job.Model.Meshes)
 			{
-				Effect.World = _boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale((Vector3)job.Size.Scale) * job.Pose;
+				Effect.World = _boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(job.Size.Scale) * job.Pose;
 				Effect.CurrentTechnique.Passes[0].Apply();
 
 				foreach (var part in mesh.MeshParts)
@@ -914,7 +914,7 @@ namespace DigitalRise.Rendering.Debugging
 
 		private void RenderSubmesh(PrimitiveJob job)
 		{
-			Effect.World = Matrix.CreateScale((Vector3)job.Size.Scale) * job.Pose;
+			Effect.World = Matrix.CreateScale(job.Size.Scale) * job.Pose;
 			Effect.CurrentTechnique.Passes[0].Apply();
 
 			job.Submesh.Draw();

@@ -91,9 +91,9 @@ namespace DigitalRise.Rendering.Debugging
 			// Premultiply color with alpha.
 			color = Color.FromNonPremultiplied(color.R, color.G, color.B, color.A);
 
-			_buffer[_numberOfLines * 2 + 0].Position = (Vector3)start;
+			_buffer[_numberOfLines * 2 + 0].Position = start;
 			_buffer[_numberOfLines * 2 + 0].Color = color;
-			_buffer[_numberOfLines * 2 + 1].Position = (Vector3)end;
+			_buffer[_numberOfLines * 2 + 1].Position = end;
 			_buffer[_numberOfLines * 2 + 1].Color = color;
 
 			_numberOfLines++;

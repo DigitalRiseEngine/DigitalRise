@@ -702,7 +702,7 @@ namespace DigitalRise.Mathematics.Algebra.Tests
     public void ExplicitFromXnaCast()
     {
       Vector3 xna = new Vector3(6, 7, 8);
-      Vector3 v = (Vector3)xna;
+      Vector3 v = xna;
 
       Assert.AreEqual(xna.X, v.X);
       Assert.AreEqual(xna.Y, v.Y);

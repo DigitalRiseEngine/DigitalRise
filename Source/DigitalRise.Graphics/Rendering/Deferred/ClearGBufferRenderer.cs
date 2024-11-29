@@ -81,7 +81,7 @@ namespace DigitalRise.Rendering.Deferred
 			// The environment is facing the camera.
 			// --> Set normal = cameraBackward.
 			var cameraNode = context.CameraNode;
-			effect.Normal.SetValue((cameraNode != null) ? (Vector3)cameraNode.ViewInverse.GetColumn(2).XYZ() : Vector3.Backward);
+			effect.Normal.SetValue((cameraNode != null) ? cameraNode.ViewInverse.GetColumn(2).XYZ() : Vector3.Backward);
 
 			// Clear specular to arbitrary value.
 			effect.SpecularPower.SetValue(1.0f);

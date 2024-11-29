@@ -770,7 +770,7 @@ namespace DigitalRise.Geometry.Meshes
 
           // Add the vertices of the current modelMeshPart.
           foreach (Vector3 p in positions)
-            triangleMesh.Vertices.Add((Vector3)p);
+            triangleMesh.Vertices.Add(p);
 
           // Get indices.
           var indexElementSize = (modelMeshPart.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits) ? 2 : 4;

@@ -131,9 +131,9 @@ namespace DigitalRise.Data.Meshes
 				// DigitalRise.Geometry uses counter-clockwise front faces. XNA uses
 				// clockwise front faces (CullMode.CullCounterClockwiseFace) per default. 
 				// Therefore we change the vertex orientation of the triangles. 
-				vertices[i * 3 + 0] = new VertexPositionNormal((Vector3)v0, (Vector3)n0);
-				vertices[i * 3 + 1] = new VertexPositionNormal((Vector3)v2, (Vector3)n2);  // v2 instead of v1!
-				vertices[i * 3 + 2] = new VertexPositionNormal((Vector3)v1, (Vector3)n1);
+				vertices[i * 3 + 0] = new VertexPositionNormal(v0, n0);
+				vertices[i * 3 + 1] = new VertexPositionNormal(v2, n2);  // v2 instead of v1!
+				vertices[i * 3 + 2] = new VertexPositionNormal(v1, n1);
 			}
 
 			// Create a vertex buffer.
@@ -335,7 +335,7 @@ namespace DigitalRise.Data.Meshes
 
 				// Add the vertices of the current modelMeshPart.
 				foreach (Vector3 p in positions)
-					triangleMesh.Vertices.Add((Vector3)p);
+					triangleMesh.Vertices.Add(p);
 
 				// Get indices.
 				int indexElementSize = (submesh.IndexBuffer.IndexElementSize == IndexElementSize.SixteenBits) ? 2 : 4;
@@ -393,9 +393,9 @@ namespace DigitalRise.Data.Meshes
 				int vertexCount = triangleMesh.Vertices.Count;
 				for (int i = 0; i < submesh.VertexCount; i += 3)
 				{
-					triangleMesh.Vertices.Add((Vector3)positions[i]);
-					triangleMesh.Vertices.Add((Vector3)positions[i + 1]);
-					triangleMesh.Vertices.Add((Vector3)positions[i + 2]);
+					triangleMesh.Vertices.Add(positions[i]);
+					triangleMesh.Vertices.Add(positions[i + 1]);
+					triangleMesh.Vertices.Add(positions[i + 2]);
 
 					triangleMesh.Indices.Add(i + vertexCount);
 					triangleMesh.Indices.Add(i + 2 + vertexCount);     // DigitalRise Geometry uses other winding order!

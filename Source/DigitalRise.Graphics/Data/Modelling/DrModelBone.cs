@@ -1,4 +1,5 @@
 ﻿using DigitalRise.Data.Meshes;
+using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 
 namespace DigitalRise.Data.Modelling

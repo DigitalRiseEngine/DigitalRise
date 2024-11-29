@@ -13,6 +13,7 @@
  * 
  */
 using DigitalRise.Data.Modelling;
+using DigitalRise.Mathematics;
 using System;
 
 namespace DigitalRise.Animation

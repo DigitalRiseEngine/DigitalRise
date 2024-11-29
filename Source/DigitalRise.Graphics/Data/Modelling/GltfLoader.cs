@@ -6,7 +6,7 @@ using AssetManagementBase;
 using DigitalRise.Animation;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes;
-using DigitalRise.Geometry.Shapes;
+using DigitalRise.Mathematics;
 using DigitalRise.Misc;
 using glTFLoader;
 using glTFLoader.Schema;

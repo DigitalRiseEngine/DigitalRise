@@ -12,8 +12,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  */
+using DigitalRise.Mathematics;
 using System;
-using DigitalRise.Data.Modelling;
 
 namespace DigitalRise.Animation
 {

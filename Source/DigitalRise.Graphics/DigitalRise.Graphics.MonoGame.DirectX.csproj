@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>DigitalRise</AssemblyName>
+	<RootNamespace>DigitalRise</RootNamespace>
+    <PackageId>DigitalRise.MonoGame.DirectX</PackageId>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputPath>bin\MonoGame.DirectX\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*.*" />
+    <EmbeddedResource Include="Effects\MonoGame.DirectX\bin\**\*.*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\..\ThirdParty\glTFLoader\**\*.cs" LinkBase="glTFLoader" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.2.1105" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalRise.Geometry\DigitalRise.Geometry.MonoGame.csproj" />
+  </ItemGroup>
+</Project>

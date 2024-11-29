@@ -1,5 +1,4 @@
-﻿using DigitalRise.Animation.Character;
-using DigitalRise.Geometry.Shapes;
+﻿using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;

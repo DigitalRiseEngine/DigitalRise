@@ -1,4 +1,4 @@
-﻿using DigitalRise.Data.Modelling;
+﻿using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 using static glTFLoader.Schema.Accessor;
 using static glTFLoader.Schema.AnimationSampler;

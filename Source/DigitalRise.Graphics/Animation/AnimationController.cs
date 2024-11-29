@@ -13,9 +13,8 @@
  * 
  */
 using System;
-using DigitalRise.Data.Modelling;
+using DigitalRise.Mathematics;
 using DigitalRise.SceneGraph;
-using Microsoft.Xna.Framework;
 
 namespace DigitalRise.Animation
 {

@@ -467,6 +467,7 @@ namespace DigitalRise.Misc
 
 		public static Texture GetCurrentRenderTarget(this GraphicsDevice device)
 		{
+#if FNA
 			var count = device.GetRenderTargetsNoAllocEXT(null);
 			if (count == 0)
 			{
@@ -482,6 +483,17 @@ namespace DigitalRise.Misc
 			{
 				_getRenderTargetBindings[i] = new RenderTargetBinding();
 			}
+#else
+			device.GetRenderTargets(_getRenderTargetBindings);
+
+			var result = _getRenderTargetBindings[0].RenderTarget;
+
+			// Reset temporary array
+			for (var i = 0; i < device.RenderTargetCount; ++i)
+			{
+				_getRenderTargetBindings[i] = new RenderTargetBinding();
+			}
+#endif
 
 			return result;
 		}

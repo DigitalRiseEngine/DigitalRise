@@ -16,7 +16,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void BoundingBoxTest()
     {
       OrthographicViewVolume viewVolume = new OrthographicViewVolume();
-      viewVolume.Set(-1, 1, -1, 1, 2, 5);
+      viewVolume.SetOffCenter(-1, 1, -1, 1, 2, 5);
       BoundingBox aabb = viewVolume.GetBoundingBox(Pose.Identity);
       Assert.AreEqual(new Vector3(-1, -1, -5), aabb.Min);
       Assert.AreEqual(new Vector3(1, 1, -2), aabb.Max);
@@ -79,7 +79,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException()
     {
       OrthographicViewVolume viewVolume = new OrthographicViewVolume();
-      viewVolume.Set(2, 2, 3, 4, 5, 6);
+      viewVolume.SetOffCenter(2, 2, 3, 4, 5, 6);
     }
 
     [Test]
@@ -87,7 +87,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException2()
     {
       OrthographicViewVolume viewVolume = new OrthographicViewVolume();
-      viewVolume.Set(1, 2, 4, 4, 5, 6);
+      viewVolume.SetOffCenter(1, 2, 4, 4, 5, 6);
     }
 
     [Test]
@@ -95,7 +95,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException3()
     {
       OrthographicViewVolume viewVolume = new OrthographicViewVolume();
-      viewVolume.Set(1, 2, 3, 4, 6, 6);
+      viewVolume.SetOffCenter(1, 2, 3, 4, 6, 6);
     }
 
     [Test]

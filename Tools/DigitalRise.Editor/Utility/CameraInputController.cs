@@ -1,6 +1,6 @@
 ﻿using System;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Geometry;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.SceneGraph;
 using Microsoft.Xna.Framework;
@@ -70,7 +70,7 @@ namespace DigitalRise.Utility
 
 		public void ResetProjection()
 		{
-			var projection = (PerspectiveProjection)CameraNode.Camera.Projection;
+			var projection = (PerspectiveViewVolume)CameraNode.ViewVolume;
 			projection.SetFieldOfView(
 			  ConstantsF.PiOver4,
 			  DR.GraphicsDevice.Viewport.AspectRatio,

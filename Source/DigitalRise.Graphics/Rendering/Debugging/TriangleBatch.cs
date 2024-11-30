@@ -216,7 +216,7 @@ namespace DigitalRise.Rendering.Debugging
 			Effect.VertexColorEnabled = true;
 			Effect.World = Matrix.Identity;
 			Effect.View = (Matrix)cameraNode.View;
-			Effect.Projection = cameraNode.Camera.Projection;
+			Effect.Projection = (Matrix)cameraNode.ViewVolume.Projection;
 			Effect.CurrentTechnique.Passes[0].Apply();
 
 			// Submit triangles. The loop is only needed if we have more triangles that can be submitted 

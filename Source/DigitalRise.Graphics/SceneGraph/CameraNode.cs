@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Geometry;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Rendering;
 using Newtonsoft.Json;
@@ -19,10 +19,10 @@ namespace DigitalRise.SceneGraph
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// A <see cref="CameraNode"/> positions a <see cref="Camera"/> object in a 3D scene. The 
-	/// <see cref="CameraNode"/> defines the view transformation, whereas the <see cref="Camera"/> 
+	/// A <see cref="CameraNode"/> positions a <see cref="ViewVolume"/> object in a 3D scene. The 
+	/// <see cref="CameraNode"/> defines the view transformation, whereas the <see cref="ViewVolume"/> 
 	/// object defines the projection transformation and imaging properties. Multiple 
-	/// <see cref="CameraNode"/>s can share the same <see cref="Camera"/> object. 
+	/// <see cref="CameraNode"/>s can share the same <see cref="ViewVolume"/> object. 
 	/// </para>
 	/// <para>
 	/// The view transformation is defined by the following properties: 
@@ -61,7 +61,7 @@ namespace DigitalRise.SceneGraph
 	/// </para>
 	/// <para>
 	/// <strong>Cloning:</strong> When a <see cref="CameraNode"/> is cloned the 
-	/// <see cref="Camera"/> is not duplicated. The <see cref="Camera"/> is copied by reference 
+	/// <see cref="ViewVolume"/> is not duplicated. The <see cref="ViewVolume"/> is copied by reference 
 	/// (shallow copy). The original <see cref="CameraNode"/> and the cloned 
 	/// <see cref="CameraNode"/> will reference the same <see cref="Graphics.Camera"/> object.
 	/// </para>
@@ -80,7 +80,7 @@ namespace DigitalRise.SceneGraph
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="value"/> is <see langword="null"/>.
 		/// </exception>
-		public Camera Camera
+		public ViewVolume ViewVolume
 		{
 			get { return _camera; }
 			set
@@ -89,10 +89,10 @@ namespace DigitalRise.SceneGraph
 					throw new ArgumentNullException("value");
 
 				_camera = value;
-				Shape = value.Projection.ViewVolume;
+				Shape = value;
 			}
 		}
-		private Camera _camera;
+		private ViewVolume _camera;
 
 
 		/// <summary>
@@ -215,17 +215,21 @@ namespace DigitalRise.SceneGraph
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CameraNode"/> class.
 		/// </summary>
-		/// <param name="camera">The camera.</param>
+		/// <param name="volume">The camera.</param>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="camera"/> is <see langword="null"/>.
+		/// <paramref name="volume"/> is <see langword="null"/>.
 		/// </exception>
-		public CameraNode(Camera camera)
+		public CameraNode(ViewVolume volume)
 		{
-			if (camera == null)
+			if (volume == null)
 				throw new ArgumentNullException("camera");
 
-			_camera = camera;
-			Shape = camera.Projection.ViewVolume;
+			_camera = volume;
+			Shape = volume;
+		}
+
+		public CameraNode()
+		{
 		}
 
 
@@ -248,7 +252,7 @@ namespace DigitalRise.SceneGraph
 		/// <inheritdoc/>
 		protected override SceneNode CreateInstanceCore()
 		{
-			return new CameraNode(Camera);
+			return new CameraNode(ViewVolume);
 		}
 
 
@@ -273,7 +277,6 @@ namespace DigitalRise.SceneGraph
 			_view = PoseWorld.Inverse;
 			IsDirty = false;
 		}
-
 
 		#endregion
 	}

@@ -154,7 +154,7 @@ namespace DigitalRise.Rendering.Deferred
 				var rectangle = GraphicsHelper.GetViewportRectangle(cameraNode, viewport, lightNode);
 				Vector2 texCoordTopLeft = new Vector2(rectangle.Left / (float)viewport.Width, rectangle.Top / (float)viewport.Height);
 				Vector2 texCoordBottomRight = new Vector2(rectangle.Right / (float)viewport.Width, rectangle.Bottom / (float)viewport.Height);
-				GraphicsHelper.GetFrustumFarCorners(cameraNode.Camera.Projection, texCoordTopLeft, texCoordBottomRight, _frustumFarCorners);
+				GraphicsHelper.GetFrustumFarCorners(cameraNode.ViewVolume, texCoordTopLeft, texCoordBottomRight, _frustumFarCorners);
 
 				var pass = GetPass(numberOfSamples);
 

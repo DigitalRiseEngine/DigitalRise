@@ -180,7 +180,7 @@ namespace DigitalRise.Rendering.Debugging
 
 			// Get WorldViewProjection matrix.
 			Matrix view = (Matrix)cameraNode.View;
-			Matrix projection = cameraNode.Camera.Projection;
+			Matrix projection = (Matrix)cameraNode.ViewVolume.Projection;
 			Matrix wvp = Matrix.Multiply(view, projection);
 
 			// The x and y point size relative to the viewport.

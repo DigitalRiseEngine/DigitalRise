@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Data.Shadows;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
@@ -37,7 +36,7 @@ namespace DigitalRise.Rendering.Shadows
 		private static readonly float[] _csmSplitDistances = new float[5];
 
 		private static readonly PerspectiveViewVolume _splitVolume = new PerspectiveViewVolume();
-		private static readonly CameraNode _orthographicCameraNode = new CameraNode(new Camera(new OrthographicProjection()));
+		private static readonly CameraNode _orthographicCameraNode = new CameraNode(new OrthographicViewVolume());
 		#endregion
 
 
@@ -65,8 +64,8 @@ namespace DigitalRise.Rendering.Shadows
 			// Camera properties
 			var cameraNode = context.CameraNode;
 			var cameraPose = cameraNode.PoseWorld;
-			var projection = cameraNode.Camera.Projection;
-			if (!(projection is PerspectiveProjection))
+			var projection = cameraNode.ViewVolume;
+			if (!(projection is PerspectiveViewVolume))
 				throw new NotImplementedException(
 				  "Cascaded shadow maps not yet implemented for scenes with orthographic camera.");
 
@@ -215,14 +214,14 @@ namespace DigitalRise.Rendering.Shadows
 
 					Matrix33F orientation = lightPose.Orientation;
 					Vector3 backward = orientation.GetColumn(2);
-					var orthographicProjection = (OrthographicProjection)_orthographicCameraNode.Camera.Projection;
+					var orthographicProjection = (OrthographicViewVolume)_orthographicCameraNode.ViewVolume;
 
 					// Create a tight orthographic frustum around the cascade's bounding sphere.
 					orthographicProjection.SetOffCenter(-radius, radius, -radius, radius, 0, 2 * radius);
 					Vector3 cameraPosition = center + radius * backward;
 					Pose frustumPose = new Pose(cameraPosition, orientation);
 					Pose view = frustumPose.Inverse;
-					shadow.ViewProjections[split] = (Matrix)view * orthographicProjection;
+					shadow.ViewProjections[split] = (Matrix)view * (Matrix)orthographicProjection.Projection;
 
 					// Convert depth bias from "texel" to light space [0, 1] depth.
 					// Minus sign to move receiver depth closer to light. Divide by depth to normalize.

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Meshes;
 using DigitalRise.Geometry.Shapes;
@@ -152,10 +151,9 @@ namespace DigitalRise.Graphics.SceneGraph.Tests
 					node.Shape = new SphereShape(random.NextFloat(0, WorldSize));
 			}
 
-			var projection = new PerspectiveProjection();
-			projection.SetFieldOfView(0.8f, 1, WorldSize / 10000, WorldSize);
-			var camera = new Camera(projection);
-			var cameraNode = new CameraNode(camera);
+			var viewVolume = new PerspectiveViewVolume();
+			viewVolume.SetFieldOfView(0.8f, 1, WorldSize / 10000, WorldSize);
+			var cameraNode = new CameraNode(viewVolume);
 
 			for (int updateIndex = 0; updateIndex < NumberOfSteps; updateIndex++)
 			{

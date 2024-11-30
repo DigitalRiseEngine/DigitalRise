@@ -1,4 +1,4 @@
-﻿using DigitalRise.Data.Cameras;
+﻿using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics.Algebra;
 using NUnit.Framework;
 using NUnit.Utils;
@@ -7,20 +7,20 @@ using NUnit.Utils;
 namespace DigitalRise.Graphics.Tests
 {
 	[TestFixture]
-	public class OrthographicProjectionTest
+	public class OrthographicViewVolumeTest
 	{
 		[Test]
-		public void SetProjectionTest()
+		public void SetViewVolumeTest()
 		{
-			OrthographicProjection projection = new OrthographicProjection();
+			OrthographicViewVolume projection = new OrthographicViewVolume();
 			projection.Set(4, 3, 2, 10);
 
-			OrthographicProjection camera2 = new OrthographicProjection();
-			camera2.Set(4, 3);
+			OrthographicViewVolume camera2 = new OrthographicViewVolume();
+			camera2.SetWidthAndHeight(4, 3);
 			camera2.Near = 2;
 			camera2.Far = 10;
 
-			OrthographicProjection camera3 = new OrthographicProjection
+			OrthographicViewVolume camera3 = new OrthographicViewVolume
 			{
 				Left = -2,
 				Right = 2,
@@ -31,23 +31,23 @@ namespace DigitalRise.Graphics.Tests
 			};
 
 			Matrix44F expected = Matrix44F.CreateOrthographic(4, 3, 2, 10);
-			AssertExt.AreNumericallyEqual(expected, projection);
-			AssertExt.AreNumericallyEqual(expected, camera2);
-			AssertExt.AreNumericallyEqual(expected, camera3.ToMatrix44F());
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera2.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera3.Projection);
 		}
 
 		[Test]
-		public void SetProjectionOffCenterTest()
+		public void SetViewVolumeOffCenterTest()
 		{
-			OrthographicProjection projection = new OrthographicProjection();
+			OrthographicViewVolume projection = new OrthographicViewVolume();
 			projection.SetOffCenter(0, 4, 1, 4, 2, 10);
 
-			OrthographicProjection camera2 = new OrthographicProjection();
-			camera2.SetOffCenter(0, 4, 1, 4);
+			OrthographicViewVolume camera2 = new OrthographicViewVolume();
+			camera2.Set(0, 4, 1, 4);
 			camera2.Near = 2;
 			camera2.Far = 10;
 
-			Projection camera3 = new OrthographicProjection
+			ViewVolume camera3 = new OrthographicViewVolume
 			{
 				Left = 0,
 				Right = 4,
@@ -58,9 +58,9 @@ namespace DigitalRise.Graphics.Tests
 			};
 
 			Matrix44F expected = Matrix44F.CreateOrthographicOffCenter(0, 4, 1, 4, 2, 10);
-			AssertExt.AreNumericallyEqual(expected, projection);
-			AssertExt.AreNumericallyEqual(expected, camera2);
-			AssertExt.AreNumericallyEqual(expected, camera3.ToMatrix44F());
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera2.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera3.Projection);
 		}
 	}
 }

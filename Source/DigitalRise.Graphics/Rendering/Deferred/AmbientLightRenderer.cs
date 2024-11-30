@@ -83,7 +83,7 @@ namespace DigitalRise.Rendering.Deferred
 			effect.GBuffer1.SetValue(context.GBuffer1);
 
 			var cameraNode = context.CameraNode;
-			Matrix viewProjection = (Matrix)cameraNode.View * cameraNode.Camera.Projection;
+			Matrix viewProjection = (Matrix)(cameraNode.View * cameraNode.ViewVolume.Projection);
 
 			// Update SceneNode.LastFrame for all visible nodes.
 			int frame = context.Frame;

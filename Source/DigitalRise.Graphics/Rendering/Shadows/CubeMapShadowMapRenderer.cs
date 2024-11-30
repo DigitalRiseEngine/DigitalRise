@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Data.Lights;
 using DigitalRise.Data.Shadows;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Misc;
@@ -59,7 +59,7 @@ namespace DigitalRise.Rendering.Shadows
 		#region Fields
 		//--------------------------------------------------------------
 
-		private static readonly CameraNode _perspectiveCameraNode = new CameraNode(new Camera(new PerspectiveProjection()));
+		private static readonly CameraNode _perspectiveCameraNode = new CameraNode(new PerspectiveViewVolume());
 		#endregion
 
 		//--------------------------------------------------------------
@@ -126,11 +126,10 @@ namespace DigitalRise.Rendering.Shadows
 						DepthFormat.Depth24));
 				}
 
-			  ((PerspectiveProjection)_perspectiveCameraNode.Camera.Projection).SetFieldOfView(
-				ConstantsF.PiOver2, 1, shadow.Near, light.Range);
+			  ((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(ConstantsF.PiOver2, 1, shadow.Near, light.Range);
 
 				// World units per texel at a planar distance of 1 world unit.
-				float unitsPerTexel = _perspectiveCameraNode.Camera.Projection.Width / (shadow.ShadowMap.Size * shadow.Near);
+				float unitsPerTexel = _perspectiveCameraNode.ViewVolume.Width / (shadow.ShadowMap.Size * shadow.Near);
 
 				// Convert depth bias from "texel" to  world space.
 				// Minus to move receiver closer to light.

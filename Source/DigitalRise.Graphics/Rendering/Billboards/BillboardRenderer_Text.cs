@@ -65,7 +65,7 @@ namespace DigitalRise.Rendering.Billboards
 			}
 
 			_textEffect.View = (Matrix)context.CameraNode.View;
-			_textEffect.Projection = context.CameraNode.Camera.Projection;
+			_textEffect.Projection = (Matrix)context.CameraNode.ViewVolume.Projection;
 
 			for (; index < _jobs.Count; ++index)
 			{

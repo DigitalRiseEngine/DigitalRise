@@ -328,13 +328,12 @@ namespace DigitalRise.Misc
 		/// </exception>
 		internal static Vector4 GetBounds(CameraNode cameraNode, Vector3 positionWorld, float radius)
 		{
-			var camera = cameraNode.Camera;
-			var projection = camera.Projection;
-			float near = projection.Near;
-			float left = projection.Left;
-			float width = projection.Width;
-			float top = projection.Top;
-			float height = projection.Height;
+			var volume = cameraNode.ViewVolume;
+			float near = volume.Near;
+			float left = volume.Left;
+			float width = volume.Width;
+			float top = volume.Top;
+			float height = volume.Height;
 
 			Vector3 l = cameraNode.PoseWorld.ToLocalPosition(positionWorld);
 			float r = radius;
@@ -485,8 +484,7 @@ namespace DigitalRise.Misc
 			Debug.Assert(!(geometricObject.Shape is SphereShape), "Call a different GetBounds() overload for spheres!");
 
 			// Projection properties.
-			var camera = cameraNode.Camera;
-			var projection = camera.Projection;
+			var projection = cameraNode.ViewVolume;
 			float near = projection.Near;
 			float left = projection.Left;
 			float right = projection.Right;
@@ -586,7 +584,7 @@ namespace DigitalRise.Misc
 			float width = diameter;
 			float height = diameter;
 
-			Matrix44F proj = cameraNode.Camera.Projection;
+			Matrix44F proj = cameraNode.ViewVolume.Projection;
 			bool isOrthographic = (proj.M33 != 0);
 
 			// ----- xScale, yScale:
@@ -717,7 +715,7 @@ namespace DigitalRise.Misc
 			float distance = cameraToObject.Length();
 
 			// Make distance independent of current FOV and scale.
-			distance = GetViewNormalizedDistance(distance, cameraNode.Camera.Projection);
+			distance = GetViewNormalizedDistance(distance, cameraNode.ViewVolume.Projection);
 			distance /= sceneNode.ScaleWorld.LargestComponent();
 
 			return distance;

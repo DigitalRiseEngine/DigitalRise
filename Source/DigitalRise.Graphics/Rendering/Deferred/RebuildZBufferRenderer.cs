@@ -3,8 +3,8 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Data.Materials;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Misc;
 using Microsoft.Xna.Framework;
@@ -182,8 +182,8 @@ namespace DigitalRise.Rendering.Deferred
 					graphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
 			}
 
-			var projection = context.CameraNode.Camera.Projection;
-			bool isPerspective = projection is PerspectiveProjection;
+			var projection = context.CameraNode.ViewVolume;
+			bool isPerspective = projection is PerspectiveViewVolume;
 			float near = projection.Near * NearBias;
 			float far = projection.Far * FarBias;
 			var biasedProjection = isPerspective

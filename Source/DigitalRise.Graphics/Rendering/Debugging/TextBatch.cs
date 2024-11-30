@@ -298,7 +298,7 @@ namespace DigitalRise.Rendering.Debugging
 			// ----- Draw world space text.
 			if (_texts3D.Count > 0)
 			{
-				Matrix44F viewProjection = cameraNode.Camera.Projection * cameraNode.View;
+				Matrix44F viewProjection = cameraNode.ViewVolume.Projection * cameraNode.View;
 				Viewport viewport = spriteBatch.GraphicsDevice.Viewport;
 
 				foreach (var textInfo in _texts3D)

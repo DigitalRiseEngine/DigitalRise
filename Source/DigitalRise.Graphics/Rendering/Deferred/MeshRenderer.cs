@@ -153,9 +153,9 @@ namespace DigitalRise.Rendering.Deferred
 					// Effect level params
 					var viewportSize = new Vector2(device.Viewport.Width, device.Viewport.Height);
 					effectBinding.View?.SetValue((Matrix)context.CameraNode.View);
-					effectBinding.Projection?.SetValue((Matrix)context.CameraNode.Camera.Projection.ToMatrix44F());
-					effectBinding.CameraNear?.SetValue(context.CameraNode.Camera.Projection.Near);
-					effectBinding.CameraFar?.SetValue(context.CameraNode.Camera.Projection.Far);
+					effectBinding.Projection?.SetValue((Matrix)context.CameraNode.ViewVolume.Projection);
+					effectBinding.CameraNear?.SetValue(context.CameraNode.ViewVolume.Near);
+					effectBinding.CameraFar?.SetValue(context.CameraNode.ViewVolume.Far);
 					effectBinding.ViewportSize?.SetValue(viewportSize);
 					effectBinding.SceneNodeType?.SetValue(0.0f);
 					effectBinding.NormalsFittingTexture?.SetValue(Resources.NormalsFittingTexture);

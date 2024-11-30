@@ -129,8 +129,7 @@ namespace DigitalRise.SceneGraph.Queries
 				// Get values for LOD computations.
 				var cameraNode = context.LodCameraNode;
 				_cameraPosition = cameraNode.PoseLocal.Position;
-				_lodBiasOverYScale = 1 / Math.Abs(cameraNode.Camera.Projection.ToMatrix44F().M11)
-									 * cameraNode.LodBias * context.LodBias;
+				_lodBiasOverYScale = 1 / Math.Abs(cameraNode.ViewVolume.Projection.M11) * cameraNode.LodBias * context.LodBias;
 
 				// Add nodes and evaluate LOD groups.
 				for (int i = 0; i < numberOfNodes; i++)

@@ -165,17 +165,17 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void BoundingBoxTest()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(-1, 1, -1, 1, 2, 5);
+      frustum.SetOffCenter(-1, 1, -1, 1, 2, 5);
       BoundingBox aabb = frustum.GetBoundingBox(Pose.Identity);
       Assert.AreEqual(new Vector3(-2.5f, -2.5f, -5), aabb.Min);
       Assert.AreEqual(new Vector3(2.5f, 2.5f, -2), aabb.Max);
 
-      frustum.Set(0, 2, 0, 2, 1, 5);
+      frustum.SetOffCenter(0, 2, 0, 2, 1, 5);
       aabb = frustum.GetBoundingBox(Pose.Identity);
       Assert.AreEqual(new Vector3(0f, 0, -5), aabb.Min);
       Assert.AreEqual(new Vector3(10, 10, -1), aabb.Max);
 
-      frustum.Set(1, 2, 1, 2, 1, 5);
+      frustum.SetOffCenter(1, 2, 1, 2, 1, 5);
       aabb = frustum.GetBoundingBox(Pose.Identity);
       Assert.AreEqual(new Vector3(1, 1, -5), aabb.Min);
       Assert.AreEqual(new Vector3(10, 10, -1), aabb.Max);
@@ -260,7 +260,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(2, 2, 3, 4, 5, 6);
+      frustum.SetOffCenter(2, 2, 3, 4, 5, 6);
     }
 
     [Test]
@@ -268,7 +268,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException2()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(1, 2, 4, 4, 5, 6);
+      frustum.SetOffCenter(1, 2, 4, 4, 5, 6);
     }
 
     [Test]
@@ -276,7 +276,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException3()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(1, 2, 3, 4, 6, 6);
+      frustum.SetOffCenter(1, 2, 3, 4, 6, 6);
     }
 
     [Test]
@@ -284,7 +284,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException4()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(1, 2, 3, 4, 0, 6);
+      frustum.SetOffCenter(1, 2, 3, 4, 0, 6);
     }
 
     [Test]
@@ -292,7 +292,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetException5()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.Set(1, 2, 3, 4, 1, 0);
+      frustum.SetOffCenter(1, 2, 3, 4, 1, 0);
     }
 
     [Test]

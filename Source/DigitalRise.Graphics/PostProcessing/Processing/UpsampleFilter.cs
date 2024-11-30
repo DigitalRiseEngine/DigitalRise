@@ -2,8 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
-using DigitalRise.Data.Cameras;
 using DigitalRise.Data.Materials;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Misc;
 using DigitalRise.Rendering;
@@ -222,11 +222,11 @@ namespace DigitalRise.PostProcessing.Processing
 		{
 			var graphicsDevice = DR.GraphicsDevice;
 
-			Projection projection = null;
+			ViewVolume projection = null;
 			if (RebuildZBuffer || Mode == UpsamplingMode.NearestDepth)
 			{
 				context.ThrowIfCameraMissing();
-				projection = context.CameraNode.Camera.Projection;
+				projection = context.CameraNode.ViewVolume;
 			}
 
 			var sourceTexture = context.SourceTexture;

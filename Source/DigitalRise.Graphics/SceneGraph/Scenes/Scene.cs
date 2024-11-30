@@ -966,7 +966,7 @@ namespace DigitalRise.SceneGraph.Scenes
 				{
 					// ----- Camera frustum queries.
 					// Extract frustum planes.
-					Matrix44F viewProjection = cameraNode.Camera.Projection * cameraNode.View;
+					Matrix44F viewProjection = cameraNode.ViewVolume.Projection * cameraNode.View;
 					GeometryHelper.ExtractPlanes(viewProjection, _tempPlanes, false);
 
 					// Use broad phase to do frustum culling.

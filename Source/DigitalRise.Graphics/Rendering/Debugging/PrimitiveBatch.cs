@@ -499,7 +499,7 @@ namespace DigitalRise.Rendering.Debugging
 			Effect.LightingEnabled = !DrawWireFrame;
 			Effect.TextureEnabled = false;
 			Effect.View = (Matrix)view;
-			Effect.Projection = cameraNode.Camera.Projection;
+			Effect.Projection = (Matrix)cameraNode.ViewVolume.Projection;
 
 			foreach (var job in _primitives)
 			{
@@ -652,7 +652,7 @@ namespace DigitalRise.Rendering.Debugging
 			if (DrawWireFrame)
 			{
 				Pose cameraPose = cameraNode.PoseWorld;
-				Matrix44F cameraProjection = cameraNode.Camera.Projection;
+				Matrix44F cameraProjection = cameraNode.ViewVolume.Projection;
 				if (Numeric.AreEqual(1.0f, cameraProjection.M33))
 				{
 					// Orthographic projection

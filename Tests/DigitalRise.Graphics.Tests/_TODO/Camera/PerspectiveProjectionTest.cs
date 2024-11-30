@@ -1,5 +1,4 @@
-﻿using DigitalRise.Data.Cameras;
-using DigitalRise.Geometry.Shapes;
+﻿using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using NUnit.Framework;
@@ -9,7 +8,7 @@ using NUnit.Utils;
 namespace DigitalRise.Graphics.Tests
 {
 	[TestFixture]
-	public class PerspectiveProjectionTest
+	public class PerspectiveViewVolumeTest
 	{
 		[Test]
 		public void GetWidthAndHeightTest()
@@ -23,25 +22,25 @@ namespace DigitalRise.Graphics.Tests
 			AssertExt.AreNumericallyEqual(2.0528009f, width);
 			AssertExt.AreNumericallyEqual(1.1547005f, height);
 
-			// We are pretty confident that the Projection.CreateProjectionXxx() works. 
-			// Use Projection.CreateProjectionXxx() to test GetWidthAndHeight().
+			// We are pretty confident that the ViewVolume.CreateViewVolumeXxx() works. 
+			// Use ViewVolume.CreateViewVolumeXxx() to test GetWidthAndHeight().
 			Matrix44F projection = Matrix44F.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
 			Matrix44F projection2 = Matrix44F.CreatePerspective(width, height, 1, 10);
 			AssertExt.AreNumericallyEqual(projection, projection2);
 		}
 
 		[Test]
-		public void SetProjectionTest()
+		public void SetViewVolumeTest()
 		{
-			PerspectiveProjection projection = new PerspectiveProjection();
+			PerspectiveViewVolume projection = new PerspectiveViewVolume();
 			projection.Set(4, 3, 2, 10);
 
-			PerspectiveProjection projection2 = new PerspectiveProjection();
-			projection2.Set(4, 3);
+			PerspectiveViewVolume projection2 = new PerspectiveViewVolume();
+			projection2.SetWidthAndHeight(4, 3);
 			projection2.Near = 2;
 			projection2.Far = 10;
 
-			Projection projection3 = new PerspectiveProjection
+			ViewVolume projection3 = new PerspectiveViewVolume
 			{
 				Left = -2,
 				Right = 2,
@@ -52,23 +51,23 @@ namespace DigitalRise.Graphics.Tests
 			};
 
 			Matrix44F expected = Matrix44F.CreatePerspective(4, 3, 2, 10);
-			AssertExt.AreNumericallyEqual(expected, projection);
-			AssertExt.AreNumericallyEqual(expected, projection2);
-			AssertExt.AreNumericallyEqual(expected, projection3.ToMatrix44F());
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection2.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection3.Projection);
 		}
 
 		[Test]
-		public void SetProjectionFieldOfViewTest()
+		public void SetViewVolumeFieldOfViewTest()
 		{
-			PerspectiveProjection projection = new PerspectiveProjection();
+			PerspectiveViewVolume projection = new PerspectiveViewVolume();
 			projection.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
 
-			PerspectiveProjection projection2 = new PerspectiveProjection();
+			PerspectiveViewVolume projection2 = new PerspectiveViewVolume();
 			projection2.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f);
 			projection2.Near = 1;
 			projection2.Far = 10;
 
-			Projection projection3 = new PerspectiveProjection
+			ViewVolume projection3 = new PerspectiveViewVolume
 			{
 				Left = -2.0528009f / 2.0f,
 				Right = 2.0528009f / 2.0f,
@@ -79,25 +78,25 @@ namespace DigitalRise.Graphics.Tests
 			};
 
 			Matrix44F expected = Matrix44F.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
-			AssertExt.AreNumericallyEqual(expected, projection);
-			AssertExt.AreNumericallyEqual(expected, projection2);
-			AssertExt.AreNumericallyEqual(expected, projection3.ToMatrix44F());
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection2.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection3.Projection);
 		}
 
 		[Test]
-		public void SetProjectionOffCenterTest()
+		public void SetViewVolumeOffCenterTest()
 		{
-			PerspectiveProjection projection = new PerspectiveProjection();
+			PerspectiveViewVolume projection = new PerspectiveViewVolume();
 			projection.SetOffCenter(0, 4, 1, 4, 2, 10);
 
-			PerspectiveProjection projection2 = new PerspectiveProjection();
-			projection2.SetOffCenter(0, 4, 1, 4);
+			PerspectiveViewVolume projection2 = new PerspectiveViewVolume();
+			projection2.Set(0, 4, 1, 4);
 			projection2.Near = 2;
 			projection2.Far = 10;
 
 			Matrix44F expected = Matrix44F.CreatePerspectiveOffCenter(0, 4, 1, 4, 2, 10);
-			AssertExt.AreNumericallyEqual(expected, projection);
-			AssertExt.AreNumericallyEqual(expected, projection2.ToMatrix44F());
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection2.Projection);
 		}
 	}
 }

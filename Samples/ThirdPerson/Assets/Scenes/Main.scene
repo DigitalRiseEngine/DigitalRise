@@ -1,22 +1,20 @@
 {
   "EnableMultithreading": true,
   "Camera": {
-    "Camera": {
-      "Projection": {
-        "$type": "DigitalRise.Data.Cameras.PerspectiveProjection, DigitalRise",
-        "Left": -1.0264004,
-        "Right": 1.0264004,
-        "Bottom": -0.57735026,
-        "Top": 0.57735026,
-        "Near": 1.0,
-        "Far": 1000.0
-      }
+    "ViewVolume": {
+      "$type": "DigitalRise.Geometry.Shapes.PerspectiveViewVolume, DigitalRise.Geometry",
+      "Left": -1.0264004,
+      "Right": 1.0264004,
+      "Bottom": -0.57735026,
+      "Top": 0.57735026,
+      "Near": 1.0,
+      "Far": 1000.0
     },
     "LodBias": 1.0,
     "Children": [],
     "IsEnabled": true,
     "ScaleLocal": "1, 1, 1",
-    "PositionLocal": "-5.9461794, 7.8971972, 13.622673"
+    "PositionLocal": "-8.484934, 9.858849, 19.821283"
   },
   "Name": "Root",
   "Children": [

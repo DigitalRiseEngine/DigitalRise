@@ -113,10 +113,10 @@ namespace DigitalRise.Rendering.Deferred
 			effect.GBuffer1.SetValue(context.GBuffer1);
 
 			var cameraNode = context.CameraNode;
-			Matrix viewProjection = (Matrix)cameraNode.View * cameraNode.Camera.Projection;
+			Matrix viewProjection = (Matrix)(cameraNode.View * cameraNode.ViewVolume.Projection);
 
 			var cameraPose = cameraNode.PoseWorld;
-			GraphicsHelper.GetFrustumFarCorners(cameraNode.Camera.Projection, _cameraFrustumFarCorners);
+			GraphicsHelper.GetFrustumFarCorners(cameraNode.ViewVolume, _cameraFrustumFarCorners);
 
 			// Convert frustum far corners from view space to world space.
 			for (int i = 0; i < _cameraFrustumFarCorners.Length; i++)

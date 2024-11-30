@@ -3,7 +3,7 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
-using DigitalRise.Data.Cameras;
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Vertices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -204,7 +204,7 @@ namespace DigitalRise.Misc
 		/// <summary>
 		/// Gets the view space positions of the 4 far corners of the viewing frustum.
 		/// </summary>
-		/// <param name="projection">The projection.</param>
+		/// <param name="volume">The projection.</param>
 		/// <param name="frustumFarCorners">
 		/// A 4 element array that will be initialized with the frustum far corners.
 		/// </param>
@@ -214,26 +214,26 @@ namespace DigitalRise.Misc
 		/// top-left, top-right, bottom-left, bottom-right.
 		/// </remarks>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="projection"/> or <paramref name="frustumFarCorners"/> is 
+		/// <paramref name="volume"/> or <paramref name="frustumFarCorners"/> is 
 		/// <see langword="null"/>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="frustumFarCorners"/> has wrong length. Expected length: 4.
 		/// </exception>
-		public static void GetFrustumFarCorners(Projection projection, Vector3[] frustumFarCorners)
+		public static void GetFrustumFarCorners(ViewVolume volume, Vector3[] frustumFarCorners)
 		{
-			if (projection == null)
+			if (volume == null)
 				throw new ArgumentNullException("projection");
 			if (frustumFarCorners == null)
 				throw new ArgumentNullException("frustumFarCorners");
 			if (frustumFarCorners.Length != 4)
 				throw new ArgumentException("frustumFarCorners must be an array with 4 elements.");
 
-			var farOverNear = projection.Far / projection.Near;
-			frustumFarCorners[0] = new Vector3(projection.Left, projection.Top, -projection.Near) * farOverNear;
-			frustumFarCorners[1] = new Vector3(projection.Right, projection.Top, -projection.Near) * farOverNear;
-			frustumFarCorners[2] = new Vector3(projection.Left, projection.Bottom, -projection.Near) * farOverNear;
-			frustumFarCorners[3] = new Vector3(projection.Right, projection.Bottom, -projection.Near) * farOverNear;
+			var farOverNear = volume.Far / volume.Near;
+			frustumFarCorners[0] = new Vector3(volume.Left, volume.Top, -volume.Near) * farOverNear;
+			frustumFarCorners[1] = new Vector3(volume.Right, volume.Top, -volume.Near) * farOverNear;
+			frustumFarCorners[2] = new Vector3(volume.Left, volume.Bottom, -volume.Near) * farOverNear;
+			frustumFarCorners[3] = new Vector3(volume.Right, volume.Bottom, -volume.Near) * farOverNear;
 		}
 
 
@@ -241,7 +241,7 @@ namespace DigitalRise.Misc
 		/// Gets the view space positions of the 4 far corners of a quad at the far plane of the viewing
 		/// frustum.
 		/// </summary>
-		/// <param name="projection">The projection.</param>
+		/// <param name="volume">The projection.</param>
 		/// <param name="topLeftTexCoord">The top left texture coordinate.</param>
 		/// <param name="bottomRightTexCoord">The bottom right texture coordinate.</param>
 		/// <param name="frustumFarCorners">
@@ -257,16 +257,16 @@ namespace DigitalRise.Misc
 		/// <see cref="GetFrustumFarCorners(Projection,Vector3[])"/>.
 		/// </remarks>
 		/// <exception cref="ArgumentNullException">
-		/// <paramref name="projection"/> or <paramref name="frustumFarCorners"/> is 
+		/// <paramref name="volume"/> or <paramref name="frustumFarCorners"/> is 
 		/// <see langword="null"/>.
 		/// </exception>
 		/// <exception cref="ArgumentException">
 		/// <paramref name="frustumFarCorners"/> has wrong length. Expected length: 4.
 		/// </exception>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
-		public static void GetFrustumFarCorners(Projection projection, Vector2 topLeftTexCoord, Vector2 bottomRightTexCoord, Vector3[] frustumFarCorners)
+		public static void GetFrustumFarCorners(ViewVolume volume, Vector2 topLeftTexCoord, Vector2 bottomRightTexCoord, Vector3[] frustumFarCorners)
 		{
-			GetFrustumFarCorners(projection, frustumFarCorners);
+			GetFrustumFarCorners(volume, frustumFarCorners);
 			float dX = frustumFarCorners[1].X - frustumFarCorners[0].X;
 			float dY = frustumFarCorners[2].Y - frustumFarCorners[0].Y;
 

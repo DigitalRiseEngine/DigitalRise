@@ -10,8 +10,8 @@ using Myra.Graphics2D.UI.Properties;
 using DigitalRise.Editor.Utility;
 using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
-using DigitalRise.Data.Cameras;
 using DigitalRise.Data.Materials;
+using DigitalRise.Geometry.Shapes;
 
 namespace DigitalRise.Editor.UI
 {
@@ -628,11 +628,7 @@ namespace DigitalRise.Editor.UI
 				Name = "Root"
 			};
 
-			var projection = new PerspectiveProjection();
-			var camera = new Camera(projection);
-
-			var cameraNode = new CameraNode(camera);
-
+			var cameraNode = new CameraNode(new PerspectiveViewVolume());
 			scene.Camera = cameraNode;
 
 			OpenTab(scene, string.Empty);

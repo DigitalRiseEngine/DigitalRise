@@ -177,11 +177,11 @@ namespace DigitalRise.Rendering.Billboards
 				var effect = _hiDefEffect;
 				effect.View.SetValue((Matrix)cameraNode.View);
 				effect.ViewInverse.SetValue((Matrix)cameraNode.ViewInverse);
-				effect.ViewProjection.SetValue((Matrix)(cameraNode.Camera.Projection * cameraNode.View));
-				effect.Projection.SetValue(cameraNode.Camera.Projection);
+				effect.ViewProjection.SetValue((Matrix)(cameraNode.ViewVolume.Projection * cameraNode.View));
+				effect.Projection.SetValue((Matrix)cameraNode.ViewVolume.Projection);
 				effect.CameraPosition.SetValue(cameraNode.PoseWorld.Position);
-				effect.CameraNear.SetValue(cameraNode.Camera.Projection.Near);
-				effect.CameraFar.SetValue(cameraNode.Camera.Projection.Far);
+				effect.CameraNear.SetValue(cameraNode.ViewVolume.Near);
+				effect.CameraFar.SetValue(cameraNode.ViewVolume.Far);
 
 				// Select effect technique.
 				if (EnableOffscreenRendering || EnableSoftParticles)
@@ -214,7 +214,7 @@ namespace DigitalRise.Rendering.Billboards
 				// ----- Reach profile
 				var basicEffect = _reachEffect;
 				basicEffect.View = (Matrix)cameraNode.View;
-				basicEffect.Projection = cameraNode.Camera.Projection;
+				basicEffect.Projection = (Matrix)cameraNode.ViewVolume.Projection;
 			}
 		}
 

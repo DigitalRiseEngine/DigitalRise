@@ -108,7 +108,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// This property returns a random point of the shape. If possible, a point in the center of the 
 		/// shape is returned. If not possible, a surface point is returned.
 		/// </remarks>
-
+		[Browsable(false)]
+		[JsonIgnore]
 		public abstract Vector3 InnerPoint { get; }
 
 		[Browsable(false)]

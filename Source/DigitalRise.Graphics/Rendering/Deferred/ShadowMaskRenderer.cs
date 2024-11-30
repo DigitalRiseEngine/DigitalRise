@@ -217,6 +217,11 @@ namespace DigitalRise.Rendering.Deferred
 
 		public static void Render(RenderContext context, IList<SceneNode> nodes)
 		{
+			if (nodes.Count == 0)
+			{
+				return;
+			}
+
 			var graphicsDevice = DR.GraphicsDevice;
 			var savedRenderState = new RenderStateSnapshot();
 			var viewport = graphicsDevice.Viewport;

@@ -113,7 +113,7 @@ namespace DigitalRise.Geometry.Tests
       Assert.AreEqual(p1.GetHashCode(), p2.GetHashCode());
 
       p1 = new Pose(new Vector3(1, 2, 3), MathHelper.CreateRotationY(0.3f));
-      p2 = new Pose(new Vector3(2, 1, 3), MathHelper.CreateRotationY(0.3f));
+      p2 = new Pose(new Vector3(3, 1, 3), MathHelper.CreateRotationY(0.3f));
       Assert.AreNotEqual(p1.GetHashCode(), p2.GetHashCode());
 
       // Too bad two rotation matrices that differ only by the sign of the angle

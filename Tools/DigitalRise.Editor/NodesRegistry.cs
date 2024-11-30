@@ -45,7 +45,7 @@ namespace DigitalRise.Editor
 
 			foreach (var type in assembly.GetTypes())
 			{
-				var attrs = type.GetCustomAttributes<EditorInfoAttribute>(true);
+				var attrs = type.GetCustomAttributes<EditorInfoAttribute>(false);
 				if (attrs == null)
 				{
 					continue;

@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using AssetManagementBase;
+using DigitalRise.Attributes;
 using DigitalRise.Geometry;
 using DigitalRise.Rendering.Deferred;
 using Newtonsoft.Json;
@@ -196,6 +197,7 @@ namespace DigitalRise.SceneGraph
 	/// <seealso cref="ISceneQuery"/>
 	/// <seealso cref="Scene"/>
 	[DebuggerDisplay("{GetType().Name,nq}(Name = {Name})")]
+	[EditorInfo("Node")]
 	public partial class SceneNode : IGeometricObject, INamedObject, IDisposable, IHasExternalAssets
 	{
 		// Notes: The position has a local pose (relative to parent node) and a world pose.

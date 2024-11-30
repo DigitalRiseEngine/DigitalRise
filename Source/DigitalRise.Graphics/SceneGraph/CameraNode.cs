@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DigitalRise.Attributes;
+using DigitalRise.Data.Lights;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics.Algebra;
@@ -67,6 +69,8 @@ namespace DigitalRise.SceneGraph
 	/// </para>
 	/// </remarks>
 	/// <seealso cref="DigitalRise.Graphics.Camera"/>
+	[EditorInfo("Camera", typeof(PerspectiveViewVolume))]
+	[EditorInfo("Camera", typeof(OrthographicViewVolume))]
 	public class CameraNode : SceneNode
 	{
 		//--------------------------------------------------------------

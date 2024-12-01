@@ -230,10 +230,11 @@ namespace DigitalRise.Misc
 				throw new ArgumentException("frustumFarCorners must be an array with 4 elements.");
 
 			var farOverNear = volume.Far / volume.Near;
-			frustumFarCorners[0] = new Vector3(volume.Left, volume.Top, -volume.Near) * farOverNear;
-			frustumFarCorners[1] = new Vector3(volume.Right, volume.Top, -volume.Near) * farOverNear;
-			frustumFarCorners[2] = new Vector3(volume.Left, volume.Bottom, -volume.Near) * farOverNear;
-			frustumFarCorners[3] = new Vector3(volume.Right, volume.Bottom, -volume.Near) * farOverNear;
+			var r = volume.Rectangle;
+			frustumFarCorners[0] = new Vector3(r.Left, r.Top, -volume.Near) * farOverNear;
+			frustumFarCorners[1] = new Vector3(r.Right, r.Top, -volume.Near) * farOverNear;
+			frustumFarCorners[2] = new Vector3(r.Left, r.Bottom, -volume.Near) * farOverNear;
+			frustumFarCorners[3] = new Vector3(r.Right, r.Bottom, -volume.Near) * farOverNear;
 		}
 
 

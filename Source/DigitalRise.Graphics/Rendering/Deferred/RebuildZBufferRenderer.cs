@@ -182,24 +182,26 @@ namespace DigitalRise.Rendering.Deferred
 					graphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
 			}
 
-			var projection = context.CameraNode.ViewVolume;
-			bool isPerspective = projection is PerspectiveViewVolume;
-			float near = projection.Near * NearBias;
-			float far = projection.Far * FarBias;
+			var volume = context.CameraNode.ViewVolume;
+			bool isPerspective = volume is PerspectiveViewVolume;
+			float near = volume.Near * NearBias;
+			float far = volume.Far * FarBias;
+
+			var rect = volume.Rectangle;
 			var biasedProjection = isPerspective
 									 ? Matrix44F.CreatePerspectiveOffCenter(
-									   projection.Left, projection.Right,
-									   projection.Bottom, projection.Top,
+									   rect.Left, rect.Right,
+									   rect.Bottom, rect.Top,
 									   near, far)
 									 : Matrix44F.CreateOrthographicOffCenter(
-									   projection.Left, projection.Right,
-									   projection.Bottom, projection.Top,
+									   rect.Left, rect.Right,
+									   rect.Bottom, rect.Top,
 									   near, far);
 
 			var viewport = graphicsDevice.Viewport;
 			effect.ViewportSize.SetValue(new Vector2(viewport.Width, viewport.Height));
 			effect.Projection.SetValue((Matrix)biasedProjection);
-			effect.CameraFar.SetValue(projection.Far);
+			effect.CameraFar.SetValue(volume.Far);
 			effect.GBuffer0.SetValue(context.GBuffer0);
 			effect.Color.SetValue(color);
 			effect.SourceTexture.SetValue(colorTexture);

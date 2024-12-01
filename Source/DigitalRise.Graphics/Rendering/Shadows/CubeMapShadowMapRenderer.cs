@@ -129,7 +129,7 @@ namespace DigitalRise.Rendering.Shadows
 			  ((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(ConstantsF.PiOver2, 1, shadow.Near, light.Range);
 
 				// World units per texel at a planar distance of 1 world unit.
-				float unitsPerTexel = _perspectiveCameraNode.ViewVolume.Width / (shadow.ShadowMap.Size * shadow.Near);
+				float unitsPerTexel = _perspectiveCameraNode.ViewVolume.Rectangle.Width / (shadow.ShadowMap.Size * shadow.Near);
 
 				// Convert depth bias from "texel" to  world space.
 				// Minus to move receiver closer to light.

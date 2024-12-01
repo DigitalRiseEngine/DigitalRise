@@ -329,11 +329,12 @@ namespace DigitalRise.Misc
 		internal static Vector4 GetBounds(CameraNode cameraNode, Vector3 positionWorld, float radius)
 		{
 			var volume = cameraNode.ViewVolume;
+			var rect = volume.Rectangle;
 			float near = volume.Near;
-			float left = volume.Left;
-			float width = volume.Width;
-			float top = volume.Top;
-			float height = volume.Height;
+			float left = rect.Left;
+			float width = rect.Width;
+			float top = rect.Top;
+			float height = rect.Height;
 
 			Vector3 l = cameraNode.PoseWorld.ToLocalPosition(positionWorld);
 			float r = radius;
@@ -484,14 +485,16 @@ namespace DigitalRise.Misc
 			Debug.Assert(!(geometricObject.Shape is SphereShape), "Call a different GetBounds() overload for spheres!");
 
 			// Projection properties.
-			var projection = cameraNode.ViewVolume;
-			float near = projection.Near;
-			float left = projection.Left;
-			float right = projection.Right;
-			float width = projection.Width;
-			float top = projection.Top;
-			float bottom = projection.Bottom;
-			float height = projection.Height;
+			var volume = cameraNode.ViewVolume;
+			var rect = volume.Rectangle;
+
+			float near = volume.Near;
+			float left = rect.Left;
+			float right = rect.Right;
+			float width = rect.Width;
+			float top = rect.Top;
+			float bottom = rect.Bottom;
+			float height = rect.Height;
 
 			// Get AABB in view space.
 			Pose localToViewPose = cameraNode.PoseWorld.Inverse * geometricObject.Pose;

@@ -27,10 +27,10 @@ namespace DigitalRise.Graphics.Tests
 
 			var projection = viewVolume.Projection;
 			AssertExt.AreNumericallyEqual(new Vector3(320, 240, 0), viewport.Project(new Vector3(0, 0, -10), projection, view));
-			AssertExt.AreNumericallyEqual(new Vector3(0, 0, 0), viewport.Project(new Vector3(viewVolume.Left, viewVolume.Top, -10), projection, view));
-			AssertExt.AreNumericallyEqual(new Vector3(640, 0, 0), viewport.Project(new Vector3(viewVolume.Right, viewVolume.Top, -10), projection, view));
-			AssertExt.AreNumericallyEqual(new Vector3(0, 480, 0), viewport.Project(new Vector3(viewVolume.Left, viewVolume.Bottom, -10), projection, view));
-			AssertExt.AreNumericallyEqual(new Vector3(640, 480, 0), viewport.Project(new Vector3(viewVolume.Right, viewVolume.Bottom, -10), projection, view));
+			AssertExt.AreNumericallyEqual(new Vector3(0, 0, 0), viewport.Project(new Vector3(viewVolume.Rectangle.Left, viewVolume.Rectangle.Top, -10), projection, view));
+			AssertExt.AreNumericallyEqual(new Vector3(640, 0, 0), viewport.Project(new Vector3(viewVolume.Rectangle.Right, viewVolume.Rectangle.Top, -10), projection, view));
+			AssertExt.AreNumericallyEqual(new Vector3(0, 480, 0), viewport.Project(new Vector3(viewVolume.Rectangle.Left, viewVolume.Rectangle.Bottom, -10), projection, view));
+			AssertExt.AreNumericallyEqual(new Vector3(640, 480, 0), viewport.Project(new Vector3(viewVolume.Rectangle.Right, viewVolume.Rectangle.Bottom, -10), projection, view));
 
 			Vector3[] farCorners = new Vector3[4];
 			GraphicsHelper.GetFrustumFarCorners(viewVolume, farCorners);
@@ -55,10 +55,10 @@ namespace DigitalRise.Graphics.Tests
 
 				var projection = viewVolume.Projection;
 				AssertExt.AreNumericallyEqual(new Vector3(0, 0, -10), viewport.Unproject(new Vector3(320, 240, 0), projection, view));
-				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Left, viewVolume.Top, -10), viewport.Unproject(new Vector3(0, 0, 0), projection, view));
-				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Right, viewVolume.Top, -10), viewport.Unproject(new Vector3(640, 0, 0), projection, view));
-				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Left, viewVolume.Bottom, -10), viewport.Unproject(new Vector3(0, 480, 0), projection, view));
-				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Right, viewVolume.Bottom, -10), viewport.Unproject(new Vector3(640, 480, 0), projection, view));
+				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Rectangle.Left, viewVolume.Rectangle.Top, -10), viewport.Unproject(new Vector3(0, 0, 0), projection, view));
+				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Rectangle.Right, viewVolume.Rectangle.Top, -10), viewport.Unproject(new Vector3(640, 0, 0), projection, view));
+				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Rectangle.Left, viewVolume.Rectangle.Bottom, -10), viewport.Unproject(new Vector3(0, 480, 0), projection, view));
+				AssertExt.AreNumericallyEqual(new Vector3(viewVolume.Rectangle.Right, viewVolume.Rectangle.Bottom, -10), viewport.Unproject(new Vector3(640, 480, 0), projection, view));
 
 				Vector3[] farCorners = new Vector3[4];
 				GraphicsHelper.GetFrustumFarCorners(viewVolume, farCorners);
@@ -150,7 +150,7 @@ namespace DigitalRise.Graphics.Tests
 		{
 			// Camera
 			var projection = new OrthographicViewVolume();
-			projection.Set(0, 4, 0, 2);
+			projection.SetOffCenter(0, 4, 0, 2);
 			var cameraNode = new CameraNode(projection);
 			cameraNode.PoseWorld = new Pose(new Vector3(123, 456, -789), Matrix33F.CreateRotation(new Vector3(1, -2, 3), MathHelper.ToRadians(75)));
 

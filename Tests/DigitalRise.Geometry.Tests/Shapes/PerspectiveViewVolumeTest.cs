@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using DigitalRise.Mathematics;
+using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using NUnit.Utils;
@@ -46,12 +47,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       AssertExt.AreNumericallyEqual(expectedFieldOfView, verticalFieldOfView);
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void GetHorizontalViewException()
-    {
-      PerspectiveViewVolume.GetFieldOfViewX(0, 4.0f / 3.0f);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -60,12 +55,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       PerspectiveViewVolume.GetFieldOfViewX(ConstantsF.PiOver4, 0);
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void GetVerticalViewException()
-    {
-      PerspectiveViewVolume.GetFieldOfViewY(0, 4.0f / 3.0f);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -85,12 +74,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       AssertExt.AreNumericallyEqual(11.547005f, extent);
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void GetExtentException()
-    {
-      PerspectiveViewVolume.GetExtent(0, 1);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -99,26 +82,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       PerspectiveViewVolume.GetExtent(ConstantsF.PiOver4, -0.1f);
     }
 
-    [Test]
-    public void GetWidthAndHeightTest()
-    {
-      float width, height;
-      PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(90), 1, 1, out width, out height);
-      AssertExt.AreNumericallyEqual(2, width);
-      AssertExt.AreNumericallyEqual(2, height);
-
-      PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, out width, out height);
-      AssertExt.AreNumericallyEqual(2.0528009f, width);
-      AssertExt.AreNumericallyEqual(1.1547005f, height);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void GetWidthAndHeightException()
-    {
-      float width, height;
-      PerspectiveViewVolume.GetWidthAndHeight(-0.1f, 1, 1, out width, out height);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -161,77 +124,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       PerspectiveViewVolume.GetFieldOfView(1, 0);
     }
 
-    [Test]
-    public void BoundingBoxTest()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(-1, 1, -1, 1, 2, 5);
-      BoundingBox aabb = frustum.GetBoundingBox(Pose.Identity);
-      Assert.AreEqual(new Vector3(-2.5f, -2.5f, -5), aabb.Min);
-      Assert.AreEqual(new Vector3(2.5f, 2.5f, -2), aabb.Max);
-
-      frustum.SetOffCenter(0, 2, 0, 2, 1, 5);
-      aabb = frustum.GetBoundingBox(Pose.Identity);
-      Assert.AreEqual(new Vector3(0f, 0, -5), aabb.Min);
-      Assert.AreEqual(new Vector3(10, 10, -1), aabb.Max);
-
-      frustum.SetOffCenter(1, 2, 1, 2, 1, 5);
-      aabb = frustum.GetBoundingBox(Pose.Identity);
-      Assert.AreEqual(new Vector3(1, 1, -5), aabb.Min);
-      Assert.AreEqual(new Vector3(10, 10, -1), aabb.Max);
-    }
-
-
-    [Test]
-    public void PropertiesTest()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume
-      {
-        Left = -2,
-        Right = 2,
-        Bottom = -1,
-        Top = 1,
-        Near = 2,
-        Far = 10
-      };
-
-      Assert.AreEqual(-2, frustum.Left);
-      Assert.AreEqual(2, frustum.Right);
-      Assert.AreEqual(-1, frustum.Bottom);
-      Assert.AreEqual(1, frustum.Top);
-      Assert.AreEqual(2, frustum.Near);
-      Assert.AreEqual(10, frustum.Far);
-      Assert.AreEqual(4, frustum.Width);
-      Assert.AreEqual(2, frustum.Height);
-      Assert.AreEqual(8, frustum.Depth);
-      Assert.AreEqual(2, frustum.AspectRatio);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(90), frustum.FieldOfViewX);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(53.130102f), frustum.FieldOfViewY);
-
-
-      frustum = new PerspectiveViewVolume
-      {
-        Left = 2,
-        Right = -2,
-        Bottom = 1,
-        Top = -1,
-        Near = 10,
-        Far = 2
-      };
-
-      Assert.AreEqual(2, frustum.Left);
-      Assert.AreEqual(-2, frustum.Right);
-      Assert.AreEqual(1, frustum.Bottom);
-      Assert.AreEqual(-1, frustum.Top);
-      Assert.AreEqual(10, frustum.Near);
-      Assert.AreEqual(2, frustum.Far);
-      Assert.AreEqual(4, frustum.Width);
-      Assert.AreEqual(2, frustum.Height);
-      Assert.AreEqual(8, frustum.Depth);
-      Assert.AreEqual(2, frustum.AspectRatio);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(90), frustum.FieldOfViewX);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(53.130102f), frustum.FieldOfViewY);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -255,45 +147,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       };
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetException()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(2, 2, 3, 4, 5, 6);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetException2()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(1, 2, 4, 4, 5, 6);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetException3()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(1, 2, 3, 4, 6, 6);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetException4()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(1, 2, 3, 4, 0, 6);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetException5()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetOffCenter(1, 2, 3, 4, 1, 0);
-    }
 
     [Test]
     public void SetFieldOfViewTest()
@@ -301,35 +154,21 @@ namespace DigitalRise.Geometry.Shapes.Tests
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
       frustum.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
 
-      AssertExt.AreNumericallyEqual(-2.0528009f / 2.0f, frustum.Left);
-      AssertExt.AreNumericallyEqual(2.0528009f / 2.0f, frustum.Right);
-      AssertExt.AreNumericallyEqual(-1.1547005f / 2.0f, frustum.Bottom);
-      AssertExt.AreNumericallyEqual(1.1547005f / 2.0f, frustum.Top);
+      var rect = frustum.Rectangle;
+      AssertExt.AreNumericallyEqual(-2.0528009f / 2.0f, rect.Left);
+      AssertExt.AreNumericallyEqual(2.0528009f / 2.0f, rect.Right);
+      AssertExt.AreNumericallyEqual(-1.1547005f / 2.0f, rect.Bottom);
+      AssertExt.AreNumericallyEqual(1.1547005f / 2.0f, rect.Top);
       Assert.AreEqual(1, frustum.Near);
       Assert.AreEqual(10, frustum.Far);
-      AssertExt.AreNumericallyEqual(2.0528009f, frustum.Width);
-      AssertExt.AreNumericallyEqual(1.1547005f, frustum.Height);
+      AssertExt.AreNumericallyEqual(2.0528009f, rect.Width);
+      AssertExt.AreNumericallyEqual(1.1547005f, rect.Height);
       Assert.AreEqual(9, frustum.Depth);
       Assert.AreEqual(16.0f / 9.0f, frustum.AspectRatio);
       AssertExt.AreNumericallyEqual(MathHelper.ToRadians(91.492843f), frustum.FieldOfViewX);
       AssertExt.AreNumericallyEqual(MathHelper.ToRadians(60), frustum.FieldOfViewY);
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetFieldOfViewException()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetFieldOfView(MathHelper.ToRadians(0), 16.0f / 9.0f, 1, 10);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetFieldOfViewException2()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetFieldOfView(MathHelper.ToRadians(180), 16.0f / 9.0f, 1, 10);
-    }
 
     [Test]
     [ExpectedException(typeof(ArgumentOutOfRangeException))]
@@ -347,13 +186,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       frustum.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 0, 10);
     }
 
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetFieldOfViewException5()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 0);
-    }
 
     [Test]
     public void SetFieldOfView2Test()
@@ -370,94 +202,21 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 
     [Test]
-    public void SetWidthAndHeightTest()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(2.0528009f, 1.1547005f, 1, 10);
-
-      AssertExt.AreNumericallyEqual(-2.0528009f / 2.0f, frustum.Left);
-      AssertExt.AreNumericallyEqual(2.0528009f / 2.0f, frustum.Right);
-      AssertExt.AreNumericallyEqual(-1.1547005f / 2.0f, frustum.Bottom);
-      AssertExt.AreNumericallyEqual(1.1547005f / 2.0f, frustum.Top);
-      Assert.AreEqual(1, frustum.Near);
-      Assert.AreEqual(10, frustum.Far);
-      AssertExt.AreNumericallyEqual(2.0528009f, frustum.Width);
-      AssertExt.AreNumericallyEqual(1.1547005f, frustum.Height);
-      Assert.AreEqual(9, frustum.Depth);
-      Assert.AreEqual(16.0f / 9.0f, frustum.AspectRatio);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(91.492843f), frustum.FieldOfViewX);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(60), frustum.FieldOfViewY);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetWidthAndHeightException()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(0, 1.1547005f, 1, 10);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetWidthAndHeightException2()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(2.0528009f, 0, 1, 10);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentOutOfRangeException))]
-    public void SetWidthAndHeightException3()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(2.0528009f, 1.1547005f, 0, 10);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetWidthAndHeightException4()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(2.0528009f, 1.1547005f, 1, 0);
-    }
-
-    [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void SetWidthAndHeightException5()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(2.0528009f, 1.1547005f, 1, 1);
-    }
-
-
-    [Test]
     public void ToStringTest()
     {
       Assert.IsTrue(new PerspectiveViewVolume().ToString().Contains("PerspectiveViewVolume"));
     }
 
-    [Test]
-    public void InnerPointTest()
-    {
-      PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetWidthAndHeight(1, 1, 1, 10);
-      Vector3 innerPoint = frustum.InnerPoint;
-      Assert.AreEqual(0, innerPoint.X);
-      Assert.AreEqual(0, innerPoint.Y);
-      Assert.AreEqual(-5.5f, innerPoint.Z);
-    }
-
-
-    [Test]
+     [Test]
     public void Clone()
     {
       PerspectiveViewVolume perspectiveViewVolume = new PerspectiveViewVolume(1.23f, 2.13f, 1.01f, 10.345f);
       PerspectiveViewVolume clone = perspectiveViewVolume.Clone() as PerspectiveViewVolume;
       Assert.IsNotNull(clone);
-      Assert.AreEqual(perspectiveViewVolume.Left, clone.Left);
-      Assert.AreEqual(perspectiveViewVolume.Right, clone.Right);
-      Assert.AreEqual(perspectiveViewVolume.Bottom, clone.Bottom);
-      Assert.AreEqual(perspectiveViewVolume.Top, clone.Top);
+      Assert.AreEqual(perspectiveViewVolume.Rectangle.Left, clone.Rectangle.Left);
+      Assert.AreEqual(perspectiveViewVolume.Rectangle.Right, clone.Rectangle.Right);
+      Assert.AreEqual(perspectiveViewVolume.Rectangle.Bottom, clone.Rectangle.Bottom);
+      Assert.AreEqual(perspectiveViewVolume.Rectangle.Top, clone.Rectangle.Top);
       Assert.AreEqual(perspectiveViewVolume.Near, clone.Near);
       Assert.AreEqual(perspectiveViewVolume.Far, clone.Far);
       Assert.AreEqual(perspectiveViewVolume.FieldOfViewX, clone.FieldOfViewX);
@@ -487,13 +246,49 @@ namespace DigitalRise.Geometry.Shapes.Tests
       var deserializer = new XmlSerializer(typeof(Shape));
       var b = (PerspectiveViewVolume)deserializer.Deserialize(stream);
 
-      Assert.AreEqual(a.Left, b.Left);
-      Assert.AreEqual(a.Right, b.Right);
-      Assert.AreEqual(a.Top, b.Top);
-      Assert.AreEqual(a.Bottom, b.Bottom);
+      Assert.AreEqual(a.Rectangle.Left, b.Rectangle.Left);
+      Assert.AreEqual(a.Rectangle.Right, b.Rectangle.Right);
+      Assert.AreEqual(a.Rectangle.Top, b.Rectangle.Top);
+      Assert.AreEqual(a.Rectangle.Bottom, b.Rectangle.Bottom);
       Assert.AreEqual(a.Near, b.Near);
       Assert.AreEqual(a.Far, b.Far);
       Assert.AreEqual(a.InnerPoint, b.InnerPoint);
     }
-  }
+
+		[Test]
+		public void GetWidthAndHeightTest()
+		{
+			float width, height;
+			PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(90), 1, 1, out width, out height);
+			AssertExt.AreNumericallyEqual(2, width);
+			AssertExt.AreNumericallyEqual(2, height);
+
+			PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, out width, out height);
+			AssertExt.AreNumericallyEqual(2.0528009f, width);
+			AssertExt.AreNumericallyEqual(1.1547005f, height);
+
+			// We are pretty confident that the ViewVolume.CreateViewVolumeXxx() works. 
+			// Use ViewVolume.CreateViewVolumeXxx() to test GetWidthAndHeight().
+			Matrix44F projection = Matrix44F.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
+			Matrix44F projection2 = Matrix44F.CreatePerspective(width, height, 1, 10);
+			AssertExt.AreNumericallyEqual(projection, projection2);
+		}
+
+
+		[Test]
+		public void SetViewVolumeFieldOfViewTest()
+		{
+			PerspectiveViewVolume projection = new PerspectiveViewVolume();
+			projection.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
+
+			PerspectiveViewVolume projection2 = new PerspectiveViewVolume();
+			projection2.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f);
+			projection2.Near = 1;
+			projection2.Far = 10;
+
+			Matrix44F expected = Matrix44F.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, projection2.Projection);
+		}
+	}
 }

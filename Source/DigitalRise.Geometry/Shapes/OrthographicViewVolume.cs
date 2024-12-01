@@ -3,10 +3,13 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using DigitalRise.Geometry.Meshes;
+using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace DigitalRise.Geometry.Shapes
 {
@@ -55,6 +58,7 @@ namespace DigitalRise.Geometry.Shapes
 		#region Fields
 		//--------------------------------------------------------------
 
+		private float _left, _right, _top, _bottom;
 		private Vector3 _boxCenter;
 		private readonly BoxShape _box;
 		#endregion
@@ -65,6 +69,125 @@ namespace DigitalRise.Geometry.Shapes
 		//--------------------------------------------------------------
 
 		/// <summary>
+		/// Gets or sets the minimum x-value of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The minimum x-value of the view volume at the near clip plane.</value>
+		public float Left
+		{
+			get => _left;
+
+			set
+			{
+				if (Numeric.AreEqual(value, _left))
+				{
+					return;
+				}
+
+				_left = value;
+				Invalidate();
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the maximum x-value of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The maximum x-value of the view volume at the near clip plane.</value>
+		public float Right
+		{
+			get => _right;
+
+			set
+			{
+				if (Numeric.AreEqual(value, _right))
+				{
+					return;
+				}
+
+				_right = value;
+				Invalidate();
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the minimum y-value of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The minimum y-value of the view volume at the near clip plane.</value>
+		public float Bottom
+		{
+			get => _bottom;
+
+			set
+			{
+				if (Numeric.AreEqual(value, _bottom))
+				{
+					return;
+				}
+
+				_bottom = value;
+				Invalidate();
+			}
+		}
+
+
+		/// <summary>
+		/// Gets or sets the maximum y-value of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The maximum y-value of the view volume at the near clip plane.</value>
+		public float Top
+		{
+			get => _top;
+
+			set
+			{
+				if (Numeric.AreEqual(value, _top))
+				{
+					return;
+				}
+
+				_top = value;
+				Invalidate();
+			}
+		}
+
+		/// <summary>
+		/// Gets the width of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The width of the view volume at the near clip plane.</value>
+		[Browsable(false)]
+		[JsonIgnore]
+		public float Width
+		{
+			get { return Math.Abs(Right - Left); }
+		}
+
+
+		/// <summary>
+		/// Gets the height of the view volume at the near clip plane.
+		/// </summary>
+		/// <value>The height of the view volume at the near clip plane.</value>
+		[Browsable(false)]
+		[JsonIgnore]
+		public float Height
+		{
+			get { return Math.Abs(Top - Bottom); }
+		}
+
+
+		/// <summary>
+		/// Gets the aspect ratio (width / height).
+		/// </summary>
+		/// <value>The aspect ratio (<see cref="Width"/> / <see cref="Height"/>).</value>
+		[Browsable(false)]
+		[JsonIgnore]
+		public float AspectRatio
+		{
+			get { return Width / Height; }
+		}
+
+
+		/// <summary>
 		/// Gets an inner point.
 		/// </summary>
 		/// <value>An inner point.</value>
@@ -73,28 +196,13 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 InnerPoint
 		{
-			get { return _boxCenter + _box.InnerPoint; }
+			get
+			{
+				Update();
+				return _boxCenter + _box.InnerPoint;
+			}
 		}
 
-
-		/// <summary>
-		/// Gets the horizontal field of view (always <see cref="Single.NaN"/>).
-		/// </summary>
-		/// <value>The horizontal field of view (always <see cref="Single.NaN"/>).</value>
-		public override float FieldOfViewX
-		{
-			get { return Single.NaN; }
-		}
-
-
-		/// <summary>
-		/// Gets the vertical field of view (always <see cref="Single.NaN"/>).
-		/// </summary>
-		/// <value>The vertical field of view (always <see cref="Single.NaN"/>).</value>
-		public override float FieldOfViewY
-		{
-			get { return Single.NaN; }
-		}
 		#endregion
 
 
@@ -203,6 +311,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// <inheritdoc/>
 		public override BoundingBox GetBoundingBox(Vector3 scale, Pose pose)
 		{
+			Update();
+			
 			return _box.GetBoundingBox(scale, pose * new Pose(_boxCenter * scale));
 		}
 
@@ -240,6 +350,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 GetSupportPoint(Vector3 direction)
 		{
+			Update();
 			Vector3 localDirection = direction;
 			Vector3 localVertex = _box.GetSupportPoint(localDirection);
 			return _boxCenter + localVertex;
@@ -261,6 +372,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 GetSupportPointNormalized(Vector3 directionNormalized)
 		{
+			Update();
+
 			Vector3 localDirection = directionNormalized;
 			Vector3 localVertex = _box.GetSupportPointNormalized(localDirection);
 			return _boxCenter + localVertex;
@@ -279,7 +392,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// <returns>The volume of this shape.</returns>
 		public float GetVolume()
 		{
-			return Width * Height * Depth;
+			var r = Rectangle;
+			return r.Width * r.Height * Depth;
 		}
 
 
@@ -303,6 +417,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// <returns>The triangle mesh for this shape.</returns>
 		protected override TriangleMesh OnGetMesh(float absoluteDistanceThreshold, int iterationLimit)
 		{
+			Update();
+
 			// Get coordinates of corners:
 			float near = -Math.Min(Near, Far);
 			float far = -Math.Max(Near, Far);
@@ -399,11 +515,123 @@ namespace DigitalRise.Geometry.Shapes
 			return mesh;
 		}
 
+		/// <overloads>
+		/// <summary>
+		/// Sets the width and height of the view volume to the specified values.
+		/// </summary>
+		/// </overloads>
+		/// 
+		/// <summary>
+		/// Sets the width and height of the view volume to the specified size and depth.
+		/// </summary>
+		/// <param name="width">The width of the view volume at the near clip plane.</param>
+		/// <param name="height">The height of the view volume at the near clip plane.</param>
+		/// <param name="near">The distance to the near clip plane.</param>
+		/// <param name="far">The distance to the far clip plane.</param>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="width"/> or <paramref name="height"/> is negative or 0.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="near"/> is greater than or equal to <paramref name="far"/>.
+		/// </exception>
+		public void SetWidthAndHeight(float width, float height, float near, float far)
+		{
+			if (near >= far)
+				throw new ArgumentException("The near plane distance of a view volume needs to be less than the far plane distance.");
+
+			Near = near;
+			Far = far;
+			SetWidthAndHeight(width, height);
+		}
+
 
 		/// <summary>
-		/// Updates the shape.
+		/// Sets the width and height of the view volume to the specified size.
 		/// </summary>
-		protected override void InternalUpdate()
+		/// <param name="width">The width of the view volume at the near clip plane.</param>
+		/// <param name="height">The height of the view volume at the near clip plane.</param>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// <paramref name="width"/> or <paramref name="height"/> is negative or 0.
+		/// </exception>
+		public void SetWidthAndHeight(float width, float height)
+		{
+			if (width <= 0)
+				throw new ArgumentOutOfRangeException("width", "The width of the view volume must be greater than 0.");
+			if (height <= 0)
+				throw new ArgumentOutOfRangeException("height", "The height of the view volume must be greater than 0.");
+
+			float halfWidth = width / 2.0f;
+			float halfHeight = height / 2.0f;
+			Left = -halfWidth;
+			Right = halfWidth;
+			Bottom = -halfHeight;
+			Top = halfHeight;
+		}
+
+
+		/// <overloads>
+		/// <summary>
+		/// Sets the dimensions of the view volume.
+		/// </summary>
+		/// </overloads>
+		/// 
+		/// <summary>
+		/// Sets the dimensions of the view volume (including depths).
+		/// </summary>
+		/// <param name="left">The minimum x-value of the view volume at the near clip plane.</param>
+		/// <param name="right">The maximum x-value of the view volume at the near clip plane.</param>
+		/// <param name="bottom">The minimum y-value of the view volume at the near clip plane.</param>
+		/// <param name="top">The maximum y-value of the view volume at the near clip plane.</param>
+		/// <param name="near">The distance to the near clip plane.</param>
+		/// <param name="far">The distance to the far clip plane.</param>
+		/// <remarks>
+		/// This method can be used to define an asymmetric, off-center view volume.
+		/// </remarks>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="left"/> is greater than or equal to <paramref name="right"/>, 
+		/// <paramref name="bottom"/> is greater than or equal to <paramref name="top"/>, or
+		/// <paramref name="near"/> is greater than or equal to <paramref name="far"/>.
+		/// </exception>
+		public void SetOffCenter(float left, float right, float bottom, float top, float near, float far)
+		{
+			if (near >= far)
+				throw new ArgumentException("The near plane distance of a view volume needs to be less than the far plane distance (near < far).");
+
+			Near = near;
+			Far = far;
+			SetOffCenter(left, right, bottom, top);
+		}
+
+
+		/// <summary>
+		/// Sets the dimensions of the view volume.
+		/// </summary>
+		/// <param name="left">The minimum x-value of the view volume at the near clip plane.</param>
+		/// <param name="right">The maximum x-value of the view volume at the near clip plane.</param>
+		/// <param name="bottom">The minimum y-value of the view volume at the near clip plane.</param>
+		/// <param name="top">The maximum y-value of the view volume at the near clip plane.</param>
+		/// <remarks>
+		/// This method can be used to define an asymmetric, off-center view volume.
+		/// </remarks>
+		/// <exception cref="ArgumentException">
+		/// <paramref name="left"/> is greater than or equal to <paramref name="right"/>, or
+		/// <paramref name="bottom"/> is greater than or equal to <paramref name="top"/>.
+		/// </exception>
+		public void SetOffCenter(float left, float right, float bottom, float top)
+		{
+			if (left >= right)
+				throw new ArgumentException("Left needs to be less than right (left < right).");
+			if (bottom >= top)
+				throw new ArgumentException("Bottom needs to be less than top (bottom < top).");
+
+			Left = left;
+			Right = right;
+			Bottom = bottom;
+			Top = top;
+		}
+
+
+		protected override void InternalUpdate(out ProjectionRectangle rectangle, out Matrix44F projection)
 		{
 			// Sort left and right.
 			float left, right;
@@ -456,11 +684,13 @@ namespace DigitalRise.Geometry.Shapes
 			float centerY = bottom + height / 2.0f;
 			float centerZ = -(near + depth / 2.0f);
 			_boxCenter = new Vector3(centerX, centerY, centerZ);
-		}
 
-		protected override Matrix44F ComputeProjection()
-		{
-			return Matrix44F.CreateOrthographicOffCenter(Left, Right, Bottom, Top, Near, Far);
+			rectangle.Left = left;
+			rectangle.Top = top;
+			rectangle.Right = right;
+			rectangle.Bottom = bottom;
+
+			projection = Matrix44F.CreateOrthographicOffCenter(Left, Right, Bottom, Top, Near, Far);
 		}
 
 		#endregion

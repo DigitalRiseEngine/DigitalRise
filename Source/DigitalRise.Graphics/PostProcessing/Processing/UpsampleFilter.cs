@@ -222,11 +222,11 @@ namespace DigitalRise.PostProcessing.Processing
 		{
 			var graphicsDevice = DR.GraphicsDevice;
 
-			ViewVolume projection = null;
+			ViewVolume volume = null;
 			if (RebuildZBuffer || Mode == UpsamplingMode.NearestDepth)
 			{
 				context.ThrowIfCameraMissing();
-				projection = context.CameraNode.ViewVolume;
+				volume = context.CameraNode.ViewVolume;
 			}
 
 			var sourceTexture = context.SourceTexture;
@@ -240,7 +240,7 @@ namespace DigitalRise.PostProcessing.Processing
 			if (Mode == UpsamplingMode.Bilateral)
 				_effect.DepthSensitivity.SetValue(DepthSensitivity);
 			else if (Mode == UpsamplingMode.NearestDepth)
-				_effect.DepthThreshold.SetValue(DepthThreshold / projection.Far);
+				_effect.DepthThreshold.SetValue(DepthThreshold / volume.Far);
 
 			int techniqueIndex = (int)Mode;
 			int passIndex = 0;
@@ -258,15 +258,16 @@ namespace DigitalRise.PostProcessing.Processing
 				var farBias = RebuildZBufferRenderer.FarBias;
 
 				// Compute biased projection for restoring the z-buffer.
+				var rect = volume.Rectangle;
 				var biasedProjection = Matrix44F.CreatePerspectiveOffCenter(
-				  projection.Left,
-				  projection.Right,
-				  projection.Bottom,
-				  projection.Top,
-				  projection.Near * nearBias,
-				  projection.Far * farBias);
+				  rect.Left,
+				  rect.Right,
+				  rect.Bottom,
+				  rect.Top,
+				  volume.Near * nearBias,
+				  volume.Far * farBias);
 				_effect.Projection.SetValue((Matrix)biasedProjection);
-				_effect.CameraFar.SetValue(projection.Far);
+				_effect.CameraFar.SetValue(volume.Far);
 
 				// PostProcessor.ProcessInternal sets the DepthStencilState to None.
 				// --> Enable depth writes.

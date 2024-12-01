@@ -479,6 +479,8 @@ namespace DigitalRise.Rendering
 			_outputBufferWrapper.Update(this);
 			_depthBufferHalfWrapper.Update(this);
 
+			Technique = string.Empty;
+
 			Statistics.Reset();
 		}
 

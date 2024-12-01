@@ -1591,7 +1591,8 @@ namespace DigitalRise.Rendering.Debugging
 			if (viewVolume == null)
 				throw new ArgumentNullException("viewVolume");
 
-			DrawViewVolume(viewVolume is PerspectiveViewVolume, viewVolume.Left, viewVolume.Right, viewVolume.Bottom, viewVolume.Top, viewVolume.Near, viewVolume.Far, pose, color, drawWireFrame, drawOverScene);
+			var rect = viewVolume.Rectangle;
+			DrawViewVolume(viewVolume is PerspectiveViewVolume, rect.Left, rect.Right, rect.Bottom, rect.Top, viewVolume.Near, viewVolume.Far, pose, color, drawWireFrame, drawOverScene);
 		}
 
 
@@ -1624,10 +1625,12 @@ namespace DigitalRise.Rendering.Debugging
 			if (!Enabled)
 				return;
 
-			float left = viewVolume.Left * scale.X;
-			float right = viewVolume.Right * scale.X;
-			float bottom = viewVolume.Bottom * scale.Y;
-			float top = viewVolume.Top * scale.Y;
+			var rect = viewVolume.Rectangle;
+
+			float left = rect.Left * scale.X;
+			float right = rect.Right * scale.X;
+			float bottom = rect.Bottom * scale.Y;
+			float top = rect.Top * scale.Y;
 			float near = viewVolume.Near * scale.Z;
 			float far = viewVolume.Far * scale.Z;
 			DrawViewVolume(viewVolume is PerspectiveViewVolume, left, right, bottom, top, near, far, pose, color, drawWireFrame, drawOverScene);

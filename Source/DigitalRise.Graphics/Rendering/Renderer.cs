@@ -1,4 +1,5 @@
-﻿using DigitalRise.Misc;
+﻿using DigitalRise.Geometry.Shapes;
+using DigitalRise.Misc;
 using DigitalRise.Rendering.Billboards;
 using DigitalRise.Rendering.Deferred;
 using DigitalRise.Rendering.Shadows;
@@ -43,6 +44,13 @@ namespace DigitalRise.Rendering
 				// required by many renderers.
 				_context.Scene = scene;
 				_context.CameraNode = scene.Camera;
+
+				// Update aspect
+				var asPerspective = _context.CameraNode.ViewVolume as PerspectiveViewVolume;
+				if (asPerspective != null)
+				{
+					asPerspective.AspectRatio = oldViewport.AspectRatio;
+				}
 
 				// LOD (level of detail) settings are also specified in the context.
 				_context.LodCameraNode = scene.Camera;

@@ -65,6 +65,10 @@ namespace DigitalRise.Geometry.Shapes
 		#region Fields
 		//--------------------------------------------------------------
 
+		private float _fieldOfViewY, _aspectRatio;
+		private Vector3 _innerPoint;
+		private Plane? _nearClipPlane;
+
 		// Cached vertices.
 		private Vector3 _nearBottomLeftVertex;
 		private Vector3 _nearBottomRightVertex;
@@ -90,61 +94,74 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 InnerPoint
 		{
-			get { return _innerPoint; }
+			get
+			{
+				Update();
+				return _innerPoint;
+			}
 		}
-		private Vector3 _innerPoint;
 
 
 		/// <summary>
 		/// Gets the horizontal field of view.
 		/// </summary>
 		/// <value>The horizontal field of view.</value>
-		public override float FieldOfViewX
+		[Browsable(false)]
+		[JsonIgnore]
+		public float FieldOfViewX
 		{
 			get
 			{
-				// Sort left and right.
-				float left, right;
-				if (Left <= Right)
-				{
-					left = Left;
-					right = Right;
-				}
-				else
-				{
-					left = Right;
-					right = Left;
-				}
-
+				var r = Rectangle;
 				float distance = (Near <= Far) ? Near : Far;
-				return (float)Math.Atan((-left) / distance) + (float)Math.Atan(right / distance);
+				return (float)Math.Atan((-r.Left) / distance) + (float)Math.Atan(r.Right / distance);
 			}
 		}
 
 
 		/// <summary>
-		/// Gets the vertical field of view.
+		/// Gets or sets the vertical field of view.
 		/// </summary>
 		/// <value>The vertical field of view.</value>
-		public override float FieldOfViewY
+		public float FieldOfViewY
 		{
-			get
+			get => _fieldOfViewY;
+
+			set
 			{
-				// Sort bottom and top.
-				float bottom, top;
-				if (Bottom <= Top)
+				if (Numeric.AreEqual(value, _fieldOfViewY))
 				{
-					bottom = Bottom;
-					top = Top;
-				}
-				else
-				{
-					bottom = Top;
-					top = Bottom;
+					return;
 				}
 
-				float distance = (Near <= Far) ? Near : Far;
-				return (float)Math.Atan((-bottom) / distance) + (float)Math.Atan(top / distance);
+				_fieldOfViewY = value;
+				Invalidate();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the aspect ratio (width / height).
+		/// </summary>
+		[Browsable(false)]
+		[JsonIgnore]
+		public float AspectRatio
+		{
+			get => _aspectRatio;
+
+			set
+			{
+				if (value <= 0)
+				{
+					throw new ArgumentOutOfRangeException(nameof(value), "The aspect ratio must not be negative or 0.");
+				}
+
+				if (Numeric.AreEqual(value, _aspectRatio))
+				{
+					return;
+				}
+
+				_aspectRatio = value;
+				Invalidate();
 			}
 		}
 
@@ -175,7 +192,21 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		[Browsable(false)]
 		[JsonIgnore]
-		public Plane? NearClipPlane { get; set; }
+		public Plane? NearClipPlane
+		{
+			get => _nearClipPlane;
+
+			set
+			{
+				if (value == _nearClipPlane)
+				{
+					return;
+				}
+
+				_nearClipPlane = value;
+				Invalidate();
+			}
+		}
 
 		#endregion
 
@@ -194,7 +225,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// Initializes a new instance of the <see cref="PerspectiveViewVolume"/> class using default 
 		/// settings.
 		/// </summary>
-		public PerspectiveViewVolume(): this(DefaultFieldOfViewY, DefaultAspectRatio, DefaultNear, DefaultFar)
+		public PerspectiveViewVolume() : this(DefaultFieldOfViewY, DefaultAspectRatio, DefaultNear, DefaultFar)
 		{
 		}
 
@@ -208,7 +239,6 @@ namespace DigitalRise.Geometry.Shapes
 		/// <param name="near">The distance to the near clip plane.</param>
 		/// <param name="far">The distance to the far clip plane.</param>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewY"/> is not between 0 and π radians (0° and 180°),
 		/// <paramref name="aspectRatio"/> is negative or 0, <paramref name="near"/> is negative or 0,
 		/// or <paramref name="far"/> is negative or 0.
 		/// </exception>
@@ -239,8 +269,9 @@ namespace DigitalRise.Geometry.Shapes
 		protected override void CloneCore(Shape sourceShape)
 		{
 			var source = (PerspectiveViewVolume)sourceShape;
-			SetOffCenter(source.Left, source.Right, source.Bottom, source.Top, source.Near, source.Far);
+			SetFieldOfView(source.FieldOfViewY, source.AspectRatio, source.Near, source.Far);
 		}
+
 		#endregion
 
 
@@ -262,6 +293,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 GetSupportPoint(Vector3 direction)
 		{
+			Update();
+
 			if (direction.X > 0)
 			{
 				// Get a right vertex.
@@ -321,6 +354,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// </remarks>
 		public override Vector3 GetSupportPointNormalized(Vector3 directionNormalized)
 		{
+			Update();
+
 			if (directionNormalized.X > 0)
 			{
 				// Get a right vertex.
@@ -378,7 +413,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// <returns>The volume of this shape.</returns>
 		public float GetVolume()
 		{
-			float nearArea = Width * Height;
+			var r = Rectangle;
+			float nearArea = r.Width * r.Height;
 			float scale = Far / Near;
 			float farArea = nearArea * scale * scale;
 
@@ -407,13 +443,15 @@ namespace DigitalRise.Geometry.Shapes
 		/// <returns>The triangle mesh for this shape.</returns>
 		protected override TriangleMesh OnGetMesh(float absoluteDistanceThreshold, int iterationLimit)
 		{
+			var r = Rectangle;
+
 			// Get coordinates of corners:
 			float near = -Math.Min(Near, Far);
 			float far = -Math.Max(Near, Far);
-			float leftNear = Math.Min(Left, Right);
-			float rightNear = Math.Max(Left, Right);
-			float topNear = Math.Max(Top, Bottom);
-			float bottomNear = Math.Min(Top, Bottom);
+			float leftNear = Math.Min(r.Left, r.Right);
+			float rightNear = Math.Max(r.Left, r.Right);
+			float topNear = Math.Max(r.Top, r.Bottom);
+			float bottomNear = Math.Min(r.Top, r.Bottom);
 			float farFactor = 1 / near * far;    // Multiply near-values by this factor to get far-values.
 			float leftFar = leftNear * farFactor;
 			float rightFar = rightNear * farFactor;
@@ -509,24 +547,8 @@ namespace DigitalRise.Geometry.Shapes
 			return mesh;
 		}
 
-
-		/// <summary>
-		/// Updates the shape.
-		/// </summary>
-		protected override void InternalUpdate()
+		protected override void InternalUpdate(out ProjectionRectangle rectangle, out Matrix44F projection)
 		{
-			// Sort left and right.
-			float left = Left;
-			float right = Right;
-			if (left > right)
-				Mathematics.MathHelper.Swap(ref left, ref right);
-
-			// Sort bottom and top.
-			float bottom = Bottom;
-			float top = Top;
-			if (bottom > top)
-				Mathematics.MathHelper.Swap(ref bottom, ref top);
-
 			// Sort near and far.
 			float near = Near;
 			float far = Far;
@@ -536,6 +558,46 @@ namespace DigitalRise.Geometry.Shapes
 				throw new ArgumentOutOfRangeException("far", "The far plane distance of a perspective view volume needs to be greater than 0.");
 			if (near > far)
 				Mathematics.MathHelper.Swap(ref near, ref far);
+
+			float width, height;
+			GetWidthAndHeight(_fieldOfViewY, _aspectRatio, Near, out width, out height);
+
+			float halfWidth = width / 2.0f;
+			float halfHeight = height / 2.0f;
+			var left = -halfWidth;
+			var right = halfWidth;
+			var bottom = -halfHeight;
+			var top = halfHeight;
+
+			rectangle.Left = left;
+			rectangle.Top = top;
+			rectangle.Right = right;
+			rectangle.Bottom = bottom;
+
+			projection = Matrix44F.CreatePerspectiveOffCenter(left, right, bottom, top, Near, Far);
+			if (NearClipPlane.HasValue)
+			{
+				Vector4 clipPlane = new Vector4(NearClipPlane.Value.Normal, -NearClipPlane.Value.DistanceFromOrigin);
+
+				// Calculate the clip-space corner point opposite the clipping plane as
+				// (-sign(clipPlane.x), -sign(clipPlane.y), 1, 1) and transform it into
+				// camera space by multiplying it by the inverse of the projection matrix.
+				Vector4 q;
+				q.X = (-Math.Sign(clipPlane.X) + projection.M02) / projection.M00;
+				q.Y = (-Math.Sign(clipPlane.Y) + projection.M12) / projection.M11;
+				q.Z = -1.0f;
+				q.W = (1.0f + projection.M22) / projection.M23;
+
+				// Calculate the scaled plane vector
+				Vector4 c = clipPlane * (1.0f / Vector4.Dot(clipPlane, q));
+
+				// Replace the third row of the projection matrix
+				projection.M20 = c.X;
+				projection.M21 = c.Y;
+				projection.M22 = c.Z;
+				projection.M23 = c.W;
+			}
+
 
 			// Update near view rectangle.
 			_nearBottomLeftVertex = new Vector3(left, bottom, -near);
@@ -568,9 +630,9 @@ namespace DigitalRise.Geometry.Shapes
 		public override string ToString()
 		{
 			return String.Format(
-			  CultureInfo.InvariantCulture,
-			  "PerspectiveViewVolume {{ Left = {0}, Right = {1}, Bottom = {2}, Top = {3}, Near = {4}, Far = {5} }}",
-			  Left, Right, Bottom, Top, Near, Far);
+				CultureInfo.InvariantCulture,
+				"PerspectiveViewVolume {{ FieldOfViewY = {0}, AspectRatio = {1}, Near = {2}, Far = {3} }}",
+				FieldOfViewY, AspectRatio, Near, Far);
 		}
 
 
@@ -591,7 +653,6 @@ namespace DigitalRise.Geometry.Shapes
 		/// This method creates a symmetric frustum.
 		/// </remarks>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewY"/> is not between 0 and π radians (0° and 180°),
 		/// <paramref name="aspectRatio"/> is negative or 0, <paramref name="near"/> is negative or 0,
 		/// or <paramref name="far"/> is negative or 0.
 		/// </exception>
@@ -600,16 +661,13 @@ namespace DigitalRise.Geometry.Shapes
 		/// </exception>
 		public void SetFieldOfView(float fieldOfViewY, float aspectRatio, float near, float far)
 		{
-			if (near <= 0)
-				throw new ArgumentOutOfRangeException("near", "The near plane distance of a frustum needs to be greater than 0.");
-			if (far <= 0)
-				throw new ArgumentOutOfRangeException("far", "The far plane distance of a frustum needs to be greater than 0.");
 			if (near >= far)
 				throw new ArgumentException("The near plane distance of a frustum needs to be less than the far plane distance (near < far).");
 
-			float width, height;
-			GetWidthAndHeight(fieldOfViewY, aspectRatio, near, out width, out height);
-			SetWidthAndHeight(width, height, near, far);
+			FieldOfViewY = fieldOfViewY;
+			AspectRatio = aspectRatio;
+			Near = near;
+			Far = far;
 		}
 
 
@@ -622,14 +680,12 @@ namespace DigitalRise.Geometry.Shapes
 		/// This method creates a symmetric frustum.
 		/// </remarks>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewY"/> is not between 0 and π radians (0° and 180°), or
 		/// <paramref name="aspectRatio"/> is negative or 0.
 		/// </exception>
 		public void SetFieldOfView(float fieldOfViewY, float aspectRatio)
 		{
-			float width, height;
-			GetWidthAndHeight(fieldOfViewY, aspectRatio, Near, out width, out height);
-			SetWidthAndHeight(width, height);
+			FieldOfViewY = fieldOfViewY;
+			AspectRatio = aspectRatio;
 		}
 
 
@@ -640,13 +696,10 @@ namespace DigitalRise.Geometry.Shapes
 		/// <param name="aspectRatio">The aspect ratio (width / height).</param>
 		/// <returns>The horizontal field of view in radians.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewY"/> is not between 0 and π radians (0° and 180°), or 
 		/// <paramref name="aspectRatio"/> is negative or 0.
 		/// </exception>
 		public static float GetFieldOfViewX(float fieldOfViewY, float aspectRatio)
 		{
-			if (fieldOfViewY <= 0f || fieldOfViewY >= ConstantsF.Pi)
-				throw new ArgumentOutOfRangeException("fieldOfViewY", "The field of view must be between 0 radians and π radians.");
 			if (aspectRatio <= 0)
 				throw new ArgumentOutOfRangeException("aspectRatio", "The aspect ratio must not be negative or 0.");
 
@@ -664,13 +717,10 @@ namespace DigitalRise.Geometry.Shapes
 		/// <param name="aspectRatio">The aspect ratio.</param>
 		/// <returns>The vertical field of view in radians.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewX"/> is not between 0 and π radians (0° and 180°), or
 		/// <paramref name="aspectRatio"/> is negative or 0.
 		/// </exception>
 		public static float GetFieldOfViewY(float fieldOfViewX, float aspectRatio)
 		{
-			if (fieldOfViewX <= 0f || fieldOfViewX >= ConstantsF.Pi)
-				throw new ArgumentOutOfRangeException("fieldOfViewX", "The field of view must be between 0 radians and π radians.");
 			if (aspectRatio <= 0)
 				throw new ArgumentOutOfRangeException("aspectRatio", "The aspect ratio must not be negative or 0.");
 
@@ -694,13 +744,10 @@ namespace DigitalRise.Geometry.Shapes
 		/// </para>
 		/// </remarks>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfView"/> is not between 0 and π radians (0° and 180°), or
 		/// <paramref name="distance"/> is negative.
 		/// </exception>
 		public static float GetExtent(float fieldOfView, float distance)
 		{
-			if (fieldOfView <= 0f || fieldOfView >= ConstantsF.Pi)
-				throw new ArgumentOutOfRangeException("fieldOfView", "The field of view must be between 0 radians and π radians.");
 			if (distance < 0)
 				throw new ArgumentOutOfRangeException("distance", "The distance must not be negative.");
 
@@ -723,13 +770,10 @@ namespace DigitalRise.Geometry.Shapes
 		/// The height of the view volume at the specified <paramref name="distance"/>.
 		/// </param>
 		/// <exception cref="ArgumentOutOfRangeException">
-		/// <paramref name="fieldOfViewY"/> is not between 0 and π radians (0° and 180°), 
 		/// <paramref name="aspectRatio"/> is negative or 0, or <paramref name="distance"/> is negative.
 		/// </exception>
 		public static void GetWidthAndHeight(float fieldOfViewY, float aspectRatio, float distance, out float width, out float height)
 		{
-			if (fieldOfViewY <= 0f || fieldOfViewY >= ConstantsF.Pi)
-				throw new ArgumentOutOfRangeException("fieldOfViewY", "The field of view must be between 0 radians and π radians.");
 			if (aspectRatio <= 0)
 				throw new ArgumentOutOfRangeException("aspectRatio", "The aspect ratio must not be negative or 0.");
 			if (distance < 0)
@@ -766,35 +810,6 @@ namespace DigitalRise.Geometry.Shapes
 			return 2.0f * (float)Math.Atan(extent / (2.0f * distance));
 		}
 
-		protected override Matrix44F ComputeProjection()
-		{
-			var projection = Matrix44F.CreatePerspectiveOffCenter(Left, Right, Bottom, Top, Near, Far);
-
-			if (NearClipPlane.HasValue)
-			{
-				Vector4 clipPlane = new Vector4(NearClipPlane.Value.Normal, -NearClipPlane.Value.DistanceFromOrigin);
-
-				// Calculate the clip-space corner point opposite the clipping plane as
-				// (-sign(clipPlane.x), -sign(clipPlane.y), 1, 1) and transform it into
-				// camera space by multiplying it by the inverse of the projection matrix.
-				Vector4 q;
-				q.X = (-Math.Sign(clipPlane.X) + projection.M02) / projection.M00;
-				q.Y = (-Math.Sign(clipPlane.Y) + projection.M12) / projection.M11;
-				q.Z = -1.0f;
-				q.W = (1.0f + projection.M22) / projection.M23;
-
-				// Calculate the scaled plane vector
-				Vector4 c = clipPlane * (1.0f / Vector4.Dot(clipPlane, q));
-
-				// Replace the third row of the projection matrix
-				projection.M20 = c.X;
-				projection.M21 = c.Y;
-				projection.M22 = c.Z;
-				projection.M23 = c.W;
-			}
-
-			return projection;
-		}
 		#endregion
 	}
 }

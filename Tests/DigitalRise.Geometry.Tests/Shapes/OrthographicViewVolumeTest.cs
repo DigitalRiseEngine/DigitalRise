@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
+using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
+using NUnit.Utils;
 
 
 namespace DigitalRise.Geometry.Shapes.Tests
@@ -46,8 +48,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(2, viewVolume.Height);
       Assert.AreEqual(8, viewVolume.Depth);
       Assert.AreEqual(2, viewVolume.AspectRatio);
-      Assert.IsNaN(viewVolume.FieldOfViewX);
-      Assert.IsNaN(viewVolume.FieldOfViewY);
 
 
       viewVolume = new OrthographicViewVolume
@@ -70,8 +70,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(2, viewVolume.Height);
       Assert.AreEqual(8, viewVolume.Depth);
       Assert.AreEqual(2, viewVolume.AspectRatio);
-      Assert.IsNaN(viewVolume.FieldOfViewX);
-      Assert.IsNaN(viewVolume.FieldOfViewY);
     }
 
     [Test]
@@ -114,8 +112,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(3, viewVolume.Height);
       Assert.AreEqual(7, viewVolume.Depth);
       Assert.AreEqual(4.0f / 3.0f, viewVolume.AspectRatio);
-      Assert.IsNaN(viewVolume.FieldOfViewX);
-      Assert.IsNaN(viewVolume.FieldOfViewY);
     }
 
     [Test]
@@ -173,8 +169,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(orthographicViewVolume.Top, clone.Top);
       Assert.AreEqual(orthographicViewVolume.Near, clone.Near);
       Assert.AreEqual(orthographicViewVolume.Far, clone.Far);
-      Assert.AreEqual(orthographicViewVolume.FieldOfViewX, clone.FieldOfViewX);
-      Assert.AreEqual(orthographicViewVolume.FieldOfViewY, clone.FieldOfViewY);
       Assert.AreEqual(orthographicViewVolume.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
       Assert.AreEqual(orthographicViewVolume.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
     }
@@ -208,5 +202,59 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(a.Far, b.Far);
       Assert.AreEqual(a.InnerPoint, b.InnerPoint);
     }
-  }
+
+		[Test]
+		public void SetViewVolumeTest()
+		{
+			OrthographicViewVolume projection = new OrthographicViewVolume();
+			projection.SetWidthAndHeight(4, 3, 2, 10);
+
+			OrthographicViewVolume camera2 = new OrthographicViewVolume();
+			camera2.SetWidthAndHeight(4, 3);
+			camera2.Near = 2;
+			camera2.Far = 10;
+
+			OrthographicViewVolume camera3 = new OrthographicViewVolume
+			{
+				Left = -2,
+				Right = 2,
+				Bottom = -1.5f,
+				Top = 1.5f,
+				Near = 2,
+				Far = 10,
+			};
+
+			Matrix44F expected = Matrix44F.CreateOrthographic(4, 3, 2, 10);
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera2.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera3.Projection);
+		}
+
+		[Test]
+		public void SetViewVolumeOffCenterTest()
+		{
+			OrthographicViewVolume projection = new OrthographicViewVolume();
+			projection.SetOffCenter(0, 4, 1, 4, 2, 10);
+
+			OrthographicViewVolume camera2 = new OrthographicViewVolume();
+			camera2.SetOffCenter(0, 4, 1, 4);
+			camera2.Near = 2;
+			camera2.Far = 10;
+
+			ViewVolume camera3 = new OrthographicViewVolume
+			{
+				Left = 0,
+				Right = 4,
+				Bottom = 1,
+				Top = 4,
+				Near = 2,
+				Far = 10,
+			};
+
+			Matrix44F expected = Matrix44F.CreateOrthographicOffCenter(0, 4, 1, 4, 2, 10);
+			AssertExt.AreNumericallyEqual(expected, projection.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera2.Projection);
+			AssertExt.AreNumericallyEqual(expected, camera3.Projection);
+		}
+	}
 }

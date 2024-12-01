@@ -64,11 +64,11 @@ namespace DigitalRise.Rendering.Shadows
 			// Camera properties
 			var cameraNode = context.CameraNode;
 			var cameraPose = cameraNode.PoseWorld;
-			var projection = cameraNode.ViewVolume;
-			if (!(projection is PerspectiveViewVolume))
+			if (!(cameraNode.ViewVolume is PerspectiveViewVolume))
 				throw new NotImplementedException(
 				  "Cascaded shadow maps not yet implemented for scenes with orthographic camera.");
 
+			var projection = (PerspectiveViewVolume)cameraNode.ViewVolume;
 			float fieldOfViewY = projection.FieldOfViewY;
 			float aspectRatio = projection.AspectRatio;
 
@@ -280,14 +280,15 @@ namespace DigitalRise.Rendering.Shadows
 		}
 
 
-		private static void GetBoundingSphere(ViewVolume viewVolume, out Vector3 center, out float radius)
+		private static void GetBoundingSphere(ViewVolume volume, out Vector3 center, out float radius)
 		{
-			float left = viewVolume.Left;
-			float top = viewVolume.Top;
-			float right = viewVolume.Right;
-			float bottom = viewVolume.Bottom;
-			float near = viewVolume.Near;
-			float far = viewVolume.Far;
+			var rect = volume.Rectangle;
+			float left = rect.Left;
+			float top = rect.Top;
+			float right = rect.Right;
+			float bottom = rect.Bottom;
+			float near = volume.Near;
+			float far = volume.Far;
 
 			_frustumCorners[0] = new Vector3(left, top, -near);
 			_frustumCorners[1] = new Vector3(right, top, -near);

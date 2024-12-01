@@ -58,7 +58,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// <summary>
 		/// The default value for <see cref="Projection.FieldOfViewY"/>.
 		/// </summary>
-		private const float DefaultFieldOfViewY = 60.0f * ConstantsF.Pi / 180; // 60°
+		private const float DefaultFieldOfViewY = 60.0f; // 60°
 		#endregion
 
 		//--------------------------------------------------------------
@@ -103,26 +103,9 @@ namespace DigitalRise.Geometry.Shapes
 
 
 		/// <summary>
-		/// Gets the horizontal field of view.
+		/// Gets or sets the vertical field of view in degrees.
 		/// </summary>
-		/// <value>The horizontal field of view.</value>
-		[Browsable(false)]
-		[JsonIgnore]
-		public float FieldOfViewX
-		{
-			get
-			{
-				var r = Rectangle;
-				float distance = (Near <= Far) ? Near : Far;
-				return (float)Math.Atan((-r.Left) / distance) + (float)Math.Atan(r.Right / distance);
-			}
-		}
-
-
-		/// <summary>
-		/// Gets or sets the vertical field of view.
-		/// </summary>
-		/// <value>The vertical field of view.</value>
+		/// <value>The vertical field of view in degrees.</value>
 		public float FieldOfViewY
 		{
 			get => _fieldOfViewY;
@@ -758,7 +741,7 @@ namespace DigitalRise.Geometry.Shapes
 		/// <summary>
 		/// Converts a field of view of a symmetric frustum to width and height.
 		/// </summary>
-		/// <param name="fieldOfViewY">The vertical field of view in radians.</param>
+		/// <param name="fieldOfViewY">The vertical field of view in degrees.</param>
 		/// <param name="aspectRatio">The aspect ratio (width / height).</param>
 		/// <param name="distance">
 		/// The distance at which <paramref name="width"/> and <paramref name="height"/> are calculated.
@@ -779,7 +762,7 @@ namespace DigitalRise.Geometry.Shapes
 			if (distance < 0)
 				throw new ArgumentOutOfRangeException("distance", "The distance must not be negative.");
 
-			height = 2.0f * distance * (float)Math.Tan(fieldOfViewY / 2.0f);
+			height = 2.0f * distance * (float)Math.Tan(Microsoft.Xna.Framework.MathHelper.ToRadians(fieldOfViewY) / 2.0f);
 			width = height * aspectRatio;
 		}
 

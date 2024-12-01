@@ -593,6 +593,7 @@ namespace DigitalRise.Rendering
 				throw new ArgumentNullException(nameof(submesh));
 			}
 
+			pass.Apply();
 			submesh.Draw();
 
 			++Statistics.DrawCalls;

@@ -75,8 +75,6 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using DigitalRise.Data.Materials;
-using DigitalRise.Vertices;
 
 namespace DigitalRise.Data.Meshes.Primitives
 {

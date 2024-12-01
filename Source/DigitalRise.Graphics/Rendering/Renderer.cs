@@ -5,6 +5,7 @@ using DigitalRise.Rendering.Deferred;
 using DigitalRise.Rendering.Shadows;
 using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
+using DigitalRune.Rendering.Sky;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -98,6 +99,9 @@ namespace DigitalRise.Rendering
 				graphicsDevice.ResetTextures();
 
 				_context.SourceTexture = null;
+
+				// ----- Sky
+				SkyboxRendererInternal.Render(_context, sceneQuery.RenderableNodes);
 
 				if (DRDebugOptions.VisualizeBuffers)
 				{

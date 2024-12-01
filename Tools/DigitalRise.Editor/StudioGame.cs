@@ -43,6 +43,7 @@ namespace DigitalRise.Editor
 				PreferredBackBufferWidth = 1200,
 				PreferredBackBufferHeight = 800,
 				PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
+				GraphicsProfile = GraphicsProfile.HiDef
 			};
 
 			Window.AllowUserResizing = true;

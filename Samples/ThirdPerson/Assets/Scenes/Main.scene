@@ -3,10 +3,7 @@
   "Camera": {
     "ViewVolume": {
       "$type": "DigitalRise.Geometry.Shapes.PerspectiveViewVolume, DigitalRise.Geometry",
-      "Left": -1.0264004,
-      "Right": 1.0264004,
-      "Bottom": -0.57735026,
-      "Top": 0.57735026,
+      "FieldOfViewY": 90.0,
       "Near": 1.0,
       "Far": 1000.0
     },
@@ -14,7 +11,7 @@
     "Children": [],
     "IsEnabled": true,
     "ScaleLocal": "1, 1, 1",
-    "PositionLocal": "-8.484934, 9.858849, 19.821283"
+    "PositionLocal": "-2.0221264, 3.296793, 0.74710923"
   },
   "Name": "Root",
   "Children": [

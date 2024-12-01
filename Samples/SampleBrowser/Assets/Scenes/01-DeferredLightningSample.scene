@@ -1,0 +1,34 @@
+{
+  "EnableMultithreading": true,
+  "Camera": {
+    "ViewVolume": {
+      "$type": "DigitalRise.Geometry.Shapes.PerspectiveViewVolume, DigitalRise.Geometry",
+      "FieldOfViewY": 90.0,
+      "Near": 1.0,
+      "Far": 1000.0
+    },
+    "LodBias": 1.0,
+    "Children": [],
+    "IsEnabled": true,
+    "ScaleLocal": "1, 1, 1",
+    "PositionLocal": "-13.8495245, 24.442295, 50.192326"
+  },
+  "Name": "Root",
+  "Children": [
+    {
+      "$type": "DigitalRise.SceneGraph.Sky.SkyboxNode, DigitalRise",
+      "TexturePath": "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets\\Textures\\Sky2.dds",
+      "Color": "255, 255, 255, 255",
+      "Alpha": 1.0,
+      "Encoding": {
+        "$type": "DigitalRise.Misc.Encodings.SRgbEncoding, DigitalRise"
+      },
+      "Name": "_sky",
+      "Children": [],
+      "IsEnabled": true,
+      "ScaleLocal": "1, 1, 1"
+    }
+  ],
+  "IsEnabled": true,
+  "ScaleLocal": "1, 1, 1"
+}

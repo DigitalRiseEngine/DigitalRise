@@ -37,7 +37,7 @@ namespace DigitalRise.Rendering.Billboards
 		public EffectTechnique TechniqueSoftLinear { get; private set; }
 		public EffectTechnique TechniqueSoftGamma { get; private set; }
 
-		public BillboardEffectWrapper() : base("DigitalRise/Billboard")
+		public BillboardEffectWrapper() : base("Billboard")
 		{
 		}
 

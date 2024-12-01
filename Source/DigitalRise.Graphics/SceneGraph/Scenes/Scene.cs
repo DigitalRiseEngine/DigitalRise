@@ -272,7 +272,6 @@ namespace DigitalRise.SceneGraph.Scenes
 			set { _collisionDomain.EnableMultithreading = value; }
 		}
 
-		[Browsable(false)]
 		public CameraNode Camera { get; set; }
 
 		[JsonIgnore]

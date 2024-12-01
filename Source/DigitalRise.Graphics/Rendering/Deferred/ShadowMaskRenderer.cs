@@ -250,6 +250,11 @@ namespace DigitalRise.Rendering.Deferred
 				}
 			}
 
+			if (_lightNodes.Count == 0)
+			{
+				return;
+			}
+
 			// Set device render target and clear it to white (= no shadow).
 			var shadowMask = _shadowMasks[0];
 			graphicsDevice.SetRenderTarget(shadowMask);

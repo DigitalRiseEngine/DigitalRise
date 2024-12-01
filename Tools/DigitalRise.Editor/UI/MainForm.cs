@@ -12,6 +12,7 @@ using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Geometry.Shapes;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DigitalRise.Editor.UI
 {
@@ -281,89 +282,101 @@ namespace DigitalRise.Editor.UI
 			UpdateStackPanelEditor();
 		}
 
+		private Widget InternalCreateCustomEditor(Record record, object obj, string[] extensions, Func<AssetManager, string, object> loader)
+		{
+			var propertyType = record.Type;
+
+			var result = new HorizontalStackPanel
+			{
+				Spacing = 8
+			};
+
+			var pathProperty = obj.GetType().GetProperty(record.Name + "Path");
+			var texturePath = (string)pathProperty.GetValue(obj);
+
+			var path = new TextBox
+			{
+				Readonly = true,
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				Text = texturePath
+			};
+
+			StackPanel.SetProportionType(path, ProportionType.Fill);
+			result.Widgets.Add(path);
+
+			var button = new Button
+			{
+				Tag = obj,
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				Content = new Label
+				{
+					Text = "Change...",
+					HorizontalAlignment = HorizontalAlignment.Center,
+				}
+			};
+			Grid.SetColumn(button, 1);
+
+			button.Click += (sender, args) =>
+			{
+				try
+				{
+					var dialog = new ChooseAssetDialog(Folder, extensions);
+
+					dialog.Closed += (s, a) =>
+					{
+						if (!dialog.Result)
+						{
+							// "Cancel" or Escape
+							return;
+						}
+
+						// "Ok" or Enter
+						try
+						{
+							var path = dialog.FilePath;
+							var assetManager = AssetManager.CreateFileAssetManager(Path.GetDirectoryName(path));
+
+
+							var value = loader(assetManager, path);
+
+							record.SetValue(obj, value);
+							pathProperty.SetValue(obj, path);
+						}
+						catch (Exception ex)
+						{
+							var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
+							dialog.ShowModal(Desktop);
+						}
+					};
+
+					dialog.ShowModal(Desktop);
+				}
+				catch (Exception ex)
+				{
+					var dialog = Dialog.CreateMessageBox("Error", ex.Message);
+					dialog.ShowModal(Desktop);
+				}
+			};
+
+			result.Widgets.Add(button);
+
+			return result;
+		}
+
 		private Widget CreateCustomEditor(Record record, object obj)
 		{
 			if (obj is DefaultMaterial && record.Name.EndsWith("Texture"))
 			{
-				var material = (DefaultMaterial)obj;
-				var propertyType = record.Type;
+				return InternalCreateCustomEditor(record, obj,
+					new[] { "dds", "png", "jpg", "gif", "bmp", "tga" },
+					(assetManager, path) => assetManager.LoadTexture2D(DR.GraphicsDevice, path));
+			}
 
-				var result = new HorizontalStackPanel
-				{
-					Spacing = 8
-				};
+			if (record.Type == typeof(TextureCube))
+			{
+				return InternalCreateCustomEditor(record, obj, new[] { "dds" },
+					(assetManager, path) => assetManager.LoadTextureCube(DR.GraphicsDevice, path));
 
-				var pathProperty = obj.GetType().GetProperty(record.Name + "Path");
-				var texturePath = (string)pathProperty.GetValue(obj);
-
-				var path = new TextBox
-				{
-					Readonly = true,
-					HorizontalAlignment = HorizontalAlignment.Stretch,
-					Text = texturePath
-				};
-
-				StackPanel.SetProportionType(path, ProportionType.Fill);
-				result.Widgets.Add(path);
-
-				var button = new Button
-				{
-					Tag = obj,
-					HorizontalAlignment = HorizontalAlignment.Stretch,
-					Content = new Label
-					{
-						Text = "Change...",
-						HorizontalAlignment = HorizontalAlignment.Center,
-					}
-				};
-				Grid.SetColumn(button, 1);
-
-				button.Click += (sender, args) =>
-				{
-					try
-					{
-						var texturesFolder = Path.GetDirectoryName(Path.GetDirectoryName(_treeFileSolution.SelectedNode.Tag.ToString()));
-						texturesFolder = Path.Combine(texturesFolder, "Textures");
-						var dialog = new ChooseAssetDialog(texturesFolder, new[] { "dds", "png", "jpg", "gif", "bmp", "tga" });
-
-						dialog.Closed += (s, a) =>
-						{
-							if (!dialog.Result)
-							{
-								// "Cancel" or Escape
-								return;
-							}
-
-							// "Ok" or Enter
-							try
-							{
-								var path = dialog.FilePath;
-								var assetManager = AssetManager.CreateFileAssetManager(Path.GetDirectoryName(path));
-
-								var texture = assetManager.LoadTexture2D(DR.GraphicsDevice, path);
-
-								record.SetValue(obj, texture);
-								pathProperty.SetValue(obj, path);
-							}
-							catch (Exception ex)
-							{
-								var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
-								dialog.ShowModal(Desktop);
-							}
-						};
-
-						dialog.ShowModal(Desktop);
-					}
-					catch (Exception ex)
-					{
-						var dialog = Dialog.CreateMessageBox("Error", ex.Message);
-						dialog.ShowModal(Desktop);
-					}
-				};
-
-				result.Widgets.Add(button);
-
-				return result;
 			}
 
 			return null;

@@ -1,8 +1,6 @@
-﻿using DigitalRise.Data.Materials;
-using DigitalRise.Data.Meshes;
+﻿using DigitalRise.Data.Meshes;
 using DigitalRise.Vertices;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace DigitalRise

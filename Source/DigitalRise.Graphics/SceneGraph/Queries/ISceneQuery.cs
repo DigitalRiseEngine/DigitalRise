@@ -60,7 +60,6 @@ namespace DigitalRise.SceneGraph.Queries
 	/// {
 	///   public class MeshQuery : ISceneQuery
 	///   {
-	///     public SceneNode ReferenceNode { get; private set; }
 	///     public List<SceneNode> Meshes { get; private set; }
 	///
 	///     public MeshQuery()
@@ -74,10 +73,9 @@ namespace DigitalRise.SceneGraph.Queries
 	///       Meshes.Clear();
 	///     }
 	///
-	///     public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+	///     public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 	///     {
 	///       Reset();
-	///       ReferenceNode = referenceNode;
 	///
 	///       for (int i = 0; i < nodes.Count; i++)
 	///       {
@@ -128,7 +126,7 @@ namespace DigitalRise.SceneGraph.Queries
 	///       Nodes.Clear();
 	///     }
 	///
-	///     public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+	///     public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 	///     {
 	///       Reset();
 	///       ReferenceNode = referenceNode;
@@ -186,7 +184,7 @@ namespace DigitalRise.SceneGraph.Queries
 	///       Nodes.Clear();
 	///     }
 	///
-	///     public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+	///     public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 	///     {
 	///       Reset();
 	///       ReferenceNode = referenceNode;
@@ -245,19 +243,8 @@ namespace DigitalRise.SceneGraph.Queries
 	public interface ISceneQuery
 	{
 		/// <summary>
-		/// Gets the reference node.
-		/// </summary>
-		/// <value>The reference node.</value>
-		SceneNode ReferenceNode { get; }
-
-
-		/// <summary>
 		/// Resets this query.
 		/// </summary>
-		/// <remarks>
-		/// <see cref="ReferenceNode"/> is set to <see langword="null"/>, and any cached results are 
-		/// cleared.
-		/// </remarks>
 		void Reset();
 
 
@@ -273,7 +260,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// <remarks>
 		/// This method is called by the scene to store the result of the query.
 		/// </remarks>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords")]
-		void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context);
+		void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes);
 	}
 }

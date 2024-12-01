@@ -4,6 +4,7 @@ using DigitalRise.Rendering.Billboards;
 using DigitalRise.Rendering.Deferred;
 using DigitalRise.Rendering.Shadows;
 using DigitalRise.SceneGraph;
+using DigitalRise.SceneGraph.Queries;
 using DigitalRise.SceneGraph.Scenes;
 using DigitalRune.Rendering.Sky;
 using Microsoft.Xna.Framework;
@@ -34,6 +35,8 @@ namespace DigitalRise.Rendering
 
 			try
 			{
+				scene.Update(gameTime.ElapsedGameTime);
+
 				foreach (var updateable in scene.UpdateableNodes)
 				{
 					updateable.Update(gameTime);

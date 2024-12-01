@@ -448,6 +448,7 @@ namespace DigitalRise.Data.Modelling
 						offset += sz;
 					}
 
+
 					/*					var vertices = new VertexPositionNormalTexture[vertexCount.Value];
 										unsafe
 										{
@@ -587,6 +588,11 @@ namespace DigitalRise.Data.Modelling
 			{
 				for (var i = 0; i < _gltf.Skins.Length; ++i)
 				{
+					if (_gltf.Skins[i].InverseBindMatrices == null)
+					{
+						continue;
+					}
+
 					var skin = LoadSkin(i);
 					_skins.Add(skin);
 				}

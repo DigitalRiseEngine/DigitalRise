@@ -22,9 +22,6 @@ namespace DigitalRise.SceneGraph.Queries
 		#region Properties & Events
 		//--------------------------------------------------------------
 
-		/// <inheritdoc/>
-		public SceneNode ReferenceNode { get; private set; }
-
 
 		/// <summary>
 		/// Gets the ambient lights.
@@ -81,7 +78,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// <inheritdoc/>
 		public void Reset()
 		{
-			ReferenceNode = null;
 			AmbientLights.Clear();
 			DirectionalLights.Clear();
 			ImageBasedLights.Clear();
@@ -90,11 +86,9 @@ namespace DigitalRise.SceneGraph.Queries
 
 
 		/// <inheritdoc/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+		public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 		{
 			Reset();
-			ReferenceNode = referenceNode;
 
 			int numberOfNodes = nodes.Count;
 			for (int i = 0; i < numberOfNodes; i++)
@@ -152,7 +146,6 @@ namespace DigitalRise.SceneGraph.Queries
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		internal List<LightNode> GetLights<T>() where T : Light
 		{
 			Type type = typeof(T);

@@ -59,15 +59,11 @@ namespace DigitalRise.SceneGraph.Queries
 		#region Properties & Events
 		//--------------------------------------------------------------
 
-		/// <inheritdoc/>
-		public SceneNode ReferenceNode { get; private set; }
-
 
 		/// <summary>
 		/// Gets the ambient lights.
 		/// </summary>
 		/// <value>The ambient lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> AmbientLights { get; private set; }
 
 
@@ -75,7 +71,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// Gets the directional lights.
 		/// </summary>
 		/// <value>The directional lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> DirectionalLights { get; private set; }
 
 
@@ -83,7 +78,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// Gets the point lights.
 		/// </summary>
 		/// <value>The point lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> PointLights { get; private set; }
 
 
@@ -91,7 +85,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// Gets the spotlights.
 		/// </summary>
 		/// <value>The spotlights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> Spotlights { get; private set; }
 
 
@@ -99,7 +92,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// Gets the projector lights.
 		/// </summary>
 		/// <value>The projector lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> ProjectorLights { get; private set; }
 
 
@@ -107,7 +99,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// Gets the image-based lights.
 		/// </summary>
 		/// <value>The image-based lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> ImageBasedLights { get; private set; }
 
 
@@ -116,7 +107,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// (<see cref="AmbientLights"/>, <see cref="DirectionalLights"/>, etc.).
 		/// </summary>
 		/// <value>The other lights.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<LightNode> OtherLights { get; private set; }
 		#endregion
 
@@ -149,7 +139,6 @@ namespace DigitalRise.SceneGraph.Queries
 		/// <inheritdoc/>
 		public void Reset()
 		{
-			ReferenceNode = null;
 			_referencePosition = null;
 
 			DirectionalLights.Clear();
@@ -163,11 +152,9 @@ namespace DigitalRise.SceneGraph.Queries
 
 
 		/// <inheritdoc/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+		public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 		{
 			Reset();
-			ReferenceNode = referenceNode;
 
 			// We use the origin of the reference node as the reference position for determining
 			// the light contribution. Alternatively we could use the closest point in/on model AABB,
@@ -363,7 +350,6 @@ namespace DigitalRise.SceneGraph.Queries
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		internal List<LightNode> GetLights<T>() where T : Light
 		{
 			Type type = typeof(T);

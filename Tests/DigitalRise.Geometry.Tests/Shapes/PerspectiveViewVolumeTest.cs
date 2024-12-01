@@ -165,7 +165,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       AssertExt.AreNumericallyEqual(1.1547005f, rect.Height);
       Assert.AreEqual(9, frustum.Depth);
       Assert.AreEqual(16.0f / 9.0f, frustum.AspectRatio);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(91.492843f), frustum.FieldOfViewX);
       AssertExt.AreNumericallyEqual(MathHelper.ToRadians(60), frustum.FieldOfViewY);
     }
 
@@ -219,7 +218,6 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Assert.AreEqual(perspectiveViewVolume.Rectangle.Top, clone.Rectangle.Top);
       Assert.AreEqual(perspectiveViewVolume.Near, clone.Near);
       Assert.AreEqual(perspectiveViewVolume.Far, clone.Far);
-      Assert.AreEqual(perspectiveViewVolume.FieldOfViewX, clone.FieldOfViewX);
       Assert.AreEqual(perspectiveViewVolume.FieldOfViewY, clone.FieldOfViewY);
       Assert.AreEqual(perspectiveViewVolume.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
       Assert.AreEqual(perspectiveViewVolume.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);

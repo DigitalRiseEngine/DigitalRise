@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using DigitalRise.Mathematics;
 using DigitalRise.Misc;
-using DigitalRise.SceneGraph;
+using DigitalRise.Rendering;
 using DigitalRise.SceneGraph.LOD;
-using DigitalRise.SceneGraph.Queries;
 
-namespace DigitalRise.Rendering.Deferred
+namespace DigitalRise.SceneGraph.Queries
 {
 	// A scene query which sorts the queried nodes into lists as required by the
 	// DeferredGraphicsScreen.
@@ -18,8 +17,6 @@ namespace DigitalRise.Rendering.Deferred
 	//   "Samples\Graphics\DeferredRendering\10-LodSample\SceneQueryWithLodBlending.cs"
 	public class CustomSceneQuery : ISceneQuery
 	{
-		public SceneNode ReferenceNode { get; protected set; }
-
 		public List<SceneNode> DecalNodes { get; private set; }
 		public List<SceneNode> Lights { get; private set; }
 		public List<SceneNode> LensFlareNodes { get; private set; }
@@ -43,8 +40,6 @@ namespace DigitalRise.Rendering.Deferred
 
 		public void Reset()
 		{
-			ReferenceNode = null;
-
 			DecalNodes.Clear();
 			Lights.Clear();
 			LensFlareNodes.Clear();
@@ -54,10 +49,9 @@ namespace DigitalRise.Rendering.Deferred
 		}
 
 
-		public virtual void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+		public virtual void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 		{
 			Reset();
-			ReferenceNode = referenceNode;
 
 			if (context.LodCameraNode == null)
 			{
@@ -112,7 +106,7 @@ namespace DigitalRise.Rendering.Deferred
 		{
 			bool hasMaxDistance = Numeric.IsPositiveFinite(node.MaxDistance);
 			var lodGroupNode = node as LodGroupNode;
-			bool isLodGroupNode = (lodGroupNode != null);
+			bool isLodGroupNode = lodGroupNode != null;
 
 			float distance = 0;
 			if (hasMaxDistance || isLodGroupNode)

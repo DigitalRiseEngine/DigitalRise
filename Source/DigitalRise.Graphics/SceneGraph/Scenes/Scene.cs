@@ -115,7 +115,7 @@ namespace DigitalRise.SceneGraph.Scenes
 	/// <seealso cref="IScene"/>
 	/// <seealso cref="ISceneQuery"/>
 	/// <seealso cref="SceneNode"/>
-	public class Scene : SceneNode, IScene
+	public class Scene : SceneNode
 	{
 		// TODO: Add/remove AttachedSceneData when a node is added/removed and use a resource pool?
 
@@ -679,6 +679,7 @@ namespace DigitalRise.SceneGraph.Scenes
 				HandleShapeChange(sceneNode);
 			}
 
+			_queries.Clear();
 			_updateablesDirty = true;
 		}
 
@@ -856,18 +857,8 @@ namespace DigitalRise.SceneGraph.Scenes
 		/// that is used for scene queries (such as frustum culling) and may perform other
 		/// optimizations.
 		/// </remarks>
-		public void Update(TimeSpan deltaTime)
+		internal void Update(TimeSpan deltaTime)
 		{
-			// Clear bins.
-			foreach (var query in _queries)
-			{
-				var referenceNode = query.ReferenceNode;
-				if (referenceNode != null)
-					referenceNode.ClearFlag(SceneNodeFlags.IsDirtyScene);
-
-				query.Reset();
-			}
-
 			// Update collisions.
 			_collisionDomain.Update(deltaTime);
 		}
@@ -905,21 +896,6 @@ namespace DigitalRise.SceneGraph.Scenes
 			while (referenceNode.Proxy != null)
 				referenceNode = referenceNode.Proxy;
 
-			// Check if the node was modified since Scene.Update(). This can happen, for
-			// example, if a CameraNode is rotated to capture 6 sides of a cube map.
-			if (referenceNode.GetFlag(SceneNodeFlags.IsDirtyScene))
-			{
-				// Reset all queries that use this node.
-				int numberOfQueries = _queries.Count;
-				for (int i = 0; i < numberOfQueries; i++)
-				{
-					if (_queries[i].ReferenceNode == referenceNode)
-						_queries[i].Reset();
-				}
-
-				referenceNode.ClearFlag(SceneNodeFlags.IsDirtyScene);
-			}
-
 			try
 			{
 				// ----- Get query of type T.
@@ -932,14 +908,7 @@ namespace DigitalRise.SceneGraph.Scenes
 						break;
 				}
 
-				if (query != null)
-				{
-					// Query exists.
-					// Return cached result if the reference node is the same.
-					if (query.ReferenceNode == referenceNode)
-						return query;
-				}
-				else
+				if (query == null)
 				{
 					// Create new query.
 					query = new T();
@@ -951,7 +920,7 @@ namespace DigitalRise.SceneGraph.Scenes
 					// ----- Infinite shape queries.
 					// Return all scene nodes.
 					GetSceneNodes(this, referenceNode, _filter, _tempNodes);
-					query.Set(referenceNode, _tempNodes, context);
+					query.Set(context, referenceNode, _tempNodes);
 					return query;
 				}
 
@@ -1002,7 +971,7 @@ namespace DigitalRise.SceneGraph.Scenes
 					}
 				}
 
-				query.Set(referenceNode, _tempNodes, context);
+				query.Set(context, referenceNode, _tempNodes);
 				return query;
 			}
 			finally

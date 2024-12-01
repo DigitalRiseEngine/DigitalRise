@@ -156,7 +156,7 @@ namespace DigitalRise.Rendering
 		/// Gets or sets the scene.
 		/// </summary>
 		/// <value>The scene.</value>
-		public IScene Scene { get; set; }
+		public Scene Scene { get; set; }
 
 
 		/// <summary>

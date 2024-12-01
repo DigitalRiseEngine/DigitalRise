@@ -33,10 +33,6 @@ namespace DigitalRise.SceneGraph.Queries
 		#region Properties & Events
 		//--------------------------------------------------------------
 
-		/// <inheritdoc/>
-		public SceneNode ReferenceNode { get; private set; }
-
-
 		/// <summary>
 		/// Gets the scene nodes that touch the <see cref="ReferenceNode"/>.
 		/// </summary>
@@ -66,16 +62,14 @@ namespace DigitalRise.SceneGraph.Queries
 		/// <inheritdoc/>
 		public void Reset()
 		{
-			ReferenceNode = null;
 			SceneNodes.Clear();
 		}
 
 
 		/// <inheritdoc/>
-		public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+		public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 		{
 			Reset();
-			ReferenceNode = referenceNode;
 
 			int numberOfNodes = nodes.Count;
 			for (int i = 0; i < numberOfNodes; i++)

@@ -53,15 +53,11 @@ namespace DigitalRise.SceneGraph.Queries
 		#region Properties & Events
 		//--------------------------------------------------------------
 
-		/// <inheritdoc/>
-		public SceneNode ReferenceNode { get; private set; }
-
 
 		/// <summary>
 		/// Gets the scene nodes that cast shadows.
 		/// </summary>
 		/// <value>The scene nodes that cast shadows.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists", Justification = "Performance")]
 		public List<SceneNode> ShadowCasters { get; private set; }
 		#endregion
 
@@ -87,16 +83,13 @@ namespace DigitalRise.SceneGraph.Queries
 		/// <inheritdoc/>
 		public void Reset()
 		{
-			ReferenceNode = null;
 			ShadowCasters.Clear();
 		}
 
 
 		/// <inheritdoc/>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		public void Set(SceneNode referenceNode, IList<SceneNode> nodes, RenderContext context)
+		public void Set(RenderContext context, SceneNode referenceNode, IList<SceneNode> nodes)
 		{
-			ReferenceNode = referenceNode;
 			ShadowCasters.Clear();
 
 			// Check if the light is the directional light. If yes, we will check the 

@@ -168,7 +168,7 @@ namespace DigitalRise.Editor.UI
 			_topSplitPane.SetSplitterPosition(0, 0.2f);
 			_topSplitPane.SetSplitterPosition(1, 0.6f);
 
-			_menuItemNew.Selected += (s, a) => NewScene();
+			_menuItemNew.Selected += (s, a) => OnNewPrefab();
 
 			_menuItemOpenSolution.Selected += (s, a) =>
 			{
@@ -440,6 +440,8 @@ namespace DigitalRise.Editor.UI
 
 			_tabControlScenes.Items.Add(tabItem);
 			_tabControlScenes.SelectedIndex = _tabControlScenes.Items.Count - 1;
+
+			SelectNodeByTag(node);
 		}
 
 		private void OpenCurrentSolutionItem()
@@ -625,7 +627,7 @@ namespace DigitalRise.Editor.UI
 			Desktop.BuildContextMenu(contextMenuOptions);
 		}
 
-		private void NewScene()
+		private void OnNewPrefab()
 		{
 			var dialog = new ChooseNodeDialog();
 
@@ -796,6 +798,11 @@ namespace DigitalRise.Editor.UI
 			return newNode;
 		}
 
+		private void SelectNodeByTag(object obj)
+		{
+			_treeFileExplorer.SelectedNode = _treeFileExplorer.FindNode(n => n.Tag == obj);
+		}
+
 		private void RefreshExplorer(SceneNode selectedNode)
 		{
 			_treeFileExplorer.RemoveAllSubNodes();
@@ -808,7 +815,7 @@ namespace DigitalRise.Editor.UI
 
 			var sceneWidget = _tabControlScenes.Items[_tabControlScenes.SelectedIndex.Value].Content.FindChild<SceneWidget>();
 			RecursiveAddToExplorer(_treeFileExplorer, sceneWidget.SceneNode);
-			_treeFileExplorer.SelectedNode = _treeFileExplorer.FindNode(n => n.Tag == selectedNode);
+			SelectNodeByTag(selectedNode);
 		}
 
 		public void RefreshLibrary()

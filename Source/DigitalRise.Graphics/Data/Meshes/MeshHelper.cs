@@ -37,6 +37,50 @@ namespace DigitalRise.Data.Meshes
 			return new ReadOnlyCollection<string>(mesh.GetMorphTargetNames());
 		}
 
+		/// <overloads>
+		/// <summary>
+		/// Creates a submesh to draw a triangle mesh.
+		/// </summary>
+		/// </overloads>
+		///
+		/// <summary>
+		/// Creates a submesh to draw a triangle mesh.
+		/// </summary>
+		/// <param name="graphicsDevice">The graphics device.</param>
+		/// <param name="mesh">The mesh.</param>
+		/// <param name="angleLimit">
+		/// The angle limit for normal vectors in radians. Normals are only merged if the angle between
+		/// the triangle normals is equal to or less than the angle limit. Set this value to -1 to
+		/// disable the angle limit (all normals of one vertex are merged). 
+		/// </param>
+		/// <returns>The submesh, or <see langword="null"/> if the mesh is empty.</returns>
+		/// <remarks>
+		/// The returned submesh will contain a triangle list that represents the given mesh. Each 
+		/// vertex contains the position and the normal vector (no texture coordinates, no vertex 
+		/// colors, etc.). The submesh will not use an index buffer.
+		/// </remarks>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="graphicsDevice"/> or <paramref name="mesh"/> is <see langword="null"/>.
+		/// </exception>
+		public static Submesh CreateSubmesh(GraphicsDevice graphicsDevice, TriangleMesh mesh, float angleLimit)
+		{
+			VertexBuffer vertexBuffer;
+			PrimitiveType primitiveType;
+			int primitiveCount;
+			CreateVertexBuffer(graphicsDevice, mesh, angleLimit, out vertexBuffer, out primitiveType, out primitiveCount);
+
+			if (vertexBuffer == null)
+				return null;
+
+			return new Submesh
+			{
+				PrimitiveType = PrimitiveType.TriangleList,
+				PrimitiveCount = primitiveCount,
+				VertexBuffer = vertexBuffer,
+				VertexCount = vertexBuffer.VertexCount
+			};
+		}
+
 
 		/// <summary>
 		/// Creates a submesh to draw a triangle mesh.

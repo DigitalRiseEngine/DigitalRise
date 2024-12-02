@@ -168,9 +168,15 @@ namespace DigitalRise.Utility
 			CameraNode.LastPoseWorld = CameraNode.PoseWorld;
 
 			// Set the new camera pose.
-			CameraNode.PoseWorld = new Pose(
-				CameraNode.PoseWorld.Position + translation,
-				orientation);
+			CameraNode.RotationLocal = new Vector3(MathHelper.ToDegrees(_currentPitch),
+				MathHelper.ToDegrees(_currentYaw),
+				0);
+
+			var pose = CameraNode.PoseWorld;
+
+			pose.Position += translation;
+
+			CameraNode.PoseWorld = pose;
 		}
 	}
 }

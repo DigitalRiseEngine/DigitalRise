@@ -295,15 +295,16 @@ namespace DigitalRise.Editor.UI
 			var pathProperty = obj.GetType().GetProperty(record.Name + "Path");
 			var texturePath = (string)pathProperty.GetValue(obj);
 
-			var path = new TextBox
+			var textBoxPath = new TextBox
 			{
 				Readonly = true,
 				HorizontalAlignment = HorizontalAlignment.Stretch,
+				MaxWidth = 200,
 				Text = texturePath
 			};
 
-			StackPanel.SetProportionType(path, ProportionType.Fill);
-			result.Widgets.Add(path);
+			StackPanel.SetProportionType(textBoxPath, ProportionType.Fill);
+			result.Widgets.Add(textBoxPath);
 
 			var button = new Button
 			{
@@ -342,6 +343,7 @@ namespace DigitalRise.Editor.UI
 
 							record.SetValue(obj, value);
 							pathProperty.SetValue(obj, path);
+							textBoxPath.Text = path;
 						}
 						catch (Exception ex)
 						{
@@ -552,7 +554,6 @@ namespace DigitalRise.Editor.UI
 
 						var node = new DrModelNode
 						{
-							Name = dialog.SelectedId,
 							ModelPath = dialog.FilePath
 						};
 

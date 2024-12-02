@@ -1,3 +1,4 @@
+using DigitalRise.Editor.Utility;
 using Myra.Graphics2D.UI;
 using System;
 using System.Collections.Generic;
@@ -7,18 +8,20 @@ namespace DigitalRise.Editor.UI
 {
 	public partial class ChooseAssetDialog
 	{
-		public string SelectedId => _textName.Text;
+		private readonly List<string> _files = new List<string>();
+
+		private string AssetFolder { get; }
 
 		public string FilePath
 		{
 			get
 			{
-				if (_comboModels.SelectedItem == null)
+				if (_listAssets.SelectedItem == null)
 				{
 					return null;
 				}
 
-				return (string)_comboModels.SelectedItem.Tag;
+				return (string)_listAssets.SelectedItem.Tag;
 			}
 		}
 
@@ -31,9 +34,9 @@ namespace DigitalRise.Editor.UI
 				throw new Exception($"Could not find folder {assetFolder} that is supposed to have project's assets.");
 			}
 
-			var allFiles = Directory.GetFiles(assetFolder, "*.*", SearchOption.AllDirectories);
+			AssetFolder = assetFolder;
 
-			var models = new List<string>();
+			var allFiles = Directory.GetFiles(assetFolder, "*.*", SearchOption.AllDirectories);
 
 			foreach (var f in allFiles)
 			{
@@ -41,38 +44,52 @@ namespace DigitalRise.Editor.UI
 				{
 					if (f.EndsWith("." + ae, StringComparison.OrdinalIgnoreCase))
 					{
-						models.Add(f); 
+						_files.Add(f);
 						break;
 					}
 				}
 			}
 
-			if (models.Count == 0)
+			if (_files.Count == 0)
 			{
 				var ext = string.Join('/', assetExtensions);
 				throw new Exception($"Folder {assetFolder} contains no asset({ext}) files.");
 			}
 
-			_comboModels.Widgets.Clear();
-			foreach (var model in models)
+			_listAssets.SelectedIndexChanged += (s, a) => UpdateEnabled();
+			_textFilter.TextChanged += (s, a) => UpdateList();
+
+			UpdateList();
+		}
+
+		private void UpdateList()
+		{
+			_listAssets.Widgets.Clear();
+			foreach (var model in _files)
 			{
+				var path = PathUtils.TryToMakePathRelativeTo(model, AssetFolder);
+
+				if (!string.IsNullOrEmpty(_textFilter.Text) &&
+					!path.Contains(_textFilter.Text, StringComparison.InvariantCultureIgnoreCase))
+				{
+					continue;
+				}
+
 				var label = new Label
 				{
-					Text = Path.GetFileName(model),
+					Text = path,
 					Tag = model
 				};
 
-				_comboModels.Widgets.Add(label);
+				_listAssets.Widgets.Add(label);
 			}
-
-			_comboModels.SelectedIndexChanged += (s, a) => UpdateEnabled();
 
 			UpdateEnabled();
 		}
 
-		public void UpdateEnabled()
+		private void UpdateEnabled()
 		{
-			ButtonOk.Enabled = _comboModels.SelectedIndex != null;
+			ButtonOk.Enabled = _listAssets.SelectedIndex != null;
 		}
 	}
 }

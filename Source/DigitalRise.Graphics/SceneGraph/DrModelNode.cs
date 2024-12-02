@@ -1,6 +1,7 @@
 ﻿using AssetManagementBase;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Modelling;
+using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Rendering.Deferred;
@@ -77,7 +78,7 @@ namespace DigitalRise.SceneGraph
 
 					ResetTransforms();
 
-					Shape = BoxShape.FromBoundingBox(CalculateBoundingBox());
+					Shape = CalculateBoundingBox().CreateShape();
 				} else
 				{
 					Shape = Shape.Empty;

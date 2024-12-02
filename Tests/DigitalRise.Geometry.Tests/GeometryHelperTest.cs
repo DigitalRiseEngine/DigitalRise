@@ -137,7 +137,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
           numberOfBoxes++;
         if (shape is SphereShape)
           numberOfSpheres++;
-        if (((TransformedShape)shape).Child.Shape is BoxShape)
+        if (((TransformedShape)shape).Shape is BoxShape)
           numberOfBoxes++;
         else
           numberOfSpheres++;

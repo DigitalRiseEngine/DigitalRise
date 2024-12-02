@@ -192,9 +192,9 @@ namespace DigitalRise.SceneGraph
 
 
 				_rotationLocal = value;
-				_poseLocal.Orientation = Matrix33F.CreateRotationX(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.X)) *
-					Matrix33F.CreateRotationY(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.Y)) *
-					Matrix33F.CreateRotationZ(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.Z));
+				_poseLocal.Orientation = Matrix33F.CreateRotationZ(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.Z)) *
+										Matrix33F.CreateRotationY(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.Y)) *
+										Matrix33F.CreateRotationX(Microsoft.Xna.Framework.MathHelper.ToRadians(_rotationLocal.X));
 				Invalidate();
 			}
 		}

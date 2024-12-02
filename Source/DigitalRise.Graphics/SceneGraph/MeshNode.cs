@@ -4,6 +4,7 @@
 
 using DigitalRise.Data.Meshes;
 using DigitalRise.Data.Meshes.Morphing;
+using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using Newtonsoft.Json;
 using System;
@@ -82,7 +83,7 @@ namespace DigitalRise.SceneGraph
 				}
 				else
 				{
-					Shape = BoxShape.FromBoundingBox(value.BoundingBox);
+					Shape = value.BoundingBox.CreateShape();
 				}
 
 				// Invalidate OccluderData.

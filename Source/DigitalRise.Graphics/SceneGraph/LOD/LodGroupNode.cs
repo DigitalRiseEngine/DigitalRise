@@ -293,7 +293,6 @@ namespace DigitalRise.SceneGraph.LOD
 
 			// Get existing shape objects to avoid unnecessary memory allocation.
 			BoxShape boxShape;
-			GeometricObject geometricObject = null;
 			TransformedShape transformedShape = null;
 			if (Shape is BoxShape)
 			{
@@ -302,8 +301,7 @@ namespace DigitalRise.SceneGraph.LOD
 			else if (Shape is TransformedShape)
 			{
 				transformedShape = (TransformedShape)Shape;
-				geometricObject = (GeometricObject)transformedShape.Child;
-				boxShape = (BoxShape)geometricObject.Shape;
+				boxShape = (BoxShape)transformedShape.Shape;
 			}
 			else
 			{
@@ -322,13 +320,12 @@ namespace DigitalRise.SceneGraph.LOD
 			// Apply offset to bounding box.
 			if (transformedShape == null)
 			{
-				geometricObject = new GeometricObject(boxShape, new Pose(unscaledCenter));
-				transformedShape = new TransformedShape(geometricObject);
+				transformedShape = new TransformedShape(boxShape, new Pose(unscaledCenter));
 			}
 			else
 			{
-				geometricObject.Shape = boxShape;
-				geometricObject.Pose = new Pose(unscaledCenter);
+				transformedShape.Shape = boxShape;
+				transformedShape.Pose = new Pose(unscaledCenter);
 			}
 
 			return transformedShape;

@@ -89,8 +89,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       // (Note: The scaling is either uniform or the transformed object has no local rotation.
       // Therefore, we only need to apply the scale of the parent to the scale and translation of 
       // the child. We can ignore the rotation.)
-      IGeometricObject childGeometricObject = transformedShape.Child;
-      Pose childPose = childGeometricObject.Pose;
+      Pose childPose = transformedShape.Pose;
 
       // Non-uniform scaling is not supported for rotated child objects.
       if ((scaleB.X != scaleB.Y || scaleB.Y != scaleB.Z) && childPose.HasRotation)
@@ -99,8 +98,8 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       childPose.Position *= scaleB;                       // Apply scaling to local translation.
       
       var testGeometricObjectB = TestGeometricObject.Create();
-      testGeometricObjectB.Shape = childGeometricObject.Shape;
-      testGeometricObjectB.Scale = scaleB * childGeometricObject.Scale;  // Apply scaling to local scale.
+      testGeometricObjectB.Shape = transformedShape.Shape;
+      testGeometricObjectB.Scale = scaleB * transformedShape.Scale;  // Apply scaling to local scale.
       testGeometricObjectB.Pose = poseB * childPose;
 
       var testCollisionObjectB = ResourcePools.TestCollisionObjects.Obtain();
@@ -203,13 +202,12 @@ namespace DigitalRise.Geometry.Collisions.Algorithms
       // (Note: The scaling is either uniform or the transformed object has no local rotation.
       // Therefore, we only need to apply the scale of the parent to the scale and translation of 
       // the child. We can ignore the rotation.)
-      IGeometricObject childGeometricObject = transformedShape.Child;
-      Pose childPose = childGeometricObject.Pose;
+      Pose childPose = transformedShape.Pose;
       childPose.Position *= scaleB;                       // Apply scaling to local translation.
 
       var testGeometricObjectB = TestGeometricObject.Create();
-      testGeometricObjectB.Shape = childGeometricObject.Shape;
-      testGeometricObjectB.Scale = scaleB * childGeometricObject.Scale;    // Apply scaling to local scale.
+      testGeometricObjectB.Shape = transformedShape.Shape;
+      testGeometricObjectB.Scale = scaleB * transformedShape.Scale;    // Apply scaling to local scale.
       testGeometricObjectB.Pose = poseB * childPose;
 
       var testCollisionObjectB = ResourcePools.TestCollisionObjects.Obtain();

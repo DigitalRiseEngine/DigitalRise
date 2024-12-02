@@ -209,14 +209,9 @@ namespace DigitalRise.Geometry.Tests.Shapes
     [Test]
     public void TransformedShapeTest()
     {
-      var c = new TransformedShape();
-
-      Assert.AreEqual(0, c.GetVolume(0.1f, 10));
-
-      c.Child = new GeometricObject(
-          new BoxShape(1, 2, 3),
-          new Vector3(10, 10, 10),
-          new Pose(new Vector3(1, 2, 3), RandomHelper.Random.NextQuaternion()));
+      var c = new TransformedShape(new BoxShape(1, 2, 3),
+		  new Pose(new Vector3(1, 2, 3), RandomHelper.Random.NextQuaternion()),
+		  new Vector3(10, 10, 10));
 
       var v0 = c.GetVolume(0.001f, 10);
 

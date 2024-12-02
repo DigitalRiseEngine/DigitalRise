@@ -112,12 +112,12 @@ namespace DigitalRise.Misc
 				}
 
 				var transformedShape = shape as TransformedShape;
-				boxShape = (transformedShape != null) ? transformedShape.Child.Shape as BoxShape : null;
+				boxShape = (transformedShape != null) ? transformedShape.Shape as BoxShape : null;
 				if (boxShape != null)
 				{
 					mtd.Submesh = InternalPrimitives.UntexturedBox;
-					mtd.Matrix = transformedShape.Child.Pose
-							 * Matrix44F.CreateScale(transformedShape.Child.Scale * boxShape.Extent);
+					mtd.Matrix = transformedShape.Pose
+							 * Matrix44F.CreateScale(transformedShape.Scale * boxShape.Extent);
 					break;
 				}
 

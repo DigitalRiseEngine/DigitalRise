@@ -501,11 +501,6 @@ namespace DigitalRise.Geometry.Shapes
 			return String.Format(CultureInfo.InvariantCulture, "BoxShape {{ WidthX = {0}, WidthY = {1}, WidthZ = {2} }}", _widthX, _widthY, _widthZ);
 		}
 
-		public static BoxShape FromBoundingBox(BoundingBox box)
-		{
-			return new BoxShape(box.Extent());
-		}
-
 		#endregion
 	}
 }

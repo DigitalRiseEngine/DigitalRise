@@ -79,21 +79,21 @@ namespace DigitalRise.Geometry
         if (center.IsNumericallyZero())
           return sphere;
 
-        return new TransformedShape(new GeometricObject(sphere, new Pose(center)));
+        return new TransformedShape(sphere, new Pose(center));
       }
       else if (capsuleVolume < boxVolume)
       {
         if (!capsulePose.HasTranslation && !capsulePose.HasRotation)
           return capsule;
 
-        return new TransformedShape(new GeometricObject(capsule, capsulePose));
+        return new TransformedShape(capsule, capsulePose);
       }
       else
       {
         if (!boxPose.HasTranslation && !boxPose.HasRotation)
           return box;
 
-        return new TransformedShape(new GeometricObject(box, boxPose));
+        return new TransformedShape(box, boxPose);
       }
     }
 
@@ -432,5 +432,18 @@ namespace DigitalRise.Geometry
 			return box.Transform(ref matrix);
 		}
 
+        public static Shape CreateShape(this BoundingBox box)
+        {
+            var boxShape = new BoxShape(box.Extent());
+
+            var pose = Pose.Identity;
+
+            var pos = new Vector3(boxShape.WidthX / 2 + box.Min.X,
+                boxShape.WidthY / 2 + box.Min.Y,
+                boxShape.WidthZ / 2 + box.Min.Z);
+            pose.Position = pos;
+
+            return new TransformedShape(boxShape, pose);
+        }
 	}
 }

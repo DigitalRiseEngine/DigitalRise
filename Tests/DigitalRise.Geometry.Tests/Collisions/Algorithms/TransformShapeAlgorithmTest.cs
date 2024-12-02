@@ -33,14 +33,7 @@ namespace DigitalRise.Geometry.Collisions.Algorithms.Tests
         GeometricObject = new GeometricObject
         {
           Pose = Pose.Identity,
-          Shape = new TransformedShape
-          {
-            Child = new GeometricObject
-             {
-                Pose = new Pose(new Vector3(1, 2, 0)),
-                Shape = new SphereShape(1),
-             },
-          },
+          Shape = new TransformedShape(new SphereShape(1), new Pose(new Vector3(1, 2, 0)))
         },
       };
 

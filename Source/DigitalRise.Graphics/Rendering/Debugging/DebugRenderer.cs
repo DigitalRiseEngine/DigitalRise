@@ -1982,13 +1982,13 @@ namespace DigitalRise.Rendering.Debugging
 				// a sphere or a box, then we do not want to draw the triangle mesh.)
 				// Combining transformation this way only works for uniform scaling or when the child
 				// is not rotated!
-				Pose childPose = transformed.Child.Pose;
+				Pose childPose = transformed.Pose;
 				if (Numeric.AreEqual(scale.X, scale.Y) && Numeric.AreEqual(scale.Y, scale.Z) || !childPose.HasRotation)
 				{
-					Vector3 childScale = transformed.Child.Scale;
+					Vector3 childScale = transformed.Scale;
 					childPose.Position *= scale;
 
-					DrawShape(transformed.Child.Shape, pose * childPose, scale * childScale, color, drawWireFrame, drawOverScene);
+					DrawShape(transformed.Shape, pose * childPose, scale * childScale, color, drawWireFrame, drawOverScene);
 					return;
 				}
 			}

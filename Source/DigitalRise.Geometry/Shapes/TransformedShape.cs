@@ -26,68 +26,109 @@ namespace DigitalRise.Geometry.Shapes
   [Serializable]
   public class TransformedShape : Shape
   {
-    //--------------------------------------------------------------
-    #region Fields
-    //--------------------------------------------------------------
-    #endregion
+		//--------------------------------------------------------------
+		#region Properties
+		//--------------------------------------------------------------
+
+		/// <summary>
+		/// Gets or sets the shape.
+		/// </summary>
+		/// <inheritdoc/>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="value"/> is <see langword="null"/>.
+		/// </exception>
+		public Shape Shape
+		{
+			get { return _shape; }
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException("value");
+
+				if (_shape != null)
+				{
+					_shape.Changed -= OnShapeChanged;
+				}
+
+				_shape = value;
+
+				_shape.Changed += OnShapeChanged;
+				OnChanged(ShapeChangedEventArgs.Empty);
+			}
+		}
+		private Shape _shape;
+
+		/// <summary>
+		/// Gets or sets the pose (position and orientation).
+		/// </summary>
+		/// <inheritdoc/>
+		public Pose Pose
+		{
+			get { return _pose; }
+			set
+			{
+				if (_pose != value)
+				{
+					_pose = value;
+					OnPoseChanged();
+				}
+			}
+		}
+		private Pose _pose;
 
 
-    //--------------------------------------------------------------
-    #region Properties
-    //--------------------------------------------------------------
-
-    /// <summary>
-    /// Gets or sets the child <see cref="IGeometricObject"/>.
-    /// </summary>
-    /// <value>
-    /// The child <see cref="IGeometricObject"/>. Must not be <see langword="null"/>.
-    /// </value>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="value"/> is <see langword="null"/>.
-    /// </exception>
-    public IGeometricObject Child
-    {
-      get { return _child; }
-      set
-      {
-        if (value == null)
-          throw new ArgumentNullException("value");
-
-        if (_child != value)
-        {
-          // Unregister event handlers from old GeometricObject.
-          _child.PoseChanged -= OnChildPoseChanged;
-          _child.ShapeChanged -= OnChildShapeChanged;
-
-          // Set new GeometricObject.
-          _child = value;
-
-          // Register event handlers for new GeometricObject.
-          _child.PoseChanged += OnChildPoseChanged;
-          _child.ShapeChanged += OnChildShapeChanged;
-
-          OnChanged(ShapeChangedEventArgs.Empty);
-        }
-      }
-    }
-    private IGeometricObject _child;
+		/// <summary>
+		/// Gets or sets the scale.
+		/// </summary>
+		/// <value>
+		/// The scale factors for the dimensions x, y and z. The default value is (1, 1, 1), which means
+		/// "no scaling".
+		/// </value>
+		/// <remarks>
+		/// <para>
+		/// This value is a scale factor that scales the <see cref="Shape"/> of this geometric object.
+		/// The scale can even be negative to mirror an object.
+		/// </para>
+		/// <para>
+		/// Changing this value does not actually change any values in the <see cref="Shape"/> instance.
+		/// Collision algorithms and anyone who uses this geometric object must use the shape and apply
+		/// the scale factor as appropriate. The scale is automatically applied in the property
+		/// <see cref="BoundingBox"/>.
+		/// </para>
+		/// <para>
+		/// Changing this property raises the <see cref="ShapeChanged"/> event.
+		/// </para>
+		/// </remarks>
+		public Vector3 Scale
+		{
+			get { return _scale; }
+			set
+			{
+				if (_scale != value)
+				{
+					_scale = value;
+					OnShapeChanged(this, ShapeChangedEventArgs.Empty);
+				}
+			}
+		}
+		private Vector3 _scale;
 
 
-    /// <summary>
-    /// Gets an inner point.
-    /// </summary>
-    /// <value>An inner point.</value>
-    /// <remarks>
-    /// This point is a "deep" inner point of the shape (in local space).
-    /// </remarks>
-    public override Vector3 InnerPoint
+		/// <summary>
+		/// Gets an inner point.
+		/// </summary>
+		/// <value>An inner point.</value>
+		/// <remarks>
+		/// This point is a "deep" inner point of the shape (in local space).
+		/// </remarks>
+		public override Vector3 InnerPoint
     {
       get
       {
-        Debug.Assert(_child != null, "GeometricObject must not be null.");
+        Debug.Assert(Shape != null, "GeometricObject must not be null.");
 
         // Return the inner point of the child.
-        return _child.Pose.ToWorldPosition(_child.Shape.InnerPoint * _child.Scale);
+        return Pose.ToWorldPosition(Shape.InnerPoint * Scale);
       }
     }
     #endregion
@@ -110,11 +151,8 @@ namespace DigitalRise.Geometry.Shapes
     /// <see cref="Child"/> is initialized with a <see cref="Child"/>
     /// with an <see cref="EmptyShape"/>.
     /// </remarks>
-    public TransformedShape()
+    public TransformedShape(): this(Shape.Empty, Pose.Identity, Vector3.One)
     {
-      _child = new GeometricObject(Empty);
-      _child.PoseChanged += OnChildPoseChanged;
-      _child.ShapeChanged += OnChildShapeChanged;
     }
 
 
@@ -122,33 +160,45 @@ namespace DigitalRise.Geometry.Shapes
     /// Initializes a new instance of the <see cref="TransformedShape"/> class from the given 
     /// geometric object.
     /// </summary>
-    /// <param name="child">The geometric object (pose + shape).</param>
+    /// <param name="shape">The geometric object (pose + shape).</param>
+    /// <param name="pose"></param>
+    /// <param name="scale"></param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="child"/> is <see langword="null"/>.
+    /// <paramref name="shape"/> is <see langword="null"/>.
     /// </exception>
-    public TransformedShape(IGeometricObject child)
+    public TransformedShape(Shape shape, Pose pose, Vector3 scale)
     {
-      if (child == null)
-        throw new ArgumentNullException("child");
-
-      _child = child;
-      _child.PoseChanged += OnChildPoseChanged;
-      _child.ShapeChanged += OnChildShapeChanged;
+      Shape = shape;
+            Pose = pose;
+            Scale = scale;
     }
-    #endregion
+
+        public TransformedShape(Shape shape, Pose pose): this(shape, pose, Vector3.One)
+        {
+        }
+
+		public TransformedShape(Shape shape, Vector3 scale) : this(shape, Pose.Identity, scale)
+		{
+		}
 
 
-    //--------------------------------------------------------------
-    #region Methods
-    //--------------------------------------------------------------
+		public TransformedShape(Shape shape) : this(shape, Pose.Identity, Vector3.One)
+		{
+		}
+		#endregion
 
-    #region ----- Cloning -----
 
-    /// <inheritdoc/>
-    protected override Shape CreateInstanceCore()
+		//--------------------------------------------------------------
+		#region Methods
+		//--------------------------------------------------------------
+
+		#region ----- Cloning -----
+
+		/// <inheritdoc/>
+		protected override Shape CreateInstanceCore()
     {
-      var clone = Child.Clone();
-      return new TransformedShape(clone);
+      var clone = Shape.Clone();
+      return new TransformedShape(clone, Pose, Scale);
     }
 
 
@@ -174,14 +224,14 @@ namespace DigitalRise.Geometry.Shapes
       {
         // Uniform scaling:
         // Transform the shape to world space and return its AABB.
-        var childPose = new Pose(_child.Pose.Position * scale.X, _child.Pose.Orientation);
-        return _child.Shape.GetBoundingBox(scale.X * _child.Scale, pose * childPose);
+        var childPose = new Pose(Pose.Position * scale.X, Pose.Orientation);
+        return Shape.GetBoundingBox(scale.X * Scale, pose * childPose);
       }
       else
       {
         // Non-uniform scaling:
         // Get AABB of child, transform the box to world space and return its AABB.
-        return _child.BoundingBox.GetBoundingBox(scale, pose);
+        return Shape.GetBoundingBox(Scale, Pose).GetBoundingBox(scale, pose);
 
         // Possible improvement: We can check if child.Pose.Orientation contains no orientation.
         // Then we compute a tighter AABB like in the uniform case.
@@ -192,19 +242,15 @@ namespace DigitalRise.Geometry.Shapes
     /// <inheritdoc/>
     public override float GetVolume(float relativeError, int iterationLimit)
     {
-      Vector3 scale = MathHelper.Absolute(Child.Scale);
-      return Child.Shape.GetVolume(relativeError, iterationLimit) * scale.X * scale.Y * scale.Z;
+      Vector3 scale = MathHelper.Absolute(Scale);
+      return Shape.GetVolume(relativeError, iterationLimit) * scale.X * scale.Y * scale.Z;
     }
 
 
     /// <summary>
     /// Called when the shape of a child geometric object was changed.
     /// </summary>
-    /// <param name="sender">The sender.</param>
-    /// <param name="eventArgs">
-    /// The <see cref="EventArgs"/> instance containing the event data.
-    /// </param>
-    private void OnChildPoseChanged(object sender, EventArgs eventArgs)
+    private void OnPoseChanged()
     {
       OnChanged(ShapeChangedEventArgs.Empty);
     }
@@ -213,11 +259,10 @@ namespace DigitalRise.Geometry.Shapes
     /// <summary>
     /// Called when the shape of a child geometric object was changed.
     /// </summary>
-    /// <param name="sender">The sender.</param>
     /// <param name="eventArgs">
     /// The <see cref="ShapeChangedEventArgs"/> instance containing the event data.
     /// </param>
-    private void OnChildShapeChanged(object sender, ShapeChangedEventArgs eventArgs)
+    private void OnShapeChanged(object sender, ShapeChangedEventArgs eventArgs)
     {
       OnChanged(eventArgs);
     }
@@ -239,10 +284,10 @@ namespace DigitalRise.Geometry.Shapes
                                 : Numeric.EpsilonF;
 
       // Get child mesh.
-      TriangleMesh mesh = _child.Shape.GetMesh(relativeThreshold, iterationLimit);
+      TriangleMesh mesh = Shape.GetMesh(relativeThreshold, iterationLimit);
 
       // Transform child mesh into local space of this parent shape.
-      mesh.Transform(_child.Pose.ToMatrix44F() * Matrix44F.CreateScale(_child.Scale));
+      mesh.Transform(Pose.ToMatrix44F() * Matrix44F.CreateScale(Scale));
       return mesh;
     }
     #endregion

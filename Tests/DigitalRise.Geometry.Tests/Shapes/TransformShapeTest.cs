@@ -11,7 +11,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		[Test]
 		public void Constructor()
 		{
-			Assert.AreNotEqual(null, new TransformedShape().Child);
+			Assert.AreNotEqual(null, new TransformedShape().Shape);
 			Assert.AreEqual(Vector3.Zero, new TransformedShape().InnerPoint);
 		}
 
@@ -21,14 +21,14 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		public void GeometryException()
 		{
 			TransformedShape t = new TransformedShape();
-			t.Child = null;
+			t.Shape = null;
 		}
 
 
 		[Test]
 		public void InnerPoint()
 		{
-			Assert.AreEqual(Pose.Identity, new TransformedShape().Child.Pose);
+			Assert.AreEqual(Pose.Identity, new TransformedShape().Pose);
 
 			Assert.AreEqual(new Vector3(0, 0, 0), new CompositeShape().InnerPoint);
 		}
@@ -37,14 +37,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		[Test]
 		public void InnerPoint2()
 		{
-			TransformedShape t = new TransformedShape
-			{
-				Child = new GeometricObject
-				{
-					Pose = new Pose(new Vector3(0, 1, 0)),
-					Shape = new PointShape(1, 0, 0),
-				},
-			};
+			TransformedShape t = new TransformedShape(new PointShape(1, 0, 0), new Pose(new Vector3(0, 1, 0)));
 
 			Assert.AreEqual(new Vector3(1, 1, 0), t.InnerPoint);
 		}
@@ -56,14 +49,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
 			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetBoundingBox(Pose.Identity).Min);
 			Assert.AreEqual(new Vector3(0, 0, 0), new TransformedShape().GetBoundingBox(Pose.Identity).Max);
 
-			TransformedShape t = new TransformedShape
-			{
-				Child = new GeometricObject
-				{
-					Pose = new Pose(new Vector3(0, 1, 0)),
-					Shape = new SphereShape(10),
-				},
-			};
+			TransformedShape t = new TransformedShape(new SphereShape(10), new Pose(new Vector3(0, 1, 0)));
 
 			Assert.AreEqual(new Vector3(-10, -9, -10), t.GetBoundingBox(Pose.Identity).Min);
 			Assert.AreEqual(new Vector3(10, 11, 10), t.GetBoundingBox(Pose.Identity).Max);
@@ -82,33 +68,33 @@ namespace DigitalRise.Geometry.Shapes.Tests
 
 			Assert.IsFalse(_propertyChanged);
 
-			((GeometricObject)t.Child).Shape = new SphereShape(1);
+			t.Shape = new SphereShape(1);
 			Assert.IsTrue(_propertyChanged);
 			_propertyChanged = false;
 
-			((SphereShape)t.Child.Shape).Radius = 3;
+			((SphereShape)t.Shape).Radius = 3;
 			Assert.IsTrue(_propertyChanged);
 			_propertyChanged = false;
 
-			((GeometricObject)t.Child).Pose = new Pose(new Vector3(1, 2, 3));
+			t.Pose = new Pose(new Vector3(1, 2, 3));
 			Assert.IsTrue(_propertyChanged);
 			_propertyChanged = false;
 
 			// Setting Pose to the same value does not create a changed event.
-			((GeometricObject)t.Child).Pose = new Pose(new Vector3(1, 2, 3));
+			t.Pose = new Pose(new Vector3(1, 2, 3));
 			Assert.IsFalse(_propertyChanged);
 			_propertyChanged = false;
 
-			((GeometricObject)t.Child).Pose = Pose.Identity;
+			t.Pose = Pose.Identity;
 			Assert.IsTrue(_propertyChanged);
 			_propertyChanged = false;
 
-			t.Child = new GeometricObject();
+			t.Shape = Shape.Empty;
 			Assert.IsTrue(_propertyChanged);
 			_propertyChanged = false;
 
 			// Setting Pose to the same value does not create a changed event.
-			((GeometricObject)t.Child).Pose = Pose.Identity;
+			t.Pose = Pose.Identity;
 			Assert.IsFalse(_propertyChanged);
 			_propertyChanged = false;
 		}
@@ -119,19 +105,17 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		{
 			Pose pose = new Pose(new Vector3(1, 2, 3));
 			PointShape pointShape = new PointShape(3, 4, 5);
-			GeometricObject geometry = new GeometricObject(pointShape, pose);
 
-			TransformedShape transformedShape = new TransformedShape(geometry);
+			TransformedShape transformedShape = new TransformedShape(pointShape, pose);
 			TransformedShape clone = transformedShape.Clone() as TransformedShape;
 			Assert.IsNotNull(clone);
-			Assert.IsNotNull(clone.Child);
-			Assert.AreNotSame(geometry, clone.Child);
-			Assert.IsTrue(clone.Child is GeometricObject);
-			Assert.AreEqual(pose, clone.Child.Pose);
-			Assert.IsNotNull(clone.Child.Shape);
-			Assert.AreNotSame(pointShape, clone.Child.Shape);
-			Assert.IsTrue(clone.Child.Shape is PointShape);
-			Assert.AreEqual(pointShape.Position, ((PointShape)clone.Child.Shape).Position);
+			Assert.IsNotNull(clone.Shape);
+			Assert.AreNotSame(pointShape, clone.Shape);
+			Assert.AreEqual(pose, clone.Pose);
+			Assert.IsNotNull(clone.Shape);
+			Assert.AreNotSame(pointShape, clone.Shape);
+			Assert.IsTrue(clone.Shape is PointShape);
+			Assert.AreEqual(pointShape.Position, ((PointShape)clone.Shape).Position);
 			Assert.AreEqual(transformedShape.GetBoundingBox(Pose.Identity).Min, clone.GetBoundingBox(Pose.Identity).Min);
 			Assert.AreEqual(transformedShape.GetBoundingBox(Pose.Identity).Max, clone.GetBoundingBox(Pose.Identity).Max);
 		}

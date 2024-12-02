@@ -133,12 +133,10 @@ namespace DigitalRise.Geometry.Shapes.Tests
       Quaternion rotation = MathHelper.CreateRotationX(0.2f);
       Pose pose = new Pose(new Vector3(1, 1, 1), rotation);
       _field.Depth = 0;
-      var box = new TransformedShape(
-        new GeometricObject(new BoxShape(100, 6, 200), new Pose(new Vector3(1050, 2, 2100))));
+      var box = new TransformedShape(new BoxShape(100, 6, 200), new Pose(new Vector3(1050, 2, 2100)));
       AssertExt.AreNumericallyEqual(box.GetBoundingBox(pose).Min, _field.GetBoundingBox(pose).Min);
       _field.Depth = 4;
-      box = new TransformedShape(
-        new GeometricObject(new BoxShape(100, 10, 200), new Pose(new Vector3(1000, 0, 2000))));
+      box = new TransformedShape(new BoxShape(100, 10, 200), new Pose(new Vector3(1000, 0, 2000)));
       AssertExt.AreNumericallyEqual(box.GetBoundingBox(pose).Min + rotation.Rotate(new Vector3(50, 0, 100)), _field.GetBoundingBox(pose).Min);
     }
 

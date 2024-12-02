@@ -1,6 +1,7 @@
 ﻿using AssetManagementBase;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes;
+using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
@@ -113,7 +114,7 @@ namespace DigitalRise.SceneGraph.Primitives
 				return;
 			}
 
-			Shape = new BoxShape(RenderMesh.BoundingBox.Extent());
+			Shape = RenderMesh.BoundingBox.CreateShape();
 		}
 	}
 }

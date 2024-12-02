@@ -416,6 +416,9 @@ namespace DigitalRise.Mathematics.Algebra
 				return result;
 			}
 		}
+
+		public Vector3 Forward => -GetColumn(2);
+
 		#endregion
 
 

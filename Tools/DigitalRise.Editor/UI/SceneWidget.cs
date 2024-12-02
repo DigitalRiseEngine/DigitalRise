@@ -16,6 +16,7 @@ using DigitalRise.Rendering.Billboards;
 using DigitalRise.Data.Billboards;
 using DigitalRise.Misc.TextureAtlas;
 using DigitalRise.Geometry.Shapes;
+using DigitalRise.Geometry;
 
 namespace DigitalRise.Editor.UI
 {
@@ -238,8 +239,15 @@ namespace DigitalRise.Editor.UI
 				_debugRenderer.DrawShape(selectionShape, selectedNode.PoseWorld, selectedNode.ScaleWorld, Color.Orange, true, false);
 				//_debugRenderer.DrawAxes(selectedNode.PoseWorld, 10, false);
 			}
+			Scene.RecursiveProcess(n =>
+			{
+				var asCamera = n as CameraNode;
+				if (asCamera != null)
+				{
+					_debugRenderer.DrawShape(asCamera.Shape, asCamera.PoseWorld, asCamera.ScaleWorld, Color.Brown, true, false);
+				}
+			});
 
-			// Axises
 			_debugRenderer.Render(Scene.Camera);
 
 			// Icons'
@@ -322,6 +330,7 @@ namespace DigitalRise.Editor.UI
 
 				// Render scene
 				var result = _renderer.Render(Scene,
+					camera,
 					StudioGame.Instance.LastRenderGameTime,
 					(ctx) => PostRender(ctx, context, camera));
 

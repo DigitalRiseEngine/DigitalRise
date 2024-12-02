@@ -59,7 +59,7 @@ namespace DigitalRise.Editor
 			{
 				if (_modelAxises == null)
 				{
-					_modelAxises = _assetManager.LoadScene("Scenes/axises.scene");
+					_modelAxises = _assetManager.LoadSceneNode("Scenes/axises.scene");
 				}
 
 				return _modelAxises;

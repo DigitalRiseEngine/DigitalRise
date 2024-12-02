@@ -94,7 +94,7 @@ namespace DigitalRise.Editor
 
 				if (!string.IsNullOrEmpty(_state.Folder))
 				{
-					_mainForm.LoadFolder(_state.Folder);
+					_mainForm.Folder = _state.Folder;
 				}
 			}
 

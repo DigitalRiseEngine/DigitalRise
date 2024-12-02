@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
-using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;

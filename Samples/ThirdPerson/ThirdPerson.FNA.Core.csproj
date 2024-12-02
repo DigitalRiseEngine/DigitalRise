@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Source\DigitalRise.Graphics\DigitalRise.Graphics.FNA.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Assets\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

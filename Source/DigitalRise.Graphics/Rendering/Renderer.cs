@@ -17,7 +17,7 @@ namespace DigitalRise.Rendering
 	public class Renderer
 	{
 		private readonly RenderContext _context = new RenderContext();
-		private readonly BillboardRenderer _billboardRenderer = new BillboardRenderer(2048);
+		private BillboardRenderer _billboardRenderer;
 
 		public bool EnableLod { get; set; }
 
@@ -28,8 +28,7 @@ namespace DigitalRise.Rendering
 
 		public RenderStatistics Statistics => _context.Statistics;
 
-
-		public RenderTarget2D Render(Scene scene, GameTime gameTime, Action<RenderContext> postRender = null)
+		public RenderTarget2D Render(Scene scene, CameraNode camera, GameTime gameTime, Action<RenderContext> postRender = null)
 		{
 			var oldViewport = DR.GraphicsDevice.Viewport;
 
@@ -47,7 +46,7 @@ namespace DigitalRise.Rendering
 				// Our scene and the camera must be set in the render context. This info is
 				// required by many renderers.
 				_context.Scene = scene;
-				_context.CameraNode = scene.Camera;
+				_context.CameraNode = camera;
 
 				// Update aspect
 				var asPerspective = _context.CameraNode.ViewVolume as PerspectiveViewVolume;
@@ -57,7 +56,7 @@ namespace DigitalRise.Rendering
 				}
 
 				// LOD (level of detail) settings are also specified in the context.
-				_context.LodCameraNode = scene.Camera;
+				_context.LodCameraNode = camera;
 				_context.LodHysteresis = 0.5f;
 				_context.LodBias = EnableLod ? 1.0f : 0.0f;
 				_context.LodBlendingEnabled = false;
@@ -98,6 +97,11 @@ namespace DigitalRise.Rendering
 				graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 				graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 				graphicsDevice.BlendState = BlendState.AlphaBlend;
+
+				if (_billboardRenderer == null)
+				{
+					_billboardRenderer = new BillboardRenderer(2048);
+				}
 				_billboardRenderer.Render(_context, sceneQuery.RenderableNodes, RenderOrder.BackToFront);
 				graphicsDevice.ResetTextures();
 

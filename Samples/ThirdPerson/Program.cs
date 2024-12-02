@@ -1,9 +1,14 @@
-﻿namespace SimpleScene
+﻿using AssetManagementBase;
+using System;
+
+namespace SimpleScene
 {
 	class Program
 	{
 		static void Main(string[] args)
 		{
+			AMBConfiguration.Logger = Console.WriteLine;
+
 			foreach (var arg in args)
 			{
 				if (arg == "/nf")

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DigitalRise.Animation;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DigitalRise.Data.Modelling
 {
@@ -11,6 +12,7 @@ namespace DigitalRise.Data.Modelling
 		public DrModelBone[] MeshBones { get; }
 		public Skin[] Skins { get; }
 		public DrModelBone Root { get; }
+		public DrModelBone[] OrderedBones { get; }
 
 		public Dictionary<string, AnimationClip> Animations { get; } = new Dictionary<string, AnimationClip>();
 
@@ -32,10 +34,17 @@ namespace DigitalRise.Data.Modelling
 			}
 
 			Bones = bones;
-
 			MeshBones = (from bone in bones where bone.Mesh != null select bone).ToArray();
 			Skins = skins;
 			Root = bones[rootIndex];
+
+			// Build correct traverse order starting from root
+			var traverseOrder = new List<DrModelBone>();
+			TraverseNodes(n =>
+			{
+				traverseOrder.Add(n);
+			});
+			OrderedBones = traverseOrder.ToArray();
 		}
 
 		private void TraverseNodes(DrModelBone root, Action<DrModelBone> action)

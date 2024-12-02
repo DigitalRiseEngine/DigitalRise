@@ -36,10 +36,32 @@ namespace DigitalRise.Editor.UI
 					return;
 				}
 
-				_folder = value;
-				UpdateTitle();
+				try
+				{
+					if (!string.IsNullOrEmpty(value))
+					{
+						// DR.EffectsSource = new DynamicEffectsSource(Path.GetDirectoryName(path));
+
+						_treeFileSolution.RemoveAllSubNodes();
+						ProcessNode(_treeFileSolution, value);
+						AssetManager = AssetManager.CreateFileAssetManager(value);
+					} else
+					{
+						AssetManager = null;
+					}
+
+					_folder = value;
+					UpdateTitle();
+				}
+				catch (Exception ex)
+				{
+					var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
+					dialog.ShowModal(Desktop);
+				}
 			}
 		}
+
+		private AssetManager AssetManager { get; set; }
 
 		public object SelectedObject
 		{
@@ -188,7 +210,7 @@ namespace DigitalRise.Editor.UI
 					}
 
 					// "Ok" or Enter
-					LoadFolder(dialog.FilePath);
+					Folder = dialog.FilePath;
 				};
 
 				dialog.ShowModal(Desktop);
@@ -283,7 +305,7 @@ namespace DigitalRise.Editor.UI
 			UpdateStackPanelEditor();
 		}
 
-		private Widget InternalCreateCustomEditor(Record record, object obj, string[] extensions, Func<AssetManager, string, object> loader)
+		private Widget InternalCreateCustomEditor(Record record, object obj, string[] extensions, Func<string, object> loader)
 		{
 			var propertyType = record.Type;
 
@@ -336,10 +358,9 @@ namespace DigitalRise.Editor.UI
 						try
 						{
 							var path = dialog.FilePath;
-							var assetManager = AssetManager.CreateFileAssetManager(Path.GetDirectoryName(path));
 
 
-							var value = loader(assetManager, path);
+							var value = loader(path);
 
 							record.SetValue(obj, value);
 							pathProperty.SetValue(obj, path);
@@ -372,17 +393,22 @@ namespace DigitalRise.Editor.UI
 			{
 				return InternalCreateCustomEditor(record, obj,
 					new[] { "dds", "png", "jpg", "gif", "bmp", "tga" },
-					(assetManager, path) => assetManager.LoadTexture2D(DR.GraphicsDevice, path));
+					path => AssetManager.LoadTexture2D(DR.GraphicsDevice, path));
 			}
 			else if (record.Type == typeof(TextureCube))
 			{
 				return InternalCreateCustomEditor(record, obj, new[] { "dds" },
-					(assetManager, path) => assetManager.LoadTextureCube(DR.GraphicsDevice, path));
+					path => AssetManager.LoadTextureCube(DR.GraphicsDevice, path));
 
 			} else if (record.Type == typeof(DrModel))
 			{
 				return InternalCreateCustomEditor(record, obj, new[] { "glb", "gltf" },
-					(assetManager, path) => assetManager.LoadGltf(path));
+					path => AssetManager.LoadGltf(path));
+			}
+			else if (record.Type == typeof(SceneNode))
+			{
+				return InternalCreateCustomEditor(record, obj, new[] { "prefab" },
+					path => AssetManager.LoadSceneNode(path).Clone());
 			}
 
 			return null;
@@ -467,9 +493,8 @@ namespace DigitalRise.Editor.UI
 					// Load scene
 					SceneNode scene;
 					var folder = Path.GetDirectoryName(file);
-					var assetManager = AssetManager.CreateFileAssetManager(folder);
 
-					scene = assetManager.LoadScene(file);
+					scene = AssetManager.LoadSceneNode(file);
 					OpenTab(scene, file);
 				}
 			}
@@ -533,11 +558,11 @@ namespace DigitalRise.Editor.UI
 			dialog.ShowModal(Desktop);
 		}
 
-		private void OnAddModel(SceneNode parent)
+		private void OnAddExternalResource<T>(SceneNode parent, string[] extensions, Func<string, T> creator) where T : SceneNode
 		{
 			try
 			{
-				var dialog = new ChooseAssetDialog(Folder, new[] { "glb", "gltf" });
+				var dialog = new ChooseAssetDialog(Folder, extensions);
 
 				dialog.Closed += (s, a) =>
 				{
@@ -550,15 +575,12 @@ namespace DigitalRise.Editor.UI
 					// "Ok" or Enter
 					try
 					{
+
 						var path = dialog.FilePath;
 
-						var node = new DrModelNode
-						{
-							ModelPath = dialog.FilePath
-						};
+						var node = creator(path);
 
-						var assetManager = AssetManager.CreateFileAssetManager(Path.GetDirectoryName(path));
-						node.Load(assetManager);
+						node.Load(AssetManager);
 
 						AddNewNode(parent, node);
 					}
@@ -576,6 +598,23 @@ namespace DigitalRise.Editor.UI
 				var dialog = Dialog.CreateMessageBox("Error", ex.Message);
 				dialog.ShowModal(Desktop);
 			}
+
+		}
+
+		private void OnAddModel(SceneNode parent)
+		{
+			OnAddExternalResource(parent, new[] { "glb", "gltf" }, path => new DrModelNode
+			{
+				ModelPath = path
+			});
+		}
+
+		private void OnAddPrefab(SceneNode parent)
+		{
+			OnAddExternalResource(parent, new[] { "prefab" }, path => new PrefabNode
+			{
+				PrefabPath = path
+			});
 		}
 
 		private void _treeFileExplorer_TouchUp(object sender, EventArgs e)
@@ -604,6 +643,11 @@ namespace DigitalRise.Editor.UI
 				{
 					// Special case
 					action = () => OnAddModel(sceneNode);
+				}
+				else if (pair.Value.Count == 1 && pair.Value[0].Type == typeof(PrefabNode))
+				{
+					// Special case
+					action = () => OnAddPrefab(sceneNode);
 				}
 				else
 				{
@@ -702,28 +746,6 @@ namespace DigitalRise.Editor.UI
 			return projectNode;
 		}
 
-		public void LoadFolder(string path)
-		{
-			try
-			{
-				if (!string.IsNullOrEmpty(path))
-				{
-					// DR.EffectsSource = new DynamicEffectsSource(Path.GetDirectoryName(path));
-
-					_treeFileSolution.RemoveAllSubNodes();
-					ProcessNode(_treeFileSolution, path);
-				}
-
-				_folder = path;
-				UpdateTitle();
-			}
-			catch (Exception ex)
-			{
-				var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
-				dialog.ShowModal(Desktop);
-			}
-		}
-
 		private void ProcessSave(Scene scene, string filePath)
 		{
 			if (string.IsNullOrEmpty(filePath))
@@ -788,7 +810,7 @@ namespace DigitalRise.Editor.UI
 
 			UpdateTreeNodeId(newNode);
 
-			if (sceneNode.Children != null)
+			if (!(sceneNode is PrefabNode) && sceneNode.Children != null)
 			{
 				foreach (var child in sceneNode.Children)
 				{

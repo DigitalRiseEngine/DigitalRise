@@ -46,6 +46,6 @@ namespace AssetManagementBase
 			return assetManager.UseLoader(_drMaterialLoader, path);
 		}
 
-		public static SceneNode LoadScene(this AssetManager assetManager, string path) => assetManager.UseLoader(_sceneLoader, path);
+		public static SceneNode LoadSceneNode(this AssetManager assetManager, string path) => assetManager.UseLoader(_sceneLoader, path);
 	}
 }

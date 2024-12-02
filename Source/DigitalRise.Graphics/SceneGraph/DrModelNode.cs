@@ -30,7 +30,6 @@ namespace DigitalRise.SceneGraph
 
 
 		private bool _transformsDirty = true;
-		private DrModelBone[] _traverseOrder;
 		private Matrix[] _localTransforms;
 		private Matrix[] _worldTransforms;
 		private SkinInfo[] _skinInfos;
@@ -51,20 +50,11 @@ namespace DigitalRise.SceneGraph
 
 				_model = value;
 
-				_traverseOrder = null;
 				_localTransforms = null;
 				_worldTransforms = null;
 				_skinInfos = null;
 				if (_model != null)
 				{
-					// Build correct traverse order starting from root
-					var traverseOrder = new List<DrModelBone>();
-					_model.TraverseNodes(n =>
-					{
-						traverseOrder.Add(n);
-					});
-
-					_traverseOrder = traverseOrder.ToArray();
 					_localTransforms = new Matrix[_model.Bones.Length];
 					_worldTransforms = new Matrix[_model.Bones.Length];
 					if (_model.Skins != null && _model.Skins.Length > 0)
@@ -79,7 +69,8 @@ namespace DigitalRise.SceneGraph
 					ResetTransforms();
 
 					Shape = CalculateBoundingBox().CreateShape();
-				} else
+				}
+				else
 				{
 					Shape = Shape.Empty;
 				}
@@ -102,9 +93,9 @@ namespace DigitalRise.SceneGraph
 				return;
 			}
 
-			for (var i = 0; i < _traverseOrder.Length; i++)
+			for (var i = 0; i < Model.OrderedBones.Length; i++)
 			{
-				var bone = _traverseOrder[i];
+				var bone = Model.OrderedBones[i];
 				_localTransforms[bone.Index] = bone.CalculateDefaultLocalTransform();
 			}
 
@@ -118,9 +109,9 @@ namespace DigitalRise.SceneGraph
 				return;
 			}
 
-			for (var i = 0; i < _traverseOrder.Length; i++)
+			for (var i = 0; i < Model.OrderedBones.Length; i++)
 			{
-				var bone = _traverseOrder[i];
+				var bone = Model.OrderedBones[i];
 
 				if (bone.Parent == null)
 				{
@@ -221,6 +212,19 @@ namespace DigitalRise.SceneGraph
 			UpdateTransforms();
 
 			return _worldTransforms[boneIndex];
+		}
+
+		public new DrModelNode Clone() => (DrModelNode)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new DrModelNode();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (DrModelNode)source;
+			ModelPath = src.ModelPath;
+			Model = src.Model;
 		}
 	}
 }

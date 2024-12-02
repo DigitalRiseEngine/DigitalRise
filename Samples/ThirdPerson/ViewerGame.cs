@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using DigitalRise;
 using DigitalRise.Animation;
-using DigitalRise.Modelling;
 using DigitalRise.Rendering;
 using System;
 using System.IO;
 using System.Reflection;
-using DigitalRise.Rendering2;
 using DigitalRise.SceneGraph;
+using DigitalRise.SceneGraph.Scenes;
+using System.Linq;
 
 namespace SimpleScene
 {
@@ -22,12 +22,11 @@ namespace SimpleScene
 		private readonly GraphicsDeviceManager _graphics;
 		private Scene _scene;
 		private SceneNode _cameraMount;
-		private Camera _mainCamera;
-		private DigitalRiseModelNode _model;
+		private CameraNode _mainCamera;
+		private DrModelNode _model;
 		private AnimationController _player;
-		private readonly ForwardRenderer _renderer = new ForwardRenderer();
-		private readonly Renderer _renderer2 = new Renderer();
-		private readonly FramesPerSecondCounter _fpsCounter = new FramesPerSecondCounter();
+		private readonly Renderer _renderer = new Renderer();
+//		private readonly FramesPerSecondCounter _fpsCounter = new FramesPerSecondCounter();
 		private SpriteBatch _spriteBatch;
 		private InputService _inputService;
 
@@ -68,32 +67,32 @@ namespace SimpleScene
 			DR.Game = this;
 
 			var assetManager = AssetManager.CreateFileAssetManager(Path.Combine(ExecutingAssemblyDirectory, "Assets"));
-			_scene = assetManager.LoadScene("Scenes/Main.scene");
+			_scene = (Scene)assetManager.LoadSceneNode("Scenes/Main.scene");
 
-			_model = _scene.QueryByType<DigitalRiseModelNode>()[0];
+			_model = _scene.GetSubtree().OfType<DrModelNode>().First();
 			_player = new AnimationController(_model);
 			_player.StartClip("idle");
 
-			_cameraMount = _scene.QueryFirstById("_cameraMount");
-			_mainCamera = _scene.QueryFirstByType<Camera>();
+			_cameraMount = _scene.GetSceneNode("_cameraMount");
+			_mainCamera = _scene.GetSubtree().OfType<CameraNode>().First();
 
 			_inputService = new InputService();
 			_inputService.MouseMoved += _inputService_MouseMoved;
 
 			_spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			//			DebugSettings.DrawLightViewFrustrum = true;
+			// DRDebugOptions.VisualizeBuffers = true;
 		}
 
 		private void _inputService_MouseMoved(object sender, InputEventArgs<Point> e)
 		{
-			var playerRotation = _model.Rotation;
+			var playerRotation = _model.RotationLocal;
 			playerRotation.Y += -(int)((e.NewValue.X - e.OldValue.X) * MouseSensitivity);
-			_model.Rotation = playerRotation;
+			_model.RotationLocal = playerRotation;
 
-			var cameraRotation = _cameraMount.Rotation;
+			var cameraRotation = _cameraMount.RotationLocal;
 			cameraRotation.X += (int)((e.NewValue.Y - e.OldValue.Y) * MouseSensitivity);
-			_cameraMount.Rotation = cameraRotation;
+			_cameraMount.RotationLocal = cameraRotation;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -145,11 +144,12 @@ namespace SimpleScene
 			}
 
 			// Perform the movement
-			var velocity = _model.GlobalTransform.Forward * movement * MovementSpeed;
-			_model.Translation += velocity;
+			var velocity = _model.PoseWorld.Orientation.Forward * movement * MovementSpeed;
+			var pose = _model.PoseLocal;
+			pose.Position += velocity;
+			_model.PoseLocal = pose;
 
-
-			_fpsCounter.Update(gameTime);
+//			_fpsCounter.Update(gameTime);
 			_player.Update(gameTime.ElapsedGameTime);
 		}
 
@@ -159,24 +159,13 @@ namespace SimpleScene
 
 			GraphicsDevice.Clear(Color.Black);
 
-			_renderer2.AddNode(_scene);
-			var result = _renderer2.Render(_mainCamera);
-
-			_fpsCounter.Draw(gameTime);
+			var result = _renderer.Render(_scene, _mainCamera, gameTime);
 
 			_spriteBatch.Begin();
-
 			_spriteBatch.Draw(result, Vector2.Zero, Color.White);
-			_spriteBatch.Draw(_renderer2.GBuffer0, new Rectangle(0, 0, 256, 256), Color.White);
-			_spriteBatch.Draw(_renderer2.GBuffer1, new Rectangle(256, 0, 256, 256), Color.White);
-			_spriteBatch.Draw(_renderer2.LightBuffer0, new Rectangle(0, 256, 256, 256), Color.White);
-			_spriteBatch.Draw(_renderer2.LightBuffer1, new Rectangle(256, 256, 256, 256), Color.White);
-
-			/*			_spriteBatch.Draw(_light.ShadowMap, 
-							new Rectangle(0, 0, 256, 256), 
-							Color.White);*/
-
 			_spriteBatch.End();
+
+//			_fpsCounter.Draw(gameTime);
 		}
 	}
 }

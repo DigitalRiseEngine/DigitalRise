@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using AssetManagementBase;
 using DigitalRise.Collections;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Collisions;
@@ -16,7 +14,6 @@ using DigitalRise.Geometry.Partitioning;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
-using DigitalRise.Misc;
 using DigitalRise.Rendering;
 using DigitalRise.SceneGraph.Queries;
 using Microsoft.Xna.Framework;
@@ -1000,29 +997,6 @@ namespace DigitalRise.SceneGraph.Scenes
 					foreach (var child in node.Children)
 						GetSceneNodes(child, referenceNode, filter, list);
 			}
-		}
-
-
-		public void SaveToFile(string path)
-		{
-			var options = JsonExtensions.CreateOptions();
-			JsonExtensions.SerializeToFile(path, options, this);
-		}
-
-		public static Scene ReadFromString(string data, AssetManager assetManager)
-		{
-			var options = JsonExtensions.CreateOptions();
-			var result = JsonExtensions.DeserializeFromString<Scene>(data, options);
-
-			result.Load(assetManager);
-
-			return result;
-		}
-
-		public static Scene ReadFromFile(string path, AssetManager assetManager)
-		{
-			var data = File.ReadAllText(path);
-			return ReadFromString(data, assetManager);
 		}
 
 		#endregion

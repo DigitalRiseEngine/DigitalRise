@@ -401,7 +401,7 @@ namespace DigitalRise.Misc
 
 		public static void SerializeToFile<T>(string path, JsonSerializerSettings options, T data)
 		{
-			var s = JsonConvert.SerializeObject(data, options);
+			var s = JsonConvert.SerializeObject(data, typeof(T), options);
 			File.WriteAllText(path, s);
 		}
 

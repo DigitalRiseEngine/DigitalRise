@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
+using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
 
 namespace AssetManagementBase
@@ -14,10 +15,10 @@ namespace AssetManagementBase
 			return loader.Load(manager, assetName);
 		};
 
-		private readonly static AssetLoader<Scene> _sceneLoader = (manager, assetName, settings, tag) =>
+		private readonly static AssetLoader<SceneNode> _sceneLoader = (manager, assetName, settings, tag) =>
 		{
 			var data = manager.LoadString(assetName);
-			return Scene.ReadFromString(data, manager);
+			return SceneNode.ReadFromString(data, manager);
 		};
 
 
@@ -45,6 +46,6 @@ namespace AssetManagementBase
 			return assetManager.UseLoader(_drMaterialLoader, path);
 		}
 
-		public static Scene LoadScene(this AssetManager assetManager, string path) => assetManager.UseLoader(_sceneLoader, path);
+		public static SceneNode LoadScene(this AssetManager assetManager, string path) => assetManager.UseLoader(_sceneLoader, path);
 	}
 }

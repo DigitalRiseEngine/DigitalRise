@@ -11,7 +11,6 @@ using DigitalRise.Editor.Utility;
 using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
 using DigitalRise.Data.Materials;
-using DigitalRise.Geometry.Shapes;
 using Microsoft.Xna.Framework.Graphics;
 using DigitalRise.Data.Modelling;
 
@@ -62,6 +61,7 @@ namespace DigitalRise.Editor.UI
 		}
 
 		public Scene CurrentScene => CurrentSceneWidget.Scene;
+
 		private readonly List<InstrumentButton> _allButtons = new List<InstrumentButton>();
 
 		public CameraNode CurrentCamera
@@ -457,7 +457,7 @@ namespace DigitalRise.Editor.UI
 				}
 
 				var file = (string)node.Tag;
-				if (file.EndsWith(".scene"))
+				if (file.EndsWith(".scene") || file.EndsWith(".prefab"))
 				{
 					if (SetTabByName(_tabControlScenes, file))
 					{
@@ -465,7 +465,7 @@ namespace DigitalRise.Editor.UI
 					}
 
 					// Load scene
-					Scene scene;
+					SceneNode scene;
 					var folder = Path.GetDirectoryName(file);
 					var assetManager = AssetManager.CreateFileAssetManager(folder);
 
@@ -679,7 +679,7 @@ namespace DigitalRise.Editor.UI
 			foreach (var subFolder in subfolders)
 			{
 				// Ignore subfolders without scenes
-				if (Directory.GetFiles(subFolder, "*.scene", SearchOption.AllDirectories).Length == 0)
+				if (Directory.GetFiles(subFolder, "*.*", SearchOption.AllDirectories).Where(s => s.EndsWith(".scene") || s.EndsWith(".prefab")).ToArray().Length == 0)
 				{
 					continue;
 				}
@@ -688,7 +688,7 @@ namespace DigitalRise.Editor.UI
 			}
 
 			// Add scene files
-			var sceneFiles = Directory.GetFiles(folder, "*.scene");
+			var sceneFiles = Directory.GetFiles(folder, "*.*").Where(s => s.EndsWith(".scene") || s.EndsWith(".prefab")).ToArray();
 			foreach (var file in sceneFiles)
 			{
 				var node = projectNode.AddSubNode(new Label
@@ -853,9 +853,11 @@ namespace DigitalRise.Editor.UI
 			}
 			else
 			{
+				var isPrefab = !(sceneWidget.SceneNode is Scene);
+
 				var dlg = new FileDialog(FileDialogMode.SaveFile)
 				{
-					Filter = "*.scene"
+					Filter = isPrefab ? "*.prefab" : "*.scene"
 				};
 
 				dlg.ShowModal(Desktop);
@@ -865,7 +867,7 @@ namespace DigitalRise.Editor.UI
 					if (dlg.Result)
 					{
 						tabInfo.FilePath = dlg.FilePath;
-						sceneWidget.Scene.SaveToFile(tabInfo.FilePath);
+						sceneWidget.SceneNode.SaveToFile(tabInfo.FilePath);
 						tabInfo.Dirty = false;
 					}
 				};

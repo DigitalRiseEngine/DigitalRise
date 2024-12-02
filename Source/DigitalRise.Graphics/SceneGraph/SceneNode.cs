@@ -7,10 +7,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using AssetManagementBase;
 using DigitalRise.Attributes;
 using DigitalRise.Geometry;
+using DigitalRise.Misc;
 using DigitalRise.Rendering.Deferred;
+using DigitalRise.SceneGraph.Scenes;
 using Newtonsoft.Json;
 
 
@@ -931,6 +934,31 @@ namespace DigitalRise.SceneGraph
 		public virtual void BatchJobs(IRenderList list)
 		{
 		}
+
+
+
+		public void SaveToFile(string path)
+		{
+			var options = JsonExtensions.CreateOptions();
+			JsonExtensions.SerializeToFile(path, options, this);
+		}
+
+		public static SceneNode ReadFromString(string data, AssetManager assetManager)
+		{
+			var options = JsonExtensions.CreateOptions();
+			var result = JsonExtensions.DeserializeFromString<SceneNode>(data, options);
+
+			result.Load(assetManager);
+
+			return result;
+		}
+
+		public static SceneNode ReadFromFile(string path, AssetManager assetManager)
+		{
+			var data = File.ReadAllText(path);
+			return ReadFromString(data, assetManager);
+		}
+
 
 		#endregion
 	}

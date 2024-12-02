@@ -66,7 +66,7 @@ namespace DigitalRise.Editor.UI
 					var cameraNode = new CameraNode(new PerspectiveViewVolume());
 
 					var pose = cameraNode.PoseLocal;
-					pose.Position = new Vector3(10, 20, 0);
+					pose.Position = new Vector3(0, 10, 20);
 
 					cameraNode.PoseLocal = pose;
 

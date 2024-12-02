@@ -36,7 +36,6 @@ namespace DigitalRise.SceneGraph
 
 		private DrModel _model;
 
-		[Browsable(false)]
 		[JsonIgnore]
 		public DrModel Model
 		{

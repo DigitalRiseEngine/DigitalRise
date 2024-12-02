@@ -13,6 +13,7 @@ using DigitalRise.SceneGraph.Scenes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Geometry.Shapes;
 using Microsoft.Xna.Framework.Graphics;
+using DigitalRise.Data.Modelling;
 
 namespace DigitalRise.Editor.UI
 {
@@ -371,12 +372,15 @@ namespace DigitalRise.Editor.UI
 					new[] { "dds", "png", "jpg", "gif", "bmp", "tga" },
 					(assetManager, path) => assetManager.LoadTexture2D(DR.GraphicsDevice, path));
 			}
-
-			if (record.Type == typeof(TextureCube))
+			else if (record.Type == typeof(TextureCube))
 			{
 				return InternalCreateCustomEditor(record, obj, new[] { "dds" },
 					(assetManager, path) => assetManager.LoadTextureCube(DR.GraphicsDevice, path));
 
+			} else if (record.Type == typeof(DrModel))
+			{
+				return InternalCreateCustomEditor(record, obj, new[] { "glb", "gltf" },
+					(assetManager, path) => assetManager.LoadGltf(path));
 			}
 
 			return null;
@@ -403,13 +407,13 @@ namespace DigitalRise.Editor.UI
 			_panelScenes.Visible = _tabControlScenes.Items.Count > 0;
 		}
 
-		private void OpenTab(Scene scene, string file)
+		private void OpenTab(SceneNode node, string file)
 		{
 			var sceneWidget = new SceneWidget
 			{
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
-				Scene = scene,
+				SceneNode = node,
 			};
 
 			var panel = new Panel();
@@ -510,17 +514,7 @@ namespace DigitalRise.Editor.UI
 
 				var ot = orderedTypes[dialog.SelectedIndex.Value];
 
-				SceneNode newNode;
-				if (ot.SubType == null)
-				{
-					newNode = (SceneNode)Activator.CreateInstance(ot.Type);
-				}
-				else
-				{
-					var par = Activator.CreateInstance(ot.SubType);
-					newNode = (SceneNode)Activator.CreateInstance(ot.Type, par);
-				}
-
+				var newNode = ot.CreateInstance();
 				newNode.Name = dialog.ItemName;
 
 				/*				var asMeshNodeBase = newNode as MeshNodeBase;
@@ -646,6 +640,10 @@ namespace DigitalRise.Editor.UI
 				// "Ok" or Enter
 				try
 				{
+					var newNode = dialog.NodeTypeInfo.CreateInstance();
+
+					OpenTab(newNode, string.Empty);
+
 				}
 				catch (Exception ex)
 				{
@@ -655,16 +653,6 @@ namespace DigitalRise.Editor.UI
 			};
 
 			dialog.ShowModal(Desktop);
-
-/*			var scene = new Scene
-			{
-				Name = "Root"
-			};
-
-			var cameraNode = new CameraNode(new PerspectiveViewVolume());
-			scene.Camera = cameraNode;
-
-			OpenTab(scene, string.Empty);*/
 		}
 
 		private void UpdateTitle()
@@ -819,7 +807,7 @@ namespace DigitalRise.Editor.UI
 			}
 
 			var sceneWidget = _tabControlScenes.Items[_tabControlScenes.SelectedIndex.Value].Content.FindChild<SceneWidget>();
-			RecursiveAddToExplorer(_treeFileExplorer, sceneWidget.Scene);
+			RecursiveAddToExplorer(_treeFileExplorer, sceneWidget.SceneNode);
 			_treeFileExplorer.SelectedNode = _treeFileExplorer.FindNode(n => n.Tag == selectedNode);
 		}
 

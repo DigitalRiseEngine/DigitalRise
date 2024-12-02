@@ -1,4 +1,5 @@
 ﻿using DigitalRise.Attributes;
+using DigitalRise.SceneGraph;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -26,6 +27,23 @@ namespace DigitalRise.Editor
 			Category = category;
 			Type = type;
 			SubType = subType;
+		}
+
+		public SceneNode CreateInstance()
+		{
+			object newNode;
+
+			if (SubType == null)
+			{
+				newNode = (SceneNode)Activator.CreateInstance(Type);
+			}
+			else
+			{
+				var par = Activator.CreateInstance(SubType);
+				newNode = (SceneNode)Activator.CreateInstance(Type, par);
+			}
+
+			return (SceneNode)newNode;
 		}
 	}
 

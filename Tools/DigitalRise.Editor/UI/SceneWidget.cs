@@ -15,6 +15,7 @@ using DirectionalLight = DigitalRise.Data.Lights.DirectionalLight;
 using DigitalRise.Rendering.Billboards;
 using DigitalRise.Data.Billboards;
 using DigitalRise.Misc.TextureAtlas;
+using DigitalRise.Geometry.Shapes;
 
 namespace DigitalRise.Editor.UI
 {
@@ -28,7 +29,9 @@ namespace DigitalRise.Editor.UI
 			[typeof(CameraNode)] = Editor.Resources.IconCamera
 		};
 
+		private SceneNode _sceneNode;
 		private Scene _scene;
+		private LightNode _ambientLightNode;
 		private CameraInputController _controller;
 		private MeshNode _gridMesh;
 		// private Modelling.DigitalRiseModelMesh _waterMarker;
@@ -39,20 +42,62 @@ namespace DigitalRise.Editor.UI
 		private readonly BillboardRenderer _billboardRenderer = new BillboardRenderer(2048);
 		private readonly List<SceneNode> _gizmos = new List<SceneNode>();
 
-		public Scene Scene
+		public SceneNode SceneNode
 		{
-			get => _scene;
+			get => _sceneNode;
+
 			set
 			{
-				if (_scene == value) return;
+				if (value == null)
+				{
+					return;
+				}
 
-				_scene = value;
+				_sceneNode = value;
+
+				if (_sceneNode is Scene)
+				{
+					_scene = (Scene)_sceneNode;
+				} else
+				{
+					// Create scene to view this node
+					_scene = new Scene();
+
+					var cameraNode = new CameraNode(new PerspectiveViewVolume());
+					_scene.Camera = cameraNode;
+
+					_scene.Children.Add(AmbientLightNode);
+					_scene.Children.Add(_sceneNode);
+				}
+
 				_controller = _scene == null ? null : new CameraInputController(_scene.Camera);
 			}
 		}
 
+		public Scene Scene
+		{
+			get => _scene;
+		}
+
 		public RenderStatistics RenderStatistics { get; private set; }
+		
 		public Instrument Instrument { get; } = new Instrument();
+
+		private LightNode AmbientLightNode
+		{
+			get
+			{
+				if (_ambientLightNode == null)
+				{
+
+					var ambientLight = new AmbientLight();
+					_ambientLightNode = new LightNode(ambientLight);
+				}
+
+				return _ambientLightNode;
+			}
+		}
+
 
 		private MeshNode GridMesh
 		{

@@ -1,0 +1,15 @@
+<Project>
+  <Project.ExportOptions Namespace="DigitalRise.Editor.UI" Class="ChooseNodeDialog" OutputPath="D:\Projects\DigitalRise\Tools\DigitalRise.Editor\UI" />
+  <Dialog Title="Choose Node" Left="531" Top="78" Width="500" Height="500">
+    <VerticalStackPanel Spacing="8">
+      <HorizontalStackPanel Spacing="8">
+        <Label Text="Filter:" />
+        <TextBox Id="_textFilter" StackPanel.ProportionType="Fill" />
+      </HorizontalStackPanel>
+      <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Id="_listNodes" StackPanel.ProportionType="Fill">
+        <Label Text="CameraNode" />
+        <Label Text="SceneNode" />
+      </ListView>
+    </VerticalStackPanel>
+  </Dialog>
+</Project>

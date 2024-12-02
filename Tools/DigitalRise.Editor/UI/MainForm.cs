@@ -539,10 +539,7 @@ namespace DigitalRise.Editor.UI
 		{
 			try
 			{
-				var projectFolder = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(_treeFileSolution.SelectedNode.Tag.ToString())));
-				var modelsFolder = Path.Combine(projectFolder, Constants.ModelsFolder);
-
-				var dialog = new ChooseAssetDialog(modelsFolder, new[] { "glb", "gltf" });
+				var dialog = new ChooseAssetDialog(Folder, new[] { "glb", "gltf" });
 
 				dialog.Closed += (s, a) =>
 				{
@@ -636,7 +633,30 @@ namespace DigitalRise.Editor.UI
 
 		private void NewScene()
 		{
-			var scene = new Scene
+			var dialog = new ChooseNodeDialog();
+
+			dialog.Closed += (s, a) =>
+			{
+				if (!dialog.Result)
+				{
+					// "Cancel" or Escape
+					return;
+				}
+
+				// "Ok" or Enter
+				try
+				{
+				}
+				catch (Exception ex)
+				{
+					var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
+					dialog.ShowModal(Desktop);
+				}
+			};
+
+			dialog.ShowModal(Desktop);
+
+/*			var scene = new Scene
 			{
 				Name = "Root"
 			};
@@ -644,7 +664,7 @@ namespace DigitalRise.Editor.UI
 			var cameraNode = new CameraNode(new PerspectiveViewVolume());
 			scene.Camera = cameraNode;
 
-			OpenTab(scene, string.Empty);
+			OpenTab(scene, string.Empty);*/
 		}
 
 		private void UpdateTitle()

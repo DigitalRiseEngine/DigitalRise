@@ -694,6 +694,8 @@ namespace DigitalRise.Editor.UI
 				var camera = sceneWidget.Camera.Clone();
 				sceneWidget.SceneNode = sceneNode;
 				sceneWidget.Camera = camera;
+
+				RefreshExplorer(null);
 			}
 			catch (Exception ex)
 			{

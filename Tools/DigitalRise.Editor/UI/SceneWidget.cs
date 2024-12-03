@@ -42,6 +42,8 @@ namespace DigitalRise.Editor.UI
 		private readonly DebugRenderer _debugRenderer = new DebugRenderer();
 		private readonly BillboardRenderer _billboardRenderer = new BillboardRenderer(2048);
 		private readonly List<SceneNode> _gizmos = new List<SceneNode>();
+		private readonly PerspectiveViewVolume _perspectiveViewVolume;
+		private readonly OrthographicViewVolume _orthographicViewVolume;
 
 		public SceneNode SceneNode
 		{
@@ -65,7 +67,8 @@ namespace DigitalRise.Editor.UI
 						_scene.SetDefaultCamera();
 
 					}
-				} else
+				}
+				else
 				{
 					// Create scene to view this node
 					_scene = new Scene();
@@ -85,7 +88,7 @@ namespace DigitalRise.Editor.UI
 		}
 
 		public RenderStatistics RenderStatistics { get; private set; }
-		
+
 		public Instrument Instrument { get; } = new Instrument();
 
 		private LightNode AmbientLightNode
@@ -126,6 +129,9 @@ namespace DigitalRise.Editor.UI
 		{
 			ClipToBounds = true;
 			AcceptsKeyboardFocus = true;
+
+			_perspectiveViewVolume = new PerspectiveViewVolume(90.0f, 16.0f / 9.0f, 0.1f, 1.0f);
+			_orthographicViewVolume = new OrthographicViewVolume();
 		}
 
 		/*		private Vector3? CalculateMarkerPosition()
@@ -213,19 +219,43 @@ namespace DigitalRise.Editor.UI
 					wd.Normalize();
 					var p2 = p + wd * 10;
 
-					_debugRenderer.DrawLine(p, p2, Color.Yellow, true);
+					_debugRenderer.DrawArrow(p, p2, Color.Yellow, false);
 				}
 			}
 
 			var modelNode = node as DrModelNode;
-			if(modelNode != null)
+			if (modelNode != null)
 			{
-//				_debugRenderer.DrawSkeleton(modelNode, modelNode.PoseWorld, modelNode.ScaleWorld, 1, Color.White, false);
+				//				_debugRenderer.DrawSkeleton(modelNode, modelNode.PoseWorld, modelNode.ScaleWorld, 1, Color.White, false);
+			}
+
+			var asCamera = node as CameraNode;
+			if (asCamera != null)
+			{
+				ViewVolume viewVolume;
+				if (asCamera.ViewVolume is PerspectiveViewVolume)
+				{
+					_perspectiveViewVolume.FieldOfViewY = ((PerspectiveViewVolume)asCamera.ViewVolume).FieldOfViewY;
+					_perspectiveViewVolume.AspectRatio = ((PerspectiveViewVolume)asCamera.ViewVolume).AspectRatio;
+
+					viewVolume = _perspectiveViewVolume;
+				}
+				else
+				{
+					viewVolume = _orthographicViewVolume;
+				}
+
+				_debugRenderer.DrawShape(viewVolume, asCamera.PoseWorld, Vector3.One, Color.Brown, true, false);
 			}
 		}
 
 		private void PostRender(RenderContext drContext, Myra.Graphics2D.RenderContext myraContext, CameraNode camera)
 		{
+			if (Scene.Camera != StudioGame.MainForm.CurrentCamera)
+			{
+				return;
+			}
+
 			_debugRenderer.Clear();
 			Scene.RecursiveProcess(n => RenderGizmos(myraContext, n));
 
@@ -237,15 +267,7 @@ namespace DigitalRise.Editor.UI
 				_debugRenderer.DrawShape(selectionShape, selectedNode.PoseWorld, selectedNode.ScaleWorld, Color.Orange, true, false);
 				//_debugRenderer.DrawAxes(selectedNode.PoseWorld, 10, false);
 			}
-			Scene.RecursiveProcess(n =>
-			{
-				var asCamera = n as CameraNode;
-				if (asCamera != null)
-				{
-					_debugRenderer.DrawShape(asCamera.Shape, asCamera.PoseWorld, asCamera.ScaleWorld, Color.Brown, true, false);
-				}
-			});
-
+			
 			_debugRenderer.Render(Scene.Camera);
 
 			// Icons'

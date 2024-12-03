@@ -13,8 +13,8 @@
     "IsEnabled": true,
     "PrefabsPaths": [],
     "ScaleLocal": "1, 1, 1",
-    "RotationLocal": "-2.9819314, -27.936611, 0",
-    "PositionLocal": "-44.061344, 35.656937, 73.61129"
+    "RotationLocal": "-33.630615, 11.227638, 0",
+    "PositionLocal": "-1.4307014, 16.342993, 13.267669"
   },
   "Name": "Root",
   "Children": [
@@ -83,7 +83,7 @@
           "IsEnabled": true,
           "PrefabsPaths": [],
           "ScaleLocal": "1, 1, 1",
-          "RotationLocal": "-53, 45, 0",
+          "RotationLocal": "-30, 30, 0",
           "PositionLocal": "0, 60, 0"
         }
       ],

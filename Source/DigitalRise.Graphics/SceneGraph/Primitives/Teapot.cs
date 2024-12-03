@@ -44,5 +44,19 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateTeapotMesh(Size, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Teapot Clone() => (Teapot)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Teapot();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Teapot)source;
+
+			Size = src.Size;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

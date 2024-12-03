@@ -1,5 +1,6 @@
 ﻿using DigitalRise.Geometry.Shapes;
 using DigitalRise.SceneGraph;
+using DigitalRise.SceneGraph.Scenes;
 using Microsoft.Xna.Framework;
 
 namespace DigitalRise.Utility
@@ -22,6 +23,18 @@ namespace DigitalRise.Utility
 			}
 
 			return result;
+		}
+
+		public static void SetDefaultCamera(this Scene scene)
+		{
+			var cameraNode = new CameraNode(new PerspectiveViewVolume());
+
+			var pose = cameraNode.PoseLocal;
+			pose.Position = new Vector3(0, 10, 20);
+
+			cameraNode.PoseLocal = pose;
+
+			scene.Camera = cameraNode;
 		}
 	}
 }

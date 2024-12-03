@@ -354,24 +354,24 @@ namespace DigitalRise.SceneGraph.Scenes
 
 		#region ----- Cloning -----
 
+		public new Scene Clone() => (Scene)base.Clone();
+
 		/// <summary>
 		/// Not supported.
 		/// </summary>
 		/// <returns>The new instance.</returns>
-		protected override SceneNode CreateInstanceCore()
-		{
-			throw new NotSupportedException("A scene cannot be cloned.");
-		}
+		protected override SceneNode CreateInstanceCore() => new Scene();
 
-
-		/// <summary>
-		/// Not supported.
-		/// </summary>
-		/// <param name="source">The object to clone.</param>
 		protected override void CloneCore(SceneNode source)
 		{
-			throw new NotSupportedException("A scene cannot be cloned.");
+			base.CloneCore(source);
+
+			var src = (Scene)source;
+
+			Camera = src.Camera;
 		}
+
+
 		#endregion
 
 

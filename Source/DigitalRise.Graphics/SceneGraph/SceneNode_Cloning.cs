@@ -4,6 +4,7 @@
 
 using System;
 using System.Globalization;
+using DigitalRise.Collections;
 using DigitalRise.Geometry;
 
 
@@ -119,6 +120,10 @@ namespace DigitalRise.SceneGraph
 			MaxDistance = source.MaxDistance;
 			SortTag = source.SortTag;
 			UserData = source.UserData;
+
+			RotationLocal = source.RotationLocal;
+			PrefabPath = source.PrefabPath;
+			PrefabsPaths.AddRange(source.PrefabsPaths);
 			// Do not clone: RenderData, SceneData
 
 			foreach (var child in source.Children)

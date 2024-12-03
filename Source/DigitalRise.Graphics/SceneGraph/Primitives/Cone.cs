@@ -61,5 +61,20 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateConeMesh(Radius, Height, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Cone Clone() => (Cone)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Cone();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Cone)source;
+
+			Radius = src.Radius;
+			Height = src.Height;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

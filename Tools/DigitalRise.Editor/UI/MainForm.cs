@@ -13,6 +13,8 @@ using DigitalRise.SceneGraph.Scenes;
 using DigitalRise.Data.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using DigitalRise.Data.Modelling;
+using DigitalRise.Collections;
+using static System.Collections.Specialized.BitVector32;
 
 namespace DigitalRise.Editor.UI
 {
@@ -611,9 +613,14 @@ namespace DigitalRise.Editor.UI
 
 		private void OnAddPrefab(SceneNode parent)
 		{
-			OnAddExternalResource(parent, new[] { "prefab" }, path => new PrefabNode
+			OnAddExternalResource(parent, new[] { "prefab" }, path =>
 			{
-				PrefabPath = path
+				parent.PrefabsPaths.Add(path);
+
+				var prefab = AssetManager.LoadSceneNode(path).Clone();
+				prefab.PrefabPath = path;
+
+				return prefab;
 			});
 		}
 
@@ -644,11 +651,6 @@ namespace DigitalRise.Editor.UI
 					// Special case
 					action = () => OnAddModel(sceneNode);
 				}
-				else if (pair.Value.Count == 1 && pair.Value[0].Type == typeof(PrefabNode))
-				{
-					// Special case
-					action = () => OnAddPrefab(sceneNode);
-				}
 				else
 				{
 					// Ordinary case
@@ -657,6 +659,9 @@ namespace DigitalRise.Editor.UI
 
 				contextMenuOptions.Add(new Tuple<string, Action>($"Insert {pair.Key}...", action));
 			}
+
+			// Prefab
+			contextMenuOptions.Add(new Tuple<string, Action>($"Insert Prefab...", () => OnAddPrefab(sceneNode)));
 
 			if (treeNode != _treeFileExplorer.GetSubNode(0))
 			{
@@ -798,7 +803,17 @@ namespace DigitalRise.Editor.UI
 		{
 			var sceneNode = (SceneNode)node.Tag;
 			var label = (Label)node.Content;
-			label.Text = $"{sceneNode.GetType().Name} (#{sceneNode.Name})";
+
+			string id;
+			if (sceneNode.IsPrefab)
+			{
+				id = $"Prefab [{sceneNode.GetType().Name}] (#{sceneNode.Name})";
+			} else
+			{
+				id = $"{sceneNode.GetType().Name} (#{sceneNode.Name})";
+			}
+
+			label.Text = id;
 		}
 
 		private TreeViewNode RecursiveAddToExplorer(ITreeViewNode treeViewNode, SceneNode sceneNode)
@@ -810,7 +825,7 @@ namespace DigitalRise.Editor.UI
 
 			UpdateTreeNodeId(newNode);
 
-			if (!(sceneNode is PrefabNode) && sceneNode.Children != null)
+			if (!sceneNode.IsPrefab && sceneNode.Children != null)
 			{
 				foreach (var child in sceneNode.Children)
 				{

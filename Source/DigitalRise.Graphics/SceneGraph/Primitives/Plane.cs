@@ -78,5 +78,21 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreatePlaneMesh(Size.X, Size.Y, Tessellation.X, Tessellation.Y, UScale, VScale, GenerateBackface, IsLeftHanded, NormalDirection);
+
+		public new Plane Clone() => (Plane)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Plane();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Plane)source;
+
+			Size = src.Size;
+			Tessellation = src.Tessellation;
+			GenerateBackface = src.GenerateBackface;
+			NormalDirection = src.NormalDirection;
+		}
 	}
 }

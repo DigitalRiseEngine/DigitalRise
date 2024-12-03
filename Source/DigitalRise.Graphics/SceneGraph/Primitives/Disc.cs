@@ -66,5 +66,20 @@ namespace DigitalRise.SceneGraph.Primitives
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateDiscMesh(Radius, 
 			MathHelper.ToRadians(SectorAngle),
 			Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Disc Clone() => (Disc)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Disc();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Disc)source;
+
+			Radius = src.Radius;
+			SectorAngle = src.SectorAngle;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

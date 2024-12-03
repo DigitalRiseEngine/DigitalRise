@@ -167,6 +167,7 @@ namespace DigitalRise.SceneGraph.Sky
 			// Clone SkyboxNode properties.
 			var sourceTyped = (SkyboxNode)source;
 			Texture = sourceTyped.Texture;
+			TexturePath = sourceTyped.TexturePath;
 			Color = sourceTyped.Color;
 			Alpha = sourceTyped.Alpha;
 			EnableAlphaBlending = sourceTyped.EnableAlphaBlending;

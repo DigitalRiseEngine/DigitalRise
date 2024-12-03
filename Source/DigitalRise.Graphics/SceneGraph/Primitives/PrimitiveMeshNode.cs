@@ -116,5 +116,17 @@ namespace DigitalRise.SceneGraph.Primitives
 
 			Shape = RenderMesh.BoundingBox.CreateShape();
 		}
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (PrimitiveMeshNode)source;
+
+			Material = src.Material.Clone();
+			IsLeftHanded = src.IsLeftHanded;
+			UScale = src.UScale;
+			VScale = src.VScale;
+		}
 	}
 }

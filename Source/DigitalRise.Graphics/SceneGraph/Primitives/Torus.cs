@@ -61,5 +61,20 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateTorusMesh(MajorRadius, MinorRadius, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Torus Clone() => (Torus)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Torus();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Torus)source;
+
+			MajorRadius = src.MajorRadius;
+			MinorRadius = src.MinorRadius;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

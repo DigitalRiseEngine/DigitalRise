@@ -27,5 +27,18 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateBoxMesh(Size, UScale, VScale, IsLeftHanded);
+
+		public new Box Clone() => (Box)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Box();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Box)source;
+
+			Size = src.Size;
+		}
 	}
 }

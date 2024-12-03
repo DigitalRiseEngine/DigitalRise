@@ -61,5 +61,20 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateCylinderMesh(Height, Radius, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Cylinder Clone() => (Cylinder)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Cylinder();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Cylinder)source;
+
+			Height = src.Height;
+			Radius = src.Radius;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

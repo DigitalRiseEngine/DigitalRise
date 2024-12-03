@@ -61,5 +61,20 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateCapsuleMesh(Length, Radius, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new Capsule Clone() => (Capsule)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new Capsule();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (Capsule)source;
+
+			Length = src.Length;
+			Radius = src.Radius;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

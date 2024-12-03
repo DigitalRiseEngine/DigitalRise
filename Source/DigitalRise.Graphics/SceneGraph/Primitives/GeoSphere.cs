@@ -44,5 +44,19 @@ namespace DigitalRise.SceneGraph.Primitives
 		}
 
 		protected override Mesh CreateMesh() => MeshPrimitives.CreateGeoSphereMesh(Radius, Tessellation, UScale, VScale, IsLeftHanded);
+
+		public new GeoSphere Clone() => (GeoSphere)base.Clone();
+
+		protected override SceneNode CreateInstanceCore() => new GeoSphere();
+
+		protected override void CloneCore(SceneNode source)
+		{
+			base.CloneCore(source);
+
+			var src = (GeoSphere)source;
+
+			Radius = src.Radius;
+			Tessellation = src.Tessellation;
+		}
 	}
 }

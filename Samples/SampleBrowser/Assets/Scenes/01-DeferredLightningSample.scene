@@ -1,18 +1,20 @@
 {
-"$type": "DigitalRise.SceneGraph.Scenes.Scene, DigitalRise",
+  "$type": "DigitalRise.SceneGraph.Scenes.Scene, DigitalRise",
   "EnableMultithreading": true,
   "Camera": {
     "ViewVolume": {
       "$type": "DigitalRise.Geometry.Shapes.PerspectiveViewVolume, DigitalRise.Geometry",
-      "FieldOfViewY": 90.0,
+      "FieldOfViewY": 60.0,
       "Near": 1.0,
       "Far": 1000.0
     },
     "LodBias": 1.0,
     "Children": [],
     "IsEnabled": true,
+    "PrefabsPaths": [],
     "ScaleLocal": "1, 1, 1",
-    "PositionLocal": "-2.4335349, 11.145267, 3.2553537"
+    "RotationLocal": "-2.9819314, -27.936611, 0",
+    "PositionLocal": "-44.061344, 35.656937, 73.61129"
   },
   "Name": "Root",
   "Children": [
@@ -38,6 +40,7 @@
           "Name": "_ambientLight",
           "Children": [],
           "IsEnabled": true,
+          "PrefabsPaths": [],
           "ScaleLocal": "1, 1, 1"
         },
         {
@@ -78,12 +81,14 @@
           "Name": "_directLight",
           "Children": [],
           "IsEnabled": true,
+          "PrefabsPaths": [],
           "ScaleLocal": "1, 1, 1",
           "RotationLocal": "-53, 45, 0",
           "PositionLocal": "0, 60, 0"
         }
       ],
       "IsEnabled": true,
+      "PrefabsPaths": [],
       "ScaleLocal": "1, 1, 1"
     },
     {
@@ -102,18 +107,13 @@
       "Children": [],
       "IsEnabled": true,
       "CastsShadows": true,
+      "PrefabsPaths": [],
       "ScaleLocal": "1, 1, 1"
-    },
-    {
-      "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise",
-      "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets/Models\\Dude.glb",
-      "Name": "_dude",
-      "Children": [],
-      "IsEnabled": true,
-      "CastsShadows": true,
-      "ScaleLocal": "0.1, 0.1, 0.1"
     }
   ],
   "IsEnabled": true,
+  "PrefabsPaths": [
+    "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets\\Prefabs\\dude.prefab"
+  ],
   "ScaleLocal": "1, 1, 1"
 }

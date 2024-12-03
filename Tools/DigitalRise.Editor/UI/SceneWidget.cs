@@ -59,19 +59,17 @@ namespace DigitalRise.Editor.UI
 				if (_sceneNode is Scene)
 				{
 					_scene = (Scene)_sceneNode;
+
+					if (_scene.Camera == null)
+					{
+						_scene.SetDefaultCamera();
+
+					}
 				} else
 				{
 					// Create scene to view this node
 					_scene = new Scene();
-
-					var cameraNode = new CameraNode(new PerspectiveViewVolume());
-
-					var pose = cameraNode.PoseLocal;
-					pose.Position = new Vector3(0, 10, 20);
-
-					cameraNode.PoseLocal = pose;
-
-					_scene.Camera = cameraNode;
+					_scene.SetDefaultCamera();
 
 					_scene.Children.Add(AmbientLightNode);
 					_scene.Children.Add(_sceneNode);

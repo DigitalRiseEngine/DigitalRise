@@ -17,6 +17,9 @@ using DigitalRise.Data.Billboards;
 using DigitalRise.Misc.TextureAtlas;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Geometry;
+using DigitalRise.Vertices;
+using DigitalRise.Data.Meshes;
+using DigitalRise.Data.Meshes.Primitives;
 
 namespace DigitalRise.Editor.UI
 {
@@ -34,7 +37,7 @@ namespace DigitalRise.Editor.UI
 		private Scene _scene;
 		private LightNode _ambientLightNode;
 		private CameraInputController _controller;
-		private MeshNode _gridMesh;
+		private Submesh _gridMesh;
 		// private Modelling.DigitalRiseModelMesh _waterMarker;
 		// private DigitalRiseModel _modelMarker;
 		private Vector3? _touchDownStart;
@@ -44,6 +47,19 @@ namespace DigitalRise.Editor.UI
 		private readonly List<SceneNode> _gizmos = new List<SceneNode>();
 		private readonly PerspectiveViewVolume _perspectiveViewVolume;
 		private readonly OrthographicViewVolume _orthographicViewVolume;
+
+		private Submesh GridMesh
+		{
+			get
+			{
+				if (_gridMesh == null)
+				{
+					_gridMesh = MeshPrimitives.CreatePlaneLinesSubmesh(GridSize);
+				}
+
+				return _gridMesh;
+			}
+		}
 
 		public SceneNode SceneNode
 		{
@@ -82,9 +98,19 @@ namespace DigitalRise.Editor.UI
 			}
 		}
 
-		public Scene Scene
+		private Scene Scene
 		{
 			get => _scene;
+		}
+
+		public CameraNode Camera
+		{
+			get => _scene.Camera;
+			set
+			{
+				_scene.Camera = value;
+				_controller = new CameraInputController(_scene.Camera);
+			}
 		}
 
 		public RenderStatistics RenderStatistics { get; private set; }
@@ -103,15 +129,6 @@ namespace DigitalRise.Editor.UI
 				}
 
 				return _ambientLightNode;
-			}
-		}
-
-
-		private MeshNode GridMesh
-		{
-			get
-			{
-				return _gridMesh;
 			}
 		}
 
@@ -266,6 +283,11 @@ namespace DigitalRise.Editor.UI
 			{
 				_debugRenderer.DrawShape(selectionShape, selectedNode.PoseWorld, selectedNode.ScaleWorld, Color.Orange, true, false);
 				//_debugRenderer.DrawAxes(selectedNode.PoseWorld, 10, false);
+			}
+
+			if (DigitalRiseEditorOptions.ShowGrid)
+			{
+				_debugRenderer.DrawMesh(GridMesh, Pose.Identity, Vector3.One, Color.LightGreen, true, false);
 			}
 			
 			_debugRenderer.Render(Scene.Camera);

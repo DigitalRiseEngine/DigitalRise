@@ -11,10 +11,9 @@
     "LodBias": 1.0,
     "Children": [],
     "IsEnabled": true,
-    "PrefabsPaths": [],
     "ScaleLocal": "1, 1, 1",
-    "RotationLocal": "-33.630615, 11.227638, 0",
-    "PositionLocal": "-1.4307014, 16.342993, 13.267669"
+    "RotationLocal": "-12.350895, -16.819221, 0",
+    "PositionLocal": "-17.097822, 34.091595, 58.985565"
   },
   "Name": "Root",
   "Children": [
@@ -40,7 +39,6 @@
           "Name": "_ambientLight",
           "Children": [],
           "IsEnabled": true,
-          "PrefabsPaths": [],
           "ScaleLocal": "1, 1, 1"
         },
         {
@@ -81,14 +79,12 @@
           "Name": "_directLight",
           "Children": [],
           "IsEnabled": true,
-          "PrefabsPaths": [],
           "ScaleLocal": "1, 1, 1",
           "RotationLocal": "-30, 30, 0",
           "PositionLocal": "0, 60, 0"
         }
       ],
       "IsEnabled": true,
-      "PrefabsPaths": [],
       "ScaleLocal": "1, 1, 1"
     },
     {
@@ -107,13 +103,23 @@
       "Children": [],
       "IsEnabled": true,
       "CastsShadows": true,
-      "PrefabsPaths": [],
       "ScaleLocal": "1, 1, 1"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.PrefabNode, DigitalRise",
+      "PrefabPath": "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets\\Prefabs\\dude.prefab",
+      "IsEnabled": true,
+      "ScaleLocal": "1, 1, 1"
+    },
+    {
+      "$type": "DigitalRise.SceneGraph.PrefabNode, DigitalRise",
+      "PrefabPath": "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets\\Prefabs\\dude.prefab",
+      "IsEnabled": true,
+      "ScaleLocal": "1, 1, 1",
+      "RotationLocal": "0, -22, 0",
+      "PositionLocal": "18, 0, 0"
     }
   ],
   "IsEnabled": true,
-  "PrefabsPaths": [
-    "D:\\Projects\\DigitalRise\\Samples\\SampleBrowser\\Assets\\Prefabs\\dude.prefab"
-  ],
   "ScaleLocal": "1, 1, 1"
 }

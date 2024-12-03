@@ -17,7 +17,7 @@ namespace AssetManagementBase
 
 		private readonly static AssetLoader<SceneNode> _sceneLoader = (manager, assetName, settings, tag) =>
 		{
-			var data = manager.LoadString(assetName);
+			var data = manager.ReadAsString(assetName);
 			return SceneNode.ReadFromString(data, manager);
 		};
 

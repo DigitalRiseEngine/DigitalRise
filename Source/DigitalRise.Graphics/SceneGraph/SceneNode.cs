@@ -667,18 +667,6 @@ namespace DigitalRise.SceneGraph
 		[Category("Misc")]
 		public object UserData { get; set; }
 
-		[Browsable(false)]
-		[JsonIgnore]
-		public string PrefabPath { get; set; }
-
-		[Browsable(false)]
-		[JsonIgnore]
-		public bool IsPrefab => !string.IsNullOrEmpty(PrefabPath);
-
-		[Browsable(false)]
-		public HashSet<string> PrefabsPaths { get; } = new HashSet<string>();
-
-
 		/// <summary>
 		/// Occurs when the local subtree changed.
 		/// </summary>
@@ -937,14 +925,6 @@ namespace DigitalRise.SceneGraph
 
 		public virtual void Load(AssetManager assetManager)
 		{
-			foreach(var path in PrefabsPaths)
-			{
-				var prefab = assetManager.LoadSceneNode(path).Clone();
-				prefab.PrefabPath = path;
-
-				Children.Add(prefab);
-			}
-
 			foreach (var child in Children)
 			{
 				child.Load(assetManager);
@@ -957,27 +937,9 @@ namespace DigitalRise.SceneGraph
 
 		public void SaveToFile(string path)
 		{
-			// Create clone without prefabs
-			var cloneWithoutPrefabs = Clone();
-
-			cloneWithoutPrefabs.RecursiveProcess(n =>
-			{
-				for(var i = 0; i < n.Children.Count; i++)
-				{
-					var child = n.Children[i];
-
-					if (child.IsPrefab)
-					{
-						n.Children.RemoveAt(i);
-						--i;
-					}
-				}
-			});
-
 			var options = JsonExtensions.CreateOptions();
 
-
-			JsonExtensions.SerializeToFile(path, options, cloneWithoutPrefabs);
+			JsonExtensions.SerializeToFile(path, options, this);
 		}
 
 		public static SceneNode ReadFromString(string data, AssetManager assetManager)

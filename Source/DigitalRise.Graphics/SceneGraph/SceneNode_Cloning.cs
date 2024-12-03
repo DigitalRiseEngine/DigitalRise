@@ -59,7 +59,6 @@ namespace DigitalRise.SceneGraph
 		/// Cannot clone <see cref="SceneNode"/>. A derived class does not implement 
 		/// <see cref="CreateInstanceCore"/>.
 		/// </exception>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		private SceneNode CreateInstance()
 		{
 			var newInstance = CreateInstanceCore();
@@ -122,8 +121,6 @@ namespace DigitalRise.SceneGraph
 			UserData = source.UserData;
 
 			RotationLocal = source.RotationLocal;
-			PrefabPath = source.PrefabPath;
-			PrefabsPaths.AddRange(source.PrefabsPaths);
 			// Do not clone: RenderData, SceneData
 
 			foreach (var child in source.Children)

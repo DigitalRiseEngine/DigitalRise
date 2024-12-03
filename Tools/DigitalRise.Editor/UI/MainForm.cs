@@ -13,8 +13,7 @@ using DigitalRise.SceneGraph.Scenes;
 using DigitalRise.Data.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using DigitalRise.Data.Modelling;
-using DigitalRise.Collections;
-using static System.Collections.Specialized.BitVector32;
+using DigitalRise.Utility;
 
 namespace DigitalRise.Editor.UI
 {
@@ -47,7 +46,8 @@ namespace DigitalRise.Editor.UI
 						_treeFileSolution.RemoveAllSubNodes();
 						ProcessNode(_treeFileSolution, value);
 						AssetManager = AssetManager.CreateFileAssetManager(value);
-					} else
+					}
+					else
 					{
 						AssetManager = null;
 					}
@@ -84,7 +84,6 @@ namespace DigitalRise.Editor.UI
 			}
 		}
 
-		public Scene CurrentScene => CurrentSceneWidget.Scene;
 
 		private readonly List<InstrumentButton> _allButtons = new List<InstrumentButton>();
 
@@ -92,7 +91,7 @@ namespace DigitalRise.Editor.UI
 		{
 			get
 			{
-				var camera = CurrentScene.Camera;
+				var camera = CurrentSceneWidget.Camera;
 
 				var asCamera = SelectedObject as CameraNode;
 				if (asCamera != null)
@@ -192,9 +191,12 @@ namespace DigitalRise.Editor.UI
 			_topSplitPane.SetSplitterPosition(0, 0.2f);
 			_topSplitPane.SetSplitterPosition(1, 0.6f);
 
-			_menuItemNew.Selected += (s, a) => OnNewPrefab();
+			_menuItemNewScene.Selected += (s, a) => NewScene();
+			_menuItemNewPrefab.Selected += (s, a) => NewPrefab();
 
-			_menuItemOpenSolution.Selected += (s, a) =>
+			_menuItemReload.Selected += (s, a) => Reload();
+
+			_menuItemOpenFolder.Selected += (s, a) =>
 			{
 				FileDialog dialog = new FileDialog(FileDialogMode.ChooseFolder);
 
@@ -300,8 +302,6 @@ namespace DigitalRise.Editor.UI
 			_buttonVisualizeBuffers.IsToggled = DRDebugOptions.VisualizeBuffers;
 
 			_buttonGrid.IsToggledChanged += (s, a) => UpdateDebugOptions();
-			_buttonBoundingBoxes.IsToggledChanged += (s, a) => UpdateDebugOptions();
-			_buttonLightViewFrustum.IsToggledChanged += (s, a) => UpdateDebugOptions();
 			_buttonVisualizeBuffers.IsToggledChanged += (s, a) => UpdateDebugOptions();
 
 			UpdateStackPanelEditor();
@@ -402,7 +402,8 @@ namespace DigitalRise.Editor.UI
 				return InternalCreateCustomEditor(record, obj, new[] { "dds" },
 					path => AssetManager.LoadTextureCube(DR.GraphicsDevice, path));
 
-			} else if (record.Type == typeof(DrModel))
+			}
+			else if (record.Type == typeof(DrModel))
 			{
 				return InternalCreateCustomEditor(record, obj, new[] { "glb", "gltf" },
 					path => AssetManager.LoadGltf(path));
@@ -478,13 +479,13 @@ namespace DigitalRise.Editor.UI
 		{
 			try
 			{
-				var node = _treeFileSolution.SelectedNode;
-				if (node == null || node.Tag == null || !(node.Tag is string))
+				var treeNode = _treeFileSolution.SelectedNode;
+				if (treeNode == null || treeNode.Tag == null || !(treeNode.Tag is string))
 				{
 					return;
 				}
 
-				var file = (string)node.Tag;
+				var file = (string)treeNode.Tag;
 				if (file.EndsWith(".scene") || file.EndsWith(".prefab"))
 				{
 					if (SetTabByName(_tabControlScenes, file))
@@ -493,11 +494,8 @@ namespace DigitalRise.Editor.UI
 					}
 
 					// Load scene
-					SceneNode scene;
-					var folder = Path.GetDirectoryName(file);
-
-					scene = AssetManager.LoadSceneNode(file);
-					OpenTab(scene, file);
+					var sceneNode = AssetManager.LoadSceneNode(file);
+					OpenTab(sceneNode, file);
 				}
 			}
 			catch (Exception ex)
@@ -615,12 +613,12 @@ namespace DigitalRise.Editor.UI
 		{
 			OnAddExternalResource(parent, new[] { "prefab" }, path =>
 			{
-				parent.PrefabsPaths.Add(path);
+				var prefabNode = new PrefabNode
+				{
+					PrefabPath = path
+				};
 
-				var prefab = AssetManager.LoadSceneNode(path).Clone();
-				prefab.PrefabPath = path;
-
-				return prefab;
+				return prefabNode;
 			});
 		}
 
@@ -677,7 +675,49 @@ namespace DigitalRise.Editor.UI
 			Desktop.BuildContextMenu(contextMenuOptions);
 		}
 
-		private void OnNewPrefab()
+		private void ReloadCurrentItem()
+		{
+			try
+			{
+				if (_tabControlScenes.SelectedItem == null)
+				{
+					return;
+				}
+				var tab = _tabControlScenes.SelectedItem;
+
+				var tabInfo = (TabInfo)tab.Tag;
+
+
+				var sceneNode = AssetManager.LoadSceneNode(tabInfo.FilePath);
+
+				var sceneWidget = tab.Content.FindChild<SceneWidget>();
+				var camera = sceneWidget.Camera.Clone();
+				sceneWidget.SceneNode = sceneNode;
+				sceneWidget.Camera = camera;
+			}
+			catch (Exception ex)
+			{
+				var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
+				dialog.ShowModal(Desktop);
+				return;
+			}
+		}
+
+		private void Reload()
+		{
+			RemoveScenesFromCache();
+			ReloadCurrentItem();
+		}
+
+		private void NewScene()
+		{
+			var scene = new Scene();
+			scene.SetDefaultCamera();
+
+			OpenTab(scene, string.Empty);
+		}
+
+		private void NewPrefab()
 		{
 			var dialog = new ChooseNodeDialog();
 
@@ -695,7 +735,6 @@ namespace DigitalRise.Editor.UI
 					var newNode = dialog.NodeTypeInfo.CreateInstance();
 
 					OpenTab(newNode, string.Empty);
-
 				}
 				catch (Exception ex)
 				{
@@ -804,15 +843,7 @@ namespace DigitalRise.Editor.UI
 			var sceneNode = (SceneNode)node.Tag;
 			var label = (Label)node.Content;
 
-			string id;
-			if (sceneNode.IsPrefab)
-			{
-				id = $"Prefab [{sceneNode.GetType().Name}] (#{sceneNode.Name})";
-			} else
-			{
-				id = $"{sceneNode.GetType().Name} (#{sceneNode.Name})";
-			}
-
+			var id = $"{sceneNode.GetType().Name} (#{sceneNode.Name})";
 			label.Text = id;
 		}
 
@@ -825,7 +856,7 @@ namespace DigitalRise.Editor.UI
 
 			UpdateTreeNodeId(newNode);
 
-			if (!sceneNode.IsPrefab && sceneNode.Children != null)
+			if (!(sceneNode is PrefabNode) && sceneNode.Children != null)
 			{
 				foreach (var child in sceneNode.Children)
 				{
@@ -885,7 +916,7 @@ namespace DigitalRise.Editor.UI
 
 			if (!string.IsNullOrEmpty(tabInfo.FilePath))
 			{
-				sceneWidget.Scene.SaveToFile(tabInfo.FilePath);
+				sceneWidget.SceneNode.SaveToFile(tabInfo.FilePath);
 				tabInfo.Dirty = false;
 			}
 			else
@@ -914,26 +945,40 @@ namespace DigitalRise.Editor.UI
 		private void UpdateDebugOptions()
 		{
 			DigitalRiseEditorOptions.ShowGrid = _buttonGrid.IsToggled;
-			/*			DebugSettings.DrawBoundingBoxes = _buttonBoundingBoxes.IsToggled;
-						DebugSettings.DrawLightViewFrustrum = _buttonLightViewFrustum.IsToggled;*/
 			DRDebugOptions.VisualizeBuffers = _buttonVisualizeBuffers.IsToggled;
 		}
 
 		public override void InternalRender(Myra.Graphics2D.RenderContext context)
 		{
-			base.InternalRender(context);
-
-			if (_panelStatistics.Visible == false || CurrentSceneWidget == null)
+			if (_panelStatistics.Visible && CurrentSceneWidget != null)
 			{
-				return;
+				var stats = CurrentSceneWidget.RenderStatistics;
+
+				_labelEffectsSwitches.Text = stats.EffectsSwitches.ToString();
+				_labelDrawCalls.Text = stats.DrawCalls.ToString();
+				_labelVerticesDrawn.Text = stats.VerticesDrawn.ToString();
+				_labelPrimitivesDrawn.Text = stats.PrimitivesDrawn.ToString();
 			}
 
-			var stats = CurrentSceneWidget.RenderStatistics;
+			base.InternalRender(context);
+		}
 
-			_labelEffectsSwitches.Text = stats.EffectsSwitches.ToString();
-			_labelDrawCalls.Text = stats.DrawCalls.ToString();
-			_labelVerticesDrawn.Text = stats.VerticesDrawn.ToString();
-			_labelPrimitivesDrawn.Text = stats.PrimitivesDrawn.ToString();
+		public void RemoveScenesFromCache()
+		{
+			var toRemove = new List<string>();
+
+			foreach (var pair in AssetManager.Cache)
+			{
+				if (pair.Value is SceneNode)
+				{
+					toRemove.Add(pair.Key);
+				}
+			}
+
+			foreach (var key in toRemove)
+			{
+				AssetManager.Cache.Remove(key);
+			}
 		}
 	}
 }

@@ -3,10 +3,16 @@
   <VerticalStackPanel Id="_mainPanel">
     <HorizontalMenu>
       <MenuItem Text="&amp;File">
-        <MenuItem Text="&amp;New" Id="_menuItemNew" />
-        <MenuItem Text="&amp;Open Solution" Id="_menuItemOpenSolution" />
-        <MenuItem Text="&amp;Save Current Item" Id="_menuItemSaveCurrentItem" />
-        <MenuItem Text="&amp;Save Everything" Id="_menuItemSaveEverything" />
+        <MenuItem Text="&amp;Open Folder" Id="_menuItemOpenFolder" />
+        <MenuItem Text="&amp;Save Current Item" ShortcutText="Ctrl+S" Id="_menuItemSaveCurrentItem" />
+        <MenuItem Text="Save &amp;Everything" Id="_menuItemSaveEverything" />
+        <MenuSeparator />
+        <MenuItem Text="&amp;New Prefab" Id="_menuItemNewPrefab" />
+        <MenuItem Text="New &amp;Scene" Id="_menuItemNewScene" />
+        <MenuSeparator />
+        <MenuItem Text="&amp;Reload" Id="_menuItemReload" />
+        <MenuItem Text="&amp;Full Reload" Id="_menuItemFullReload" />
+        <MenuSeparator />
         <MenuItem Text="&amp;Quit" Id="_menuItemQuit" />
       </MenuItem>
       <MenuItem Text="&amp;Help">
@@ -24,12 +30,6 @@
             <HorizontalStackPanel Spacing="8">
               <ToggleButton Id="_buttonGrid">
                 <Label Text="Grid" />
-              </ToggleButton>
-              <ToggleButton Id="_buttonBoundingBoxes">
-                <Label Text="Bounding Boxes" />
-              </ToggleButton>
-              <ToggleButton Id="_buttonLightViewFrustum">
-                <Label Text="Light View Frustum" />
               </ToggleButton>
               <ToggleButton Id="_buttonVisualizeBuffers">
                 <Label Text="Render Buffers" />

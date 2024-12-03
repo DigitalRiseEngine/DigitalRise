@@ -1,4 +1,5 @@
 {
+"$type": "DigitalRise.SceneGraph.Scenes.Scene, DigitalRise",
   "EnableMultithreading": true,
   "Camera": {
     "ViewVolume": {

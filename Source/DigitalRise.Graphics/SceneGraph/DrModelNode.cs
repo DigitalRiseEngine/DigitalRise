@@ -1,5 +1,6 @@
 ﻿using AssetManagementBase;
 using DigitalRise.Attributes;
+using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
@@ -13,6 +14,31 @@ using System.ComponentModel;
 
 namespace DigitalRise.SceneGraph
 {
+	public class MeshMaterials
+	{
+		public string MeshName { get; set; }
+		public IMaterial[] Materials { get; set; }
+
+		public MeshMaterials Clone()
+		{
+			var result = new MeshMaterials
+			{
+				MeshName = MeshName
+			};
+
+			if (Materials != null)
+			{
+				result.Materials = new IMaterial[Materials.Length];
+				for (var i = 0; i < Materials.Length; ++i)
+				{
+					result.Materials[i] = Materials[i].Clone();
+				}
+			}
+
+			return result;
+		}
+	}
+
 	[EditorInfo("Model")]
 	public class DrModelNode : SceneNode
 	{
@@ -27,6 +53,7 @@ namespace DigitalRise.SceneGraph
 				Transforms = new Matrix[skin.Joints.Length];
 			}
 		}
+
 
 
 		private bool _transformsDirty = true;
@@ -48,37 +75,15 @@ namespace DigitalRise.SceneGraph
 					return;
 				}
 
-				_model = value;
-
-				_localTransforms = null;
-				_worldTransforms = null;
-				_skinInfos = null;
-				if (_model != null)
-				{
-					_localTransforms = new Matrix[_model.Bones.Length];
-					_worldTransforms = new Matrix[_model.Bones.Length];
-					if (_model.Skins != null && _model.Skins.Length > 0)
-					{
-						_skinInfos = new SkinInfo[_model.Skins.Length];
-						for (var i = 0; i < _model.Skins.Length; ++i)
-						{
-							_skinInfos[i] = new SkinInfo(_model.Skins[i]);
-						}
-					}
-
-					ResetTransforms();
-
-					Shape = CalculateBoundingBox().CreateShape();
-				}
-				else
-				{
-					Shape = Shape.Empty;
-				}
+				SetModel(value, true);
 			}
 		}
 
 		[Browsable(false)]
 		public string ModelPath { get; set; }
+
+		[Browsable(false)]
+		public MeshMaterials[] MeshMaterials { get; set; }
 
 		public DrModelNode()
 		{
@@ -155,8 +160,10 @@ namespace DigitalRise.SceneGraph
 
 			// Render meshes
 			var rootTransform = CalculateGlobalTransform();
-			foreach (var bone in _model.MeshBones)
+
+			for (var i = 0; i < _model.MeshBones.Length; ++i)
 			{
+				var bone = _model.MeshBones[i];
 				// If mesh has bones, then parent node transform had been already
 				// applied to bones transform
 				// Thus to avoid applying parent transform twice, we use
@@ -170,9 +177,67 @@ namespace DigitalRise.SceneGraph
 					bones = _skinInfos[bone.Skin.SkinIndex].Transforms;
 				}
 
-				foreach (var submesh in bone.Mesh.Submeshes)
+				for (var j = 0; j < bone.Mesh.Submeshes.Count; ++j)
 				{
-					list.AddJob(submesh, transform, bones);
+					var submesh = bone.Mesh.Submeshes[j];
+					list.AddJob(submesh, MeshMaterials[i].Materials[j], transform, bones);
+				}
+			}
+		}
+
+		private void SetModel(DrModel model, bool setMaterialsFromModel)
+		{
+			_model = model;
+
+			_localTransforms = null;
+			_worldTransforms = null;
+			_skinInfos = null;
+			if (_model != null)
+			{
+				_localTransforms = new Matrix[_model.Bones.Length];
+				_worldTransforms = new Matrix[_model.Bones.Length];
+				if (_model.Skins != null && _model.Skins.Length > 0)
+				{
+					_skinInfos = new SkinInfo[_model.Skins.Length];
+					for (var i = 0; i < _model.Skins.Length; ++i)
+					{
+						_skinInfos[i] = new SkinInfo(_model.Skins[i]);
+					}
+				}
+
+				ResetTransforms();
+
+				Shape = CalculateBoundingBox().CreateShape();
+
+				if (setMaterialsFromModel)
+				{
+					var meshMaterials = new List<MeshMaterials>();
+					foreach (var meshBone in _model.MeshBones)
+					{
+						var mesh = meshBone.Mesh;
+						var materials = new List<IMaterial>();
+						foreach (var submesh in mesh.Submeshes)
+						{
+							materials.Add(submesh.Material.Clone());
+						}
+
+						meshMaterials.Add(new MeshMaterials
+						{
+							MeshName = meshBone.Name,
+							Materials = materials.ToArray()
+						});
+					}
+
+					MeshMaterials = meshMaterials.ToArray();
+				}
+			}
+			else
+			{
+				Shape = Shape.Empty;
+
+				if (setMaterialsFromModel)
+				{
+					MeshMaterials = null;
 				}
 			}
 		}
@@ -181,7 +246,8 @@ namespace DigitalRise.SceneGraph
 		{
 			base.Load(assetManager);
 
-			Model = assetManager.LoadGltf(ModelPath);
+			var model = assetManager.LoadGltf(ModelPath);
+			SetModel(model, MeshMaterials == null);
 		}
 
 		private BoundingBox CalculateBoundingBox()
@@ -224,7 +290,20 @@ namespace DigitalRise.SceneGraph
 
 			var src = (DrModelNode)source;
 			ModelPath = src.ModelPath;
-			Model = src.Model;
+			SetModel(src.Model, src.MeshMaterials == null);
+
+			if (src.MeshMaterials != null)
+			{
+				MeshMaterials = new MeshMaterials[src.MeshMaterials.Length];
+
+				for (var i = 0; i < MeshMaterials.Length; ++i)
+				{
+					MeshMaterials[i] = src.MeshMaterials[i].Clone();
+				}
+			} else
+			{
+				MeshMaterials = null;
+			}
 		}
 	}
 }

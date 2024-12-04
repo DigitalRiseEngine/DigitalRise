@@ -1,0 +1,15 @@
+<Project>
+  <Project.ExportOptions Namespace="DigitalRise.Editor.UI" Class="EditMaterialsDialog" OutputPath="D:\Projects\DigitalRise\Tools\DigitalRise.Editor\UI" />
+  <Dialog Title="Edit Materials" Left="531" Top="78" Width="500" Height="500">
+    <VerticalStackPanel>
+      <HorizontalSeparator />
+      <HorizontalSplitPane StackPanel.ProportionType="Fill">
+        <Panel Id="_panelLeft" />
+        <ScrollViewer>
+          <PropertyGrid Id="_properties" />
+        </ScrollViewer>
+      </HorizontalSplitPane>
+      <HorizontalSeparator />
+    </VerticalStackPanel>
+  </Dialog>
+</Project>

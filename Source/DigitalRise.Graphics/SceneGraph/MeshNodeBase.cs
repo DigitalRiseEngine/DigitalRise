@@ -20,12 +20,9 @@ namespace DigitalRise.SceneGraph
 		//--------------------------------------------------------------
 
 		/// <summary>
-		/// Gets or sets the mesh.
+		/// Gets the mesh.
 		/// </summary>
 		/// <value>The mesh.</value>
-		/// <exception cref="ArgumentNullException">
-		/// <paramref name="value"/> is <see langword="null"/>.
-		/// </exception>
 		protected abstract Mesh RenderMesh { get; }
 
 		/// <summary>
@@ -184,7 +181,7 @@ namespace DigitalRise.SceneGraph
 					continue;
 				}
 
-				list.AddJob(submesh, CalculateGlobalTransform());
+				list.AddJob(submesh, submesh.Material, CalculateGlobalTransform());
 			}
 		}
 

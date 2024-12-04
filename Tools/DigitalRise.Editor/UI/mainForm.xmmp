@@ -63,9 +63,12 @@
             </Panel>
           </VerticalStackPanel>
         </Panel>
-        <ScrollViewer>
-          <PropertyGrid Id="_propertyGrid" />
-        </ScrollViewer>
+        <VerticalStackPanel Spacing="8">
+          <ScrollViewer StackPanel.ProportionType="Fill">
+            <PropertyGrid Id="_propertyGrid" />
+          </ScrollViewer>
+          <HorizontalStackPanel Spacing="8" Id="_panelObjectButtons" />
+        </VerticalStackPanel>
       </HorizontalSplitPane>
     </Panel>
   </VerticalStackPanel>

@@ -14,6 +14,7 @@ using DigitalRise.Data.Materials;
 using Microsoft.Xna.Framework.Graphics;
 using DigitalRise.Data.Modelling;
 using DigitalRise.Utility;
+using Myra.Events;
 
 namespace DigitalRise.Editor.UI
 {
@@ -232,64 +233,10 @@ namespace DigitalRise.Editor.UI
 			};
 			_treeFileExplorer.TouchUp += _treeFileExplorer_TouchUp;
 
-			_treeFileExplorer.SelectionChanged += (s, a) =>
-			{
-				_propertyGrid.Object = _treeFileExplorer.SelectedNode?.Tag;
-			};
-
-			_treeFileSolution.TouchDoubleClick += (s, a) => OpenCurrentSolutionItem();
-
-			_propertyGrid.ObjectChanged += (s, a) =>
-			{
-				var tab = _tabControlScenes.SelectedItem;
-				if (tab == null)
-				{
-					return;
-				}
-
-				var buttonsGrid = _tabControlScenes.SelectedItem.Content.FindChildById<StackPanel>(ButtonsPanelId);
-				var buttonShowCamera = tab.Content.FindChildById<ToggleButton>(ButtonCameraViewId);
-				var asCamera = _propertyGrid.Object as CameraNode;
-
-				if (asCamera == null && buttonShowCamera != null)
-				{
-					// Remove button from the grid
-					buttonsGrid.Widgets.Remove(buttonShowCamera);
-				}
-				else if (asCamera != null && buttonShowCamera == null)
-				{
-					// Add button to the grid
-					var label = new Label
-					{
-						Text = "Camera View"
-					};
-
-					buttonShowCamera = new ToggleButton
-					{
-						Id = ButtonCameraViewId,
-						Content = label,
-					};
-
-					buttonsGrid.Widgets.Add(buttonShowCamera);
-				}
-			};
-
-			_propertyGrid.PropertyChanged += (s, a) =>
-			{
-				InvalidateCurrentItem();
-
-				switch (a.Data)
-				{
-					case "Id":
-						UpdateTreeNodeId(_treeFileExplorer.SelectedNode);
-						break;
-
-					case "PrimitiveMeshType":
-						_propertyGrid.Rebuild();
-						break;
-				}
-			};
-
+			_treeFileExplorer.SelectionChanged += OnExplorerNodeChanged;
+			_treeFileSolution.TouchDoubleClick += OnOpenCurrentSolutionItem;
+			_propertyGrid.ObjectChanged += OnObjectChanged;
+			_propertyGrid.PropertyChanged += OnPropertyChanged;
 			_propertyGrid.CustomWidgetProvider = CreateCustomEditor;
 
 			_tabControlScenes.Items.Clear();
@@ -438,6 +385,78 @@ namespace DigitalRise.Editor.UI
 			_panelScenes.Visible = _tabControlScenes.Items.Count > 0;
 		}
 
+		private void OnExplorerNodeChanged(object sender, EventArgs args)
+		{
+			_propertyGrid.Object = _treeFileExplorer.SelectedNode?.Tag;
+		}
+
+		private void EditMaterials(DrModelNode modelNode)
+		{
+			var dialog = new EditMaterialsDialog(modelNode);
+
+			dialog.Closed += (s, a) =>
+			 {
+				 if (!dialog.Result)
+				 {
+					 // "Cancel" or Escape
+					 return;
+				 }
+
+			 };
+
+			dialog.ShowModal(Desktop);
+		}
+
+		private void OnObjectChanged(object sender, EventArgs args)
+		{
+			var tab = _tabControlScenes.SelectedItem;
+			if (tab == null)
+			{
+				return;
+			}
+
+			var buttonsGrid = _tabControlScenes.SelectedItem.Content.FindChildById<StackPanel>(ButtonsPanelId);
+			var buttonShowCamera = tab.Content.FindChildById<ToggleButton>(ButtonCameraViewId);
+			var asCamera = _propertyGrid.Object as CameraNode;
+			if (asCamera == null && buttonShowCamera != null)
+			{
+				// Remove button from the grid
+				buttonsGrid.Widgets.Remove(buttonShowCamera);
+			}
+			else if (asCamera != null && buttonShowCamera == null)
+			{
+				// Add button to the grid
+				var label = new Label
+				{
+					Text = "Camera View"
+				};
+
+				buttonShowCamera = new ToggleButton
+				{
+					Id = ButtonCameraViewId,
+					Content = label,
+				};
+
+				buttonsGrid.Widgets.Add(buttonShowCamera);
+			}
+
+			_panelObjectButtons.Widgets.Clear();
+			var asModel = _propertyGrid.Object as DrModelNode;
+			if (asModel != null)
+			{
+				var buttonMaterials = new Button
+				{
+					Content = new Label
+					{
+						Text = "Materials..."
+					}
+				};
+
+				buttonMaterials.Click += (s, a) => EditMaterials(asModel);
+				_panelObjectButtons.Widgets.Add(buttonMaterials);
+			}
+		}
+
 		private void OpenTab(SceneNode node, string file)
 		{
 			var sceneWidget = new SceneWidget
@@ -475,7 +494,7 @@ namespace DigitalRise.Editor.UI
 			SelectNodeByTag(node);
 		}
 
-		private void OpenCurrentSolutionItem()
+		private void OnOpenCurrentSolutionItem(object sender, EventArgs args)
 		{
 			try
 			{
@@ -503,6 +522,22 @@ namespace DigitalRise.Editor.UI
 				var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
 				dialog.ShowModal(Desktop);
 				return;
+			}
+		}
+
+		private void OnPropertyChanged(object sender, GenericEventArgs<string> args)
+		{
+			InvalidateCurrentItem();
+
+			switch (args.Data)
+			{
+				case "Id":
+					UpdateTreeNodeId(_treeFileExplorer.SelectedNode);
+					break;
+
+				case "PrimitiveMeshType":
+					_propertyGrid.Rebuild();
+					break;
 			}
 		}
 

@@ -16,7 +16,7 @@ namespace DigitalRise.Rendering.Deferred
 
 	public interface IRenderList
 	{
-		void AddJob(Submesh mesh, Matrix transform, Matrix[] bones = null);
+		void AddJob(Submesh mesh, IMaterial material, Matrix transform, Matrix[] bones = null);
 	}
 
 
@@ -25,21 +25,20 @@ namespace DigitalRise.Rendering.Deferred
 		private struct RenderJob
 		{
 			public readonly Submesh Mesh;
+			public readonly IMaterial Material;
 			public readonly Matrix Transform;
 			public readonly Matrix[] Bones;
 			public readonly int GBufferBatchId;
 			public readonly int ShadowMapBatchId;
 			public readonly int MaterialBatchId;
 
-			public IMaterial Material => Mesh.Material;
-
-			public RenderJob(Submesh mesh, Matrix transform, Matrix[] bones)
+			public RenderJob(Submesh mesh, IMaterial material, Matrix transform, Matrix[] bones)
 			{
 				Mesh = mesh ?? throw new ArgumentNullException(nameof(mesh));
+				Material = material ?? throw new ArgumentNullException(nameof(material));
 				Transform = transform;
 				Bones = bones;
 
-				var material = mesh.Material;
 				GBufferBatchId = material.EffectGBuffer.BatchId;
 				ShadowMapBatchId = material.EffectShadowMap.BatchId;
 				MaterialBatchId = material.EffectMaterial.BatchId;
@@ -50,9 +49,9 @@ namespace DigitalRise.Rendering.Deferred
 		{
 			public List<RenderJob> Jobs { get; } = new List<RenderJob>();
 
-			public void AddJob(Submesh mesh, Matrix transform, Matrix[] bones = null)
+			public void AddJob(Submesh mesh, IMaterial material, Matrix transform, Matrix[] bones = null)
 			{
-				var job = new RenderJob(mesh, transform, bones);
+				var job = new RenderJob(mesh, material, transform, bones);
 
 				Jobs.Add(job);
 			}

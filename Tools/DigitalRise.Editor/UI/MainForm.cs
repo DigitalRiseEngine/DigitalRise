@@ -258,24 +258,8 @@ namespace DigitalRise.Editor.UI
 		{
 			var propertyType = record.Type;
 
-			var result = new HorizontalStackPanel
-			{
-				Spacing = 8
-			};
-
 			var pathProperty = obj.GetType().GetProperty(record.Name + "Path");
 			var texturePath = (string)pathProperty.GetValue(obj);
-
-			var textBoxPath = new TextBox
-			{
-				Readonly = true,
-				HorizontalAlignment = HorizontalAlignment.Stretch,
-				MaxWidth = 200,
-				Text = texturePath
-			};
-
-			StackPanel.SetProportionType(textBoxPath, ProportionType.Fill);
-			result.Widgets.Add(textBoxPath);
 
 			var button = new Button
 			{
@@ -287,7 +271,6 @@ namespace DigitalRise.Editor.UI
 					HorizontalAlignment = HorizontalAlignment.Center,
 				}
 			};
-			Grid.SetColumn(button, 1);
 
 			button.Click += (sender, args) =>
 			{
@@ -308,12 +291,10 @@ namespace DigitalRise.Editor.UI
 						{
 							var path = dialog.FilePath;
 
-
 							var value = loader(path);
 
 							record.SetValue(obj, value);
 							pathProperty.SetValue(obj, path);
-							textBoxPath.Text = path;
 						}
 						catch (Exception ex)
 						{
@@ -331,12 +312,10 @@ namespace DigitalRise.Editor.UI
 				}
 			};
 
-			result.Widgets.Add(button);
-
-			return result;
+			return button;
 		}
 
-		private Widget CreateCustomEditor(Record record, object obj)
+		public Widget CreateCustomEditor(Record record, object obj)
 		{
 			if (obj is DefaultMaterial && record.Name.EndsWith("Texture"))
 			{

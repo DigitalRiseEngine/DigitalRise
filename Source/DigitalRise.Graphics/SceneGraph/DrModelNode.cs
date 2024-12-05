@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 
 namespace DigitalRise.SceneGraph
 {
@@ -185,6 +186,16 @@ namespace DigitalRise.SceneGraph
 			}
 		}
 
+		private static string UpdateMaterialPath(string texturePath, string modelFolder)
+		{
+			if (!string.IsNullOrEmpty(texturePath) && !Path.IsPathRooted(texturePath))
+			{
+				texturePath = Path.Combine(modelFolder, texturePath);
+			}
+
+			return texturePath;
+		}
+
 		private void SetModel(DrModel model, bool setMaterialsFromModel)
 		{
 			_model = model;
@@ -218,7 +229,21 @@ namespace DigitalRise.SceneGraph
 						var materials = new List<IMaterial>();
 						foreach (var submesh in mesh.Submeshes)
 						{
-							materials.Add(submesh.Material.Clone());
+							var material = submesh.Material.Clone();
+
+							// Make texture paths relative to the node
+							if (!string.IsNullOrEmpty(ModelPath))
+							{
+								var asDefaultMaterial = material as DefaultMaterial;
+								var modelFolder = Path.GetDirectoryName(ModelPath);
+								if (asDefaultMaterial != null && !string.IsNullOrEmpty(modelFolder))
+								{
+									asDefaultMaterial.DiffuseTexturePath = UpdateMaterialPath(asDefaultMaterial.DiffuseTexturePath, modelFolder);
+									asDefaultMaterial.SpecularTexturePath = UpdateMaterialPath(asDefaultMaterial.SpecularTexturePath, modelFolder);
+								}
+							}
+
+							materials.Add(material);
 						}
 
 						meshMaterials.Add(new MeshMaterials
@@ -246,7 +271,24 @@ namespace DigitalRise.SceneGraph
 		{
 			base.Load(assetManager);
 
+			if (MeshMaterials != null)
+			{
+				foreach (var meshMaterials in MeshMaterials)
+				{
+					foreach(var material in meshMaterials.Materials)
+					{
+						var hasExternalAssets = material as IHasExternalAssets;
+						if (hasExternalAssets != null)
+						{
+							hasExternalAssets.Load(assetManager);
+						}
+					}
+				}
+			}
+
+
 			var model = assetManager.LoadGltf(ModelPath);
+
 			SetModel(model, MeshMaterials == null);
 		}
 

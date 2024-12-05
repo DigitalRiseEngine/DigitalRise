@@ -495,7 +495,8 @@ namespace DigitalRise.Data.Modelling
 									{
 										// Create default material
 										material.Name = image.Uri;
-										material.DiffuseTexture = _assetManager.LoadTexture2D(DR.GraphicsDevice, image.Uri);
+										material.DiffuseTexturePath = image.Uri;
+										material.Load(_assetManager);
 									}
 								}
 							}

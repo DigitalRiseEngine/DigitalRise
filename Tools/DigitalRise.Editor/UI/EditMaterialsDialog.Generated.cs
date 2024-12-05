@@ -31,11 +31,11 @@ namespace DigitalRise.Editor.UI
 			_panelLeft = new Panel();
 			_panelLeft.Id = "_panelLeft";
 
-			_properties = new PropertyGrid();
-			_properties.Id = "_properties";
+			_propertyGrid = new PropertyGrid();
+			_propertyGrid.Id = "_properties";
 
 			var scrollViewer1 = new ScrollViewer();
-			scrollViewer1.Content = _properties;
+			scrollViewer1.Content = _propertyGrid;
 
 			var horizontalSplitPane1 = new HorizontalSplitPane();
 			StackPanel.SetProportionType(horizontalSplitPane1, Myra.Graphics2D.UI.ProportionType.Fill);
@@ -60,6 +60,6 @@ namespace DigitalRise.Editor.UI
 
 		
 		public Panel _panelLeft;
-		public PropertyGrid _properties;
+		public PropertyGrid _propertyGrid;
 	}
 }

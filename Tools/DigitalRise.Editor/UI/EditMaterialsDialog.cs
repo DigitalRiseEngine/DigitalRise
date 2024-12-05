@@ -1,5 +1,6 @@
 using DigitalRise.SceneGraph;
 using Myra.Graphics2D.UI;
+using Myra.Graphics2D.UI.Properties;
 using System;
 
 namespace DigitalRise.Editor.UI
@@ -48,11 +49,13 @@ namespace DigitalRise.Editor.UI
 			_treeMeshes.SelectionChanged += _treeMeshes_SelectionChanged;
 
 			_panelLeft.Widgets.Add(_treeMeshes);
+
+			_propertyGrid.CustomWidgetProvider = StudioGame.MainForm.CreateCustomEditor;
 		}
 
 		private void _treeMeshes_SelectionChanged(object sender, EventArgs e)
 		{
-			_properties.Object = _treeMeshes.SelectedNode.Tag;
+			_propertyGrid.Object = _treeMeshes.SelectedNode.Tag;
 		}
 	}
 }

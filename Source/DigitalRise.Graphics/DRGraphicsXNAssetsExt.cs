@@ -1,6 +1,4 @@
-﻿using System.IO;
-using DigitalRise.Data.Materials;
-using DigitalRise.Data.Modelling;
+﻿using DigitalRise.Data.Modelling;
 using DigitalRise.SceneGraph;
 
 namespace AssetManagementBase

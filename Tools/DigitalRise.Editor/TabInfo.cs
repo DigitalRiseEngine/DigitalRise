@@ -5,9 +5,27 @@ namespace DigitalRise.Editor
 {
 	internal class TabInfo
 	{
+		private bool IsPrefab;
+		private string _filePath;
 		private bool _dirty;
 
-		public string FilePath { get; set; }
+		public string FilePath
+		{
+			get => _filePath;
+
+			set
+			{
+				if (value == _filePath)
+				{
+					return;
+				}
+
+				_filePath = value;
+				TitleChanged?.Invoke(this, EventArgs.Empty);
+			}
+		}
+
+
 		public bool Dirty
 		{
 			get => _dirty;
@@ -28,7 +46,14 @@ namespace DigitalRise.Editor
 		{
 			get
 			{
-				var title = !string.IsNullOrEmpty(FilePath) ? Path.GetFileName(FilePath) : "New Scene";
+				string title;
+				if(string.IsNullOrEmpty(FilePath))
+				{
+					title = IsPrefab ? "New Prefab" : "New Scene";
+				} else
+				{
+					title = Path.GetFileName(FilePath);
+				}
 
 				if (Dirty)
 				{
@@ -41,9 +66,10 @@ namespace DigitalRise.Editor
 
 		public event EventHandler TitleChanged;
 
-		public TabInfo(string filePath)
+		public TabInfo(string filePath, bool isPrefab)
 		{
 			FilePath = filePath;
+			IsPrefab = isPrefab;
 		}
 	}
 }

@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using DigitalRise.Data.Modelling;
 using DigitalRise.Utility;
 using Myra.Events;
+using info.lundin.math;
 
 namespace DigitalRise.Editor.UI
 {
@@ -38,14 +39,14 @@ namespace DigitalRise.Editor.UI
 					return;
 				}
 
+				_folder = value;
+
 				try
 				{
 					if (!string.IsNullOrEmpty(value))
 					{
 						// DR.EffectsSource = new DynamicEffectsSource(Path.GetDirectoryName(path));
-
-						_treeFileSolution.RemoveAllSubNodes();
-						ProcessNode(_treeFileSolution, value);
+						RefreshSolution();
 						AssetManager = AssetManager.CreateFileAssetManager(value);
 					}
 					else
@@ -53,7 +54,7 @@ namespace DigitalRise.Editor.UI
 						AssetManager = null;
 					}
 
-					_folder = value;
+
 					UpdateTitle();
 				}
 				catch (Exception ex)
@@ -244,8 +245,6 @@ namespace DigitalRise.Editor.UI
 			_tabControlScenes.ItemsCollectionChanged += (s, a) => UpdateStackPanelEditor();
 
 			_buttonGrid.IsToggled = DigitalRiseEditorOptions.ShowGrid;
-			/*			_buttonBoundingBoxes.IsToggled = DebugSettings.DrawBoundingBoxes;
-						_buttonLightViewFrustum.IsToggled = DebugSettings.DrawLightViewFrustrum;*/
 			_buttonVisualizeBuffers.IsToggled = DRDebugOptions.VisualizeBuffers;
 
 			_buttonGrid.IsToggledChanged += (s, a) => UpdateDebugOptions();
@@ -293,9 +292,9 @@ namespace DigitalRise.Editor.UI
 
 							var value = loader(path);
 
-							record.SetValue(obj, value);
 							pathProperty.SetValue(obj, path);
-						}
+							record.SetValue(obj, value);
+}
 						catch (Exception ex)
 						{
 							var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
@@ -436,7 +435,7 @@ namespace DigitalRise.Editor.UI
 			}
 		}
 
-		private void OpenTab(SceneNode node, string file)
+		private void OpenTab(SceneNode node, string file, bool isPrefab)
 		{
 			var sceneWidget = new SceneWidget
 			{
@@ -456,7 +455,7 @@ namespace DigitalRise.Editor.UI
 			panel.Widgets.Add(sceneWidget);
 			panel.Widgets.Add(buttonsPanel);
 
-			var tabInfo = new TabInfo(file);
+			var tabInfo = new TabInfo(file, isPrefab);
 
 			var tabItem = new TabItem
 			{
@@ -493,7 +492,7 @@ namespace DigitalRise.Editor.UI
 
 					// Load scene
 					var sceneNode = AssetManager.LoadSceneNode(file);
-					OpenTab(sceneNode, file);
+					OpenTab(sceneNode, file, file.EndsWith(".prefab"));
 				}
 			}
 			catch (Exception ex)
@@ -730,7 +729,7 @@ namespace DigitalRise.Editor.UI
 			var scene = new Scene();
 			scene.SetDefaultCamera();
 
-			OpenTab(scene, string.Empty);
+			OpenTab(scene, string.Empty, false);
 		}
 
 		private void NewPrefab()
@@ -750,7 +749,7 @@ namespace DigitalRise.Editor.UI
 				{
 					var newNode = dialog.NodeTypeInfo.CreateInstance();
 
-					OpenTab(newNode, string.Empty);
+					OpenTab(newNode, string.Empty, true);
 				}
 				catch (Exception ex)
 				{
@@ -806,53 +805,11 @@ namespace DigitalRise.Editor.UI
 			return projectNode;
 		}
 
-		private void ProcessSave(Scene scene, string filePath)
+		private void RefreshSolution()
 		{
-			if (string.IsNullOrEmpty(filePath))
-			{
-				return;
-			}
-
-			try
-			{
-				scene.SaveToFile(filePath);
-			}
-			catch (Exception ex)
-			{
-				var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
-				dialog.ShowModal(Desktop);
-			}
+			_treeFileSolution.RemoveAllSubNodes();
+			ProcessNode(_treeFileSolution, _folder);
 		}
-
-		/*		private void Save(bool setFileName)
-				{
-					if (string.IsNullOrEmpty(FilePath) || setFileName)
-					{
-						var dlg = new FileDialog(FileDialogMode.SaveFile)
-						{
-							Filter = "*.scene"
-						};
-
-						if (!string.IsNullOrEmpty(FilePath))
-						{
-							dlg.FilePath = FilePath;
-						}
-
-						dlg.ShowModal(Desktop);
-
-						dlg.Closed += (s, a) =>
-						{
-							if (dlg.Result)
-							{
-								ProcessSave(dlg.FilePath);
-							}
-						};
-					}
-					else
-					{
-						ProcessSave(FilePath);
-					}
-				}*/
 
 		private void UpdateTreeNodeId(TreeViewNode node)
 		{
@@ -903,10 +860,6 @@ namespace DigitalRise.Editor.UI
 			SelectNodeByTag(selectedNode);
 		}
 
-		public void RefreshLibrary()
-		{
-		}
-
 		private void InvalidateCurrentItem()
 		{
 			if (_tabControlScenes.SelectedIndex == null)
@@ -941,7 +894,8 @@ namespace DigitalRise.Editor.UI
 
 				var dlg = new FileDialog(FileDialogMode.SaveFile)
 				{
-					Filter = isPrefab ? "*.prefab" : "*.scene"
+					Filter = isPrefab ? "*.prefab" : "*.scene",
+					Folder = Folder
 				};
 
 				dlg.ShowModal(Desktop);
@@ -953,6 +907,8 @@ namespace DigitalRise.Editor.UI
 						tabInfo.FilePath = dlg.FilePath;
 						sceneWidget.SceneNode.SaveToFile(tabInfo.FilePath);
 						tabInfo.Dirty = false;
+
+						RefreshSolution();
 					}
 				};
 			}

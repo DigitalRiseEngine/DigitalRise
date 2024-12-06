@@ -8,8 +8,9 @@ namespace DigitalRise.Data.Materials
 {
 	internal class DefaultGBufferBinding : BatchEffectBinding
 	{
-		private static DefaultGBufferBinding _gBuffer, _gBufferSkinning;
+		private static DefaultGBufferBinding _gBuffer, _gBufferSkinning, _gBufferNormal;
 		public EffectParameter SpecularPower { get; private set; }
+		public EffectParameter NormalTexture { get; private set; }
 
 		public static DefaultGBufferBinding GBuffer
 		{
@@ -37,6 +38,19 @@ namespace DigitalRise.Data.Materials
 			}
 		}
 
+		public static DefaultGBufferBinding GBufferNormal
+		{
+			get
+			{
+				if (_gBufferNormal == null)
+				{
+					_gBufferNormal = new DefaultGBufferBinding("Materials/GBufferNormal");
+				}
+
+				return _gBufferNormal;
+			}
+		}
+
 		private DefaultGBufferBinding(string path) : base(path)
 		{
 		}
@@ -45,6 +59,7 @@ namespace DigitalRise.Data.Materials
 		{
 			base.BindParameters(effect);
 			SpecularPower = effect.Parameters["SpecularPower"];
+			NormalTexture = effect.Parameters["NormalTexture"];
 		}
 	}
 
@@ -143,7 +158,7 @@ namespace DigitalRise.Data.Materials
 	public partial class DefaultMaterial : INamedObject, IMaterial, IHasExternalAssets
 	{
 		private bool _skinning;
-		private Texture2D _diffuseTexture, _specularTexture;
+		private Texture2D _diffuseTexture, _specularTexture, _normalTexture;
 
 		private DefaultGBufferBinding _gBufferBinding;
 		private DefaultShadowMapBinding _shadowMapBinding;
@@ -159,7 +174,16 @@ namespace DigitalRise.Data.Materials
 			{
 				if (_gBufferBinding == null)
 				{
-					_gBufferBinding = Skinning ? DefaultGBufferBinding.GBufferSkinning : DefaultGBufferBinding.GBuffer;
+					if (Skinning)
+					{
+						_gBufferBinding = DefaultGBufferBinding.GBufferSkinning;
+					} else if (NormalTexture != null)
+					{
+						_gBufferBinding = DefaultGBufferBinding.GBufferNormal;
+					} else
+					{
+						_gBufferBinding = DefaultGBufferBinding.GBuffer;
+					}
 				}
 
 				return _gBufferBinding;
@@ -239,9 +263,28 @@ namespace DigitalRise.Data.Materials
 		[Browsable(false)]
 		public string SpecularTexturePath { get; set; }
 
-
 		[DefaultValue(250.0f)]
 		public float SpecularPower { get; set; } = 250.0f;
+
+		[JsonIgnore]
+		public Texture2D NormalTexture
+		{
+			get => _normalTexture;
+
+			set
+			{
+				if (value == _normalTexture)
+				{
+					return;
+				}
+
+				_normalTexture = value;
+				Invalidate();
+			}
+		}
+
+		[Browsable(false)]
+		public string NormalTexturePath { get; set; }
 
 
 		[Browsable(false)]
@@ -273,11 +316,25 @@ namespace DigitalRise.Data.Materials
 			{
 				SpecularTexture = assetManager.LoadTexture2D(DR.GraphicsDevice, SpecularTexturePath);
 			}
+
+			if (!string.IsNullOrEmpty(NormalTexturePath))
+			{
+				NormalTexture = assetManager.LoadTexture2D(DR.GraphicsDevice, NormalTexturePath);
+			}
 		}
 
 		public void SetGBufferParameters()
 		{
 			_gBufferBinding.SpecularPower.SetValue(SpecularPower);
+
+			if (NormalTexture != null)
+			{
+				_gBufferBinding.NormalTexture?.SetValue(NormalTexture);
+			}
+			else
+			{
+				_gBufferBinding.NormalTexture?.SetValue((Texture2D)null);
+			}
 		}
 
 		public void SetShadowMapParameters()
@@ -327,6 +384,8 @@ namespace DigitalRise.Data.Materials
 				DiffuseTexturePath = DiffuseTexturePath,
 				SpecularTexture = SpecularTexture,
 				SpecularTexturePath = SpecularTexturePath,
+				NormalTexture = NormalTexture,
+				NormalTexturePath = NormalTexturePath,
 				Skinning = Skinning
 			};
 		}

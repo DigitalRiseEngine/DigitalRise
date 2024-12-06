@@ -240,6 +240,7 @@ namespace DigitalRise.SceneGraph
 								{
 									asDefaultMaterial.DiffuseTexturePath = UpdateMaterialPath(asDefaultMaterial.DiffuseTexturePath, modelFolder);
 									asDefaultMaterial.SpecularTexturePath = UpdateMaterialPath(asDefaultMaterial.SpecularTexturePath, modelFolder);
+									asDefaultMaterial.NormalTexturePath = UpdateMaterialPath(asDefaultMaterial.NormalTexturePath, modelFolder);
 								}
 							}
 

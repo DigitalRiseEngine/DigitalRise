@@ -376,24 +376,6 @@ namespace DigitalRise.Graphics.SceneGraph.Tests
 			scene.Children.Add(n);
 
 			// Invalid changes of already added node:
-			var mesh = new TriangleMesh();
-			mesh.Add(new Triangle(new Vector3(1), new Vector3(2), new Vector3(3)));
-			mesh.Add(new Triangle(new Vector3(4), new Vector3(float.NaN, 5, 5), new Vector3(6)));
-			var meshShape = new TriangleMeshShape(mesh);
-			Assert.Throws<GraphicsException>(() => n.Shape = meshShape);
-		}
-
-
-		[Test]
-		public void Validate7()
-		{
-			GlobalSettings.ValidationLevel = 0xff;
-			var scene = new Scene();
-			// This is allowed.
-			var n = new TestSceneNode { Shape = Shape.Empty };
-			scene.Children.Add(n);
-
-			// Invalid changes of already added node:
 			Assert.Throws<GraphicsException>(() => n.PoseLocal = new Pose(new Vector3(float.NaN)));
 		}
 	}

@@ -95,7 +95,7 @@ namespace DigitalRise.Graphics.Tests
 		{
 			// Camera
 			var projection = new PerspectiveViewVolume();
-			projection.SetFieldOfView(MathHelper.ToRadians(90), 2.0f / 1.0f, 1.0f, 100f);
+			projection.SetFieldOfView(90, 2.0f / 1.0f, 1.0f, 100f);
 			var cameraNode = new CameraNode(projection);
 			cameraNode.PoseWorld = new Pose(new Vector3(123, 456, -789), Matrix33F.CreateRotation(new Vector3(1, -2, 3), MathHelper.ToRadians(75)));
 

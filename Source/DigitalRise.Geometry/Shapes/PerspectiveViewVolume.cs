@@ -191,6 +191,36 @@ namespace DigitalRise.Geometry.Shapes
 			}
 		}
 
+		public override float Near
+		{
+			get => base.Near;
+
+			set
+			{
+				if (value <= 0)
+				{
+					throw new ArgumentOutOfRangeException("near", "The near plane distance of a perspective view volume needs to be greater than 0.");
+				}
+
+				base.Near = value;
+			}
+		}
+
+		public override float Far
+		{
+			get => base.Far;
+
+			set
+			{
+				if (value <= 0)
+				{
+					throw new ArgumentOutOfRangeException("far", "The far plane distance of a perspective view volume needs to be greater than 0.");
+				}
+
+				base.Far = value;
+			}
+		}
+
 		#endregion
 
 

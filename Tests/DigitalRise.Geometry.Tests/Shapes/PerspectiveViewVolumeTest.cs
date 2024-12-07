@@ -152,7 +152,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
     public void SetFieldOfViewTest()
     {
       PerspectiveViewVolume frustum = new PerspectiveViewVolume();
-      frustum.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
+      frustum.SetFieldOfView(60, 16.0f / 9.0f, 1, 10);
 
       var rect = frustum.Rectangle;
       AssertExt.AreNumericallyEqual(-2.0528009f / 2.0f, rect.Left);
@@ -165,7 +165,7 @@ namespace DigitalRise.Geometry.Shapes.Tests
       AssertExt.AreNumericallyEqual(1.1547005f, rect.Height);
       Assert.AreEqual(9, frustum.Depth);
       Assert.AreEqual(16.0f / 9.0f, frustum.AspectRatio);
-      AssertExt.AreNumericallyEqual(MathHelper.ToRadians(60), frustum.FieldOfViewY);
+      AssertExt.AreNumericallyEqual(60, frustum.FieldOfViewY);
     }
 
 
@@ -257,11 +257,11 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		public void GetWidthAndHeightTest()
 		{
 			float width, height;
-			PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(90), 1, 1, out width, out height);
+			PerspectiveViewVolume.GetWidthAndHeight(90, 1, 1, out width, out height);
 			AssertExt.AreNumericallyEqual(2, width);
 			AssertExt.AreNumericallyEqual(2, height);
 
-			PerspectiveViewVolume.GetWidthAndHeight(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, out width, out height);
+			PerspectiveViewVolume.GetWidthAndHeight(60, 16.0f / 9.0f, 1, out width, out height);
 			AssertExt.AreNumericallyEqual(2.0528009f, width);
 			AssertExt.AreNumericallyEqual(1.1547005f, height);
 
@@ -277,10 +277,10 @@ namespace DigitalRise.Geometry.Shapes.Tests
 		public void SetViewVolumeFieldOfViewTest()
 		{
 			PerspectiveViewVolume projection = new PerspectiveViewVolume();
-			projection.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f, 1, 10);
+			projection.SetFieldOfView(60, 16.0f / 9.0f, 1, 10);
 
 			PerspectiveViewVolume projection2 = new PerspectiveViewVolume();
-			projection2.SetFieldOfView(MathHelper.ToRadians(60), 16.0f / 9.0f);
+			projection2.SetFieldOfView(60, 16.0f / 9.0f);
 			projection2.Near = 1;
 			projection2.Far = 10;
 

@@ -28,10 +28,10 @@ namespace DigitalRise.Geometry
   public static partial class GeometryHelper
   {
     /// <summary>
-    /// Computes a minimum bounding shape that contains all given points.
+    /// Computes a Min bounding shape that contains all given points.
     /// </summary>
     /// <param name="points">The points.</param>
-    /// <returns>A minimum bounding shape that contains all given points.</returns>
+    /// <returns>A Min bounding shape that contains all given points.</returns>
     /// <remarks>
     /// The returned shape will be a <see cref="SphereShape"/>, a <see cref="CapsuleShape"/>,
     /// a <see cref="BoxShape"/>, or a <see cref="TransformedShape"/> (containing a sphere, capsule,
@@ -420,16 +420,67 @@ namespace DigitalRise.Geometry
 
         public static BoundingBox GetBoundingBox(this BoundingBox box, Vector3 scale, Pose pose)
         {
-            var matrix = pose.ToMatrixWithScale(scale);
+            box.Scale(scale);
 
-            return box.Transform(ref matrix);
+            return box.GetBoundingBox(pose);
         }
 
 		public static BoundingBox GetBoundingBox(this BoundingBox box, Pose pose)
 		{
-            var matrix = (Matrix)pose.ToMatrix44F();
+			Vector3 halfExtent;
+			halfExtent.X = (box.Max.X - box.Min.X) / 2;
+			halfExtent.Y = (box.Max.Y - box.Min.Y) / 2;
+			halfExtent.Z = (box.Max.Z - box.Min.Z) / 2;
 
-			return box.Transform(ref matrix);
+			Vector3 center;
+			center.X = (box.Min.X + box.Max.X) / 2;
+			center.Y = (box.Min.Y + box.Max.Y) / 2;
+			center.Z = (box.Min.Z + box.Max.Z) / 2;
+			Vector3 centerWorld = pose.ToWorldPosition(center);
+
+			// Get world axes in local space. They are equal to the rows of the orientation matrix.
+			Vector3 worldX, worldY, worldZ;
+			worldX.X = pose.Orientation.M00;
+			worldX.Y = pose.Orientation.M01;
+			worldX.Z = pose.Orientation.M02;
+			worldY.X = pose.Orientation.M10;
+			worldY.Y = pose.Orientation.M11;
+			worldY.Z = pose.Orientation.M12;
+			worldZ.X = pose.Orientation.M20;
+			worldZ.Y = pose.Orientation.M21;
+			worldZ.Z = pose.Orientation.M22;
+
+			// The half extent vector is in the +x/+y/+z octant of the world. We want to project
+			// the extent onto the world axes. The half extent projected onto world x gives us the 
+			// x extent. 
+			// The world axes in local space could be in another world octant. We could now either find 
+			// out the in which octant the world axes is pointing and build the correct half extent vector
+			// for this octant. OR we mirror the world axis vectors into the +x/+y/+z octant by taking
+			// the absolute vector.
+			worldX.X = Math.Abs(worldX.X);
+			worldX.Y = Math.Abs(worldX.Y);
+			worldX.Z = Math.Abs(worldX.Z);
+			worldY.X = Math.Abs(worldY.X);
+			worldY.Y = Math.Abs(worldY.Y);
+			worldY.Z = Math.Abs(worldY.Z);
+			worldZ.X = Math.Abs(worldZ.X);
+			worldZ.Y = Math.Abs(worldZ.Y);
+			worldZ.Z = Math.Abs(worldZ.Z);
+
+			// Now we project the extent onto the world axes.
+			Vector3 halfExtentWorld;
+			halfExtentWorld.X = halfExtent.X * worldX.X + halfExtent.Y * worldX.Y + halfExtent.Z * worldX.Z;
+			halfExtentWorld.Y = halfExtent.X * worldY.X + halfExtent.Y * worldY.Y + halfExtent.Z * worldY.Z;
+			halfExtentWorld.Z = halfExtent.X * worldZ.X + halfExtent.Y * worldZ.Y + halfExtent.Z * worldZ.Z;
+
+			BoundingBox result;
+			result.Min.X = centerWorld.X - halfExtentWorld.X;
+			result.Min.Y = centerWorld.Y - halfExtentWorld.Y;
+			result.Min.Z = centerWorld.Z - halfExtentWorld.Z;
+			result.Max.X = centerWorld.X + halfExtentWorld.X;
+			result.Max.Y = centerWorld.Y + halfExtentWorld.Y;
+			result.Max.Z = centerWorld.Z + halfExtentWorld.Z;
+			return result;
 		}
 
         public static Shape CreateShape(this BoundingBox box)

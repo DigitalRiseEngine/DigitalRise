@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SplitAtlas": {
-      "commandName": "Project",
-      "commandLineArgs": "\"D:\\Projects\\DigitalRune\\Samples\\Content\\UI Themes\\BlendBlue\\Theme.xml\""
-    }
-  }
-}

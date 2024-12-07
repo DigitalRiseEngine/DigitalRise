@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>drtexconv</PackageId>
+    <ToolCommandName>drtexconv</ToolCommandName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>drtexconv</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalRise.ConverterBase\DigitalRise.ConverterBase.csproj" />
+  </ItemGroup>
+
+</Project>

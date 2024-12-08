@@ -10,6 +10,7 @@ using DigitalRise.Linq;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation
@@ -517,18 +518,18 @@ namespace DigitalRise.Animation
 				return Vector3.Zero;
 
 			// ----- Angular Velocity
-			Quaternion orientationDelta = targetOrientation * currentOrientation.Conjugated;
+			Quaternion orientationDelta = targetOrientation * currentOrientation.Conjugated();
 
 			// Make sure we move along the shortest arc.
 			if (Quaternion.Dot(currentOrientation, targetOrientation) < 0)
 				orientationDelta = -orientationDelta;
 
 			// Determine the angular velocity that rotates the body.
-			Vector3 rotationAxis = orientationDelta.Axis;
-			if (!rotationAxis.IsNumericallyZero)
+			Vector3 rotationAxis = orientationDelta.Axis();
+			if (!rotationAxis.IsNumericallyZero())
 			{
 				// The angular velocity is computed as rotationAxis * rotationSpeed.
-				float rotationSpeed = (orientationDelta.Angle / deltaTime);
+				float rotationSpeed = (orientationDelta.Angle() / deltaTime);
 				return rotationAxis * rotationSpeed;
 			}
 
@@ -551,7 +552,7 @@ namespace DigitalRise.Animation
 		/// </returns>
 		public static Vector3 ComputeAngularVelocity(Matrix33F currentOrientation, Matrix33F targetOrientation, float deltaTime)
 		{
-			return ComputeAngularVelocity(Quaternion.CreateRotation(currentOrientation), Quaternion.CreateRotation(targetOrientation), deltaTime);
+			return ComputeAngularVelocity(MathHelper.CreateRotation(currentOrientation), MathHelper.CreateRotation(targetOrientation), deltaTime);
 		}
 	}
 }

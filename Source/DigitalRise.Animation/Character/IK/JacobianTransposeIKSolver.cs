@@ -1,3 +1,6 @@
+// Disable this solver since we don't have MatrixF/VectorF types
+#if false
+
 // DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
@@ -7,6 +10,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation.Character
@@ -344,7 +348,7 @@ namespace DigitalRise.Animation.Character
 					float angle = velocities[i] * StepSize;
 
 					// Apply rotation.
-					Quaternion rotationChange = Quaternion.CreateRotation(axis, angle);
+					Quaternion rotationChange = MathHelper.CreateRotation(axis, angle);
 					SkeletonPose.RotateBoneAbsolute(currentBoneIndex, rotationChange);
 
 					currentBoneIndex = skeleton.GetParent(currentBoneIndex);
@@ -388,3 +392,5 @@ namespace DigitalRise.Animation.Character
 		#endregion
 	}
 }
+
+#endif

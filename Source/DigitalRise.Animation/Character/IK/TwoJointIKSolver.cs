@@ -6,6 +6,7 @@ using System;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation.Character
@@ -288,12 +289,12 @@ namespace DigitalRise.Animation.Character
 			}
 
 			// Abort if we already touch the target.
-			if (Vector3.AreNumericallyEqual(tipAbsolute, Target))
+			if (MathHelper.AreNumericallyEqual(tipAbsolute, Target))
 				return;
 
 			// Root to target vector.
 			var rootToTarget = Target - rootBonePoseAbsolute.Translation;
-			var rootToTargetLength = rootToTarget.Length;
+			var rootToTargetLength = rootToTarget.Length();
 			if (Numeric.IsZero(rootToTargetLength))
 				return;
 			rootToTarget /= rootToTargetLength;
@@ -301,13 +302,13 @@ namespace DigitalRise.Animation.Character
 			// ----- Align chain with target.
 			// Align the root to target vector with the root to tip vector.
 			var rootToTip = tipAbsolute - rootBonePoseAbsolute.Translation;
-			var rootToTipLength = rootToTip.Length;
+			var rootToTipLength = rootToTip.Length();
 			if (!Numeric.IsZero(rootToTipLength))
 			{
 				rootToTip /= rootToTipLength;
 
-				var rotation = Quaternion.CreateRotation(rootToTip, rootToTarget);
-				if (rotation.Angle > Numeric.EpsilonF)
+				var rotation = MathHelper.CreateRotation(rootToTip, rootToTarget);
+				if (rotation.Angle() > Numeric.EpsilonF)
 				{
 					// Apply rotation to root bone.
 					rootBonePoseAbsolute.Rotation = rotation * rootBonePoseAbsolute.Rotation;
@@ -330,12 +331,12 @@ namespace DigitalRise.Animation.Character
 			hingeToTip -= hingeAxis * Vector3.Dot(hingeToTip, hingeAxis);
 
 			// Get lengths.
-			float rootToHingeLength = rootToHinge.Length;
+			float rootToHingeLength = rootToHinge.Length();
 			if (Numeric.IsZero(rootToHingeLength))
 				return;
 			rootToHinge /= rootToHingeLength;
 
-			float hingeToTipLength = hingeToTip.Length;
+			float hingeToTipLength = hingeToTip.Length();
 			if (Numeric.IsZero(hingeToTipLength))
 				return;
 			hingeToTip /= hingeToTipLength;
@@ -360,7 +361,7 @@ namespace DigitalRise.Animation.Character
 
 			// Compute delta rotation between current and desired angle.
 			float deltaAngle = desiredHingeAngle - currentHingeAngle;
-			var hingeRotation = Quaternion.CreateRotation(hingeAxis, deltaAngle);
+			var hingeRotation = MathHelper.CreateRotation(hingeAxis, deltaAngle);
 			hingeBonePoseAbsolute.Rotation = hingeRotation * hingeBonePoseAbsolute.Rotation;
 
 			// Update tip position.
@@ -370,11 +371,11 @@ namespace DigitalRise.Animation.Character
 			// If we hit a hinge limit, then we can move the tip closer to the target by aligning
 			// the whole chain again.
 			rootToTip = tipAbsolute - rootBonePoseAbsolute.Translation;
-			rootToTipLength = rootToTip.Length;
+			rootToTipLength = rootToTip.Length();
 			if (!Numeric.IsZero(rootToTipLength))
 			{
 				rootToTip /= rootToTipLength;
-				var rotation = Quaternion.CreateRotation(rootToTip, rootToTarget);
+				var rotation = MathHelper.CreateRotation(rootToTip, rootToTarget);
 				rootBonePoseAbsolute.Rotation = rotation * rootBonePoseAbsolute.Rotation;
 				hingeBonePoseAbsolute.Rotation = rotation * hingeBonePoseAbsolute.Rotation;
 			}

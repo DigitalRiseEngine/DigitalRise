@@ -113,17 +113,8 @@ namespace DigitalRise.Animation
 			_tempProperties = new List<IAnimatableProperty>();
 			_tempTransitions = new List<AnimationTransition>();
 
-#if WP7 || UNITY
-      // Cannot access Environment.ProcessorCount in phone app. (Security issue.)
-      EnableMultithreading = false;
-#else
 			// Enable multithreading by default if the current system has multiple processors.
 			EnableMultithreading = Environment.ProcessorCount > 1;
-
-			// Multithreading works but Parallel.For of Xamarin.Android/iOS is very inefficient.
-			if (GlobalSettings.PlatformID == PlatformID.Android || GlobalSettings.PlatformID == PlatformID.iOS)
-				EnableMultithreading = false;
-#endif
 
 			_updateAnimationsMethod = UpdateAnimation;
 			_updateCompositionChainMethod = UpdateCompositionChain;

@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using DigitalRise.Animation.Character;
+using DigitalRise.Mathematics;
 
 
 namespace DigitalRise.Animation.Traits

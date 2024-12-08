@@ -145,7 +145,7 @@ namespace DigitalRise.Animation.Character
 				var current = context.UncompressedKeyFrames[i];
 				float parameter = (current.Time.Ticks - start.Time.Ticks) / ticks;
 				Quaternion lerpedRotation = InterpolationHelper.Lerp(start.Transform.Rotation, end.Transform.Rotation, parameter);
-				float error = Quaternion.GetAngle(current.Transform.Rotation, lerpedRotation);
+				float error = MathHelper.GetAngle(current.Transform.Rotation, lerpedRotation);
 				if (error > maxError)
 				{
 					maxError = error;
@@ -167,7 +167,7 @@ namespace DigitalRise.Animation.Character
 				var current = context.UncompressedKeyFrames[i];
 				float parameter = (current.Time.Ticks - start.Time.Ticks) / ticks;
 				Vector3 lerpedTranslation = InterpolationHelper.Lerp(start.Transform.Translation, end.Transform.Translation, parameter);
-				float error = (current.Transform.Translation - lerpedTranslation).Length;
+				float error = (current.Transform.Translation - lerpedTranslation).Length();
 				if (error > maxError)
 				{
 					maxError = error;
@@ -189,7 +189,7 @@ namespace DigitalRise.Animation.Character
 				var current = context.UncompressedKeyFrames[i];
 				float parameter = (current.Time.Ticks - start.Time.Ticks) / ticks;
 				Vector3 lerpedScale = InterpolationHelper.Lerp(start.Transform.Scale, end.Transform.Scale, parameter);
-				float error = (current.Transform.Scale - lerpedScale).Length;
+				float error = (current.Transform.Scale - lerpedScale).Length();
 				if (error > maxError)
 				{
 					maxError = error;

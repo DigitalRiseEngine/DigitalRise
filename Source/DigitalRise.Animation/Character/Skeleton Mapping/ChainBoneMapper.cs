@@ -2,9 +2,8 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
+using DigitalRise.Mathematics;
 using System;
-using DigitalRise.Mathematics.Algebra;
-using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Animation.Character
@@ -288,14 +287,14 @@ namespace DigitalRise.Animation.Character
 			var directionA = tipBoneA.Translation - rootBoneA.Translation;
 
 			// Abort if any chain has zero length.
-			if (directionB.IsNumericallyZero || directionA.IsNumericallyZero)
+			if (directionB.IsNumericallyZero() || directionA.IsNumericallyZero())
 				return;
 
 			// Apply global skeleton rotation offset to rotate all into model B space.
 			directionA = SkeletonMapper.RotationOffset.Rotate(directionA);
 
 			// Compute and apply rotation between the two direction vectors.
-			var rotation = Quaternion.CreateRotation(directionB, directionA);
+			var rotation = MathHelper.CreateRotation(directionB, directionA);
 			skeletonInstanceB.RotateBoneAbsolute(RootBoneIndexB, rotation);
 		}
 
@@ -328,12 +327,12 @@ namespace DigitalRise.Animation.Character
 			var directionB = tipBoneB.Translation - rootBoneB.Translation;
 			var directionA = tipBoneA.Translation - rootBoneA.Translation;
 
-			if (directionB.IsNumericallyZero || directionA.IsNumericallyZero)
+			if (directionB.IsNumericallyZero() || directionA.IsNumericallyZero())
 				return;
 
-			directionB = SkeletonMapper.RotationOffset.Conjugated.Rotate(directionB);
+			directionB = SkeletonMapper.RotationOffset.Conjugated().Rotate(directionB);
 
-			var rotation = Quaternion.CreateRotation(directionA, directionB);
+			var rotation = MathHelper.CreateRotation(directionA, directionB);
 			skeletonInstanceA.RotateBoneAbsolute(RootBoneIndexA, rotation);
 		}
 		#endregion

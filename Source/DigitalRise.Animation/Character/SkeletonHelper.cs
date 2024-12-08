@@ -130,7 +130,7 @@ namespace DigitalRise.Animation.Character
 
 		//public static void RotateBoneWorld(this SkeletonPose SkeletonPose, int boneIndex, Quaternion rotation, Matrix44F world)
 		//{
-		//  Quaternion worldRotation = Quaternion.CreateRotation(world.Minor);
+		//  Quaternion worldRotation = MathHelper.CreateRotation(world.Minor);
 		//  RotateBoneAbsolute(SkeletonPose, boneIndex, worldRotation.Conjugated * rotation);
 		//}
 
@@ -182,8 +182,8 @@ namespace DigitalRise.Animation.Character
 			// ...
 
 			// Rotation relative to bone bind pose space (using similarity transformation).
-			var rotationRelative = bindPoseRelative.Rotation.Conjugated
-								   * parentBonePoseAbsolute.Rotation.Conjugated
+			var rotationRelative = bindPoseRelative.Rotation.Conjugated()
+								   * parentBonePoseAbsolute.Rotation.Conjugated()
 								   * rotation
 								   * parentBonePoseAbsolute.Rotation
 								   * bindPoseRelative.Rotation;
@@ -222,8 +222,8 @@ namespace DigitalRise.Animation.Character
 			// rotation = parentBonePoseAbsolute * bindPoseRelative * rotationRelative;
 			// rotationRelative = boneTransform.
 
-			var rotationRelative = bindPoseRelative.Rotation.Conjugated
-								   * parentBonePoseAbsolute.Rotation.Conjugated
+			var rotationRelative = bindPoseRelative.Rotation.Conjugated()
+								   * parentBonePoseAbsolute.Rotation.Conjugated()
 								   * rotation;
 
 			rotationRelative.Normalize();

@@ -4,6 +4,7 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using DigitalRise.Mathematics;
 
 
 namespace DigitalRise.Animation.Character
@@ -183,7 +184,7 @@ namespace DigitalRise.Animation.Character
 			// Use parent bone lengths to estimate the scale factor.
 			var bindPoseARelative = SkeletonMapper.SkeletonPoseA.Skeleton.GetBindPoseRelative(BoneIndexA);
 			var bindPoseBRelative = SkeletonMapper.SkeletonPoseB.Skeleton.GetBindPoseRelative(BoneIndexB);
-			ScaleAToB = bindPoseBRelative.Translation.Length / bindPoseARelative.Translation.Length;
+			ScaleAToB = bindPoseBRelative.Translation.Length() / bindPoseARelative.Translation.Length();
 		}
 
 
@@ -231,7 +232,7 @@ namespace DigitalRise.Animation.Character
 				// Apply rotation offset to change from model A space to model B space.
 				// Change model B space to B bone space.
 				// --> The result transforms from bone A space to bone B space.
-				_rotationAToB = bindPoseBAbsoluteInverse.Rotation * SkeletonMapper.RotationOffset * bindPoseAAbsoluteInverse.Rotation.Conjugated;
+				_rotationAToB = bindPoseBAbsoluteInverse.Rotation * SkeletonMapper.RotationOffset * bindPoseAAbsoluteInverse.Rotation.Conjugated();
 			}
 			_rotationAToB.Normalize();
 		}
@@ -252,7 +253,7 @@ namespace DigitalRise.Animation.Character
 				  SkeletonMapper.SkeletonPoseB,
 				  BoneIndexB,
 				  ScaleAToB,
-				  _rotationAToB.Conjugated,
+				  _rotationAToB.Conjugated(),
 				  _rotationAToB);
 			else
 				MapLocal(
@@ -262,7 +263,7 @@ namespace DigitalRise.Animation.Character
 				  SkeletonMapper.SkeletonPoseB,
 				  BoneIndexB,
 				  ScaleAToB,
-				  _rotationAToB.Conjugated,
+				  _rotationAToB.Conjugated(),
 				  _rotationAToB);
 		}
 
@@ -283,7 +284,7 @@ namespace DigitalRise.Animation.Character
 				  BoneIndexA,
 				  1 / ScaleAToB,
 				  _rotationAToB,
-				  _rotationAToB.Conjugated);
+				  _rotationAToB.Conjugated());
 			else
 				MapLocal(
 				  MapTranslations,
@@ -293,7 +294,7 @@ namespace DigitalRise.Animation.Character
 				  BoneIndexA,
 				  1 / ScaleAToB,
 				  _rotationAToB,
-				  _rotationAToB.Conjugated);
+				  _rotationAToB.Conjugated());
 		}
 
 
@@ -306,7 +307,7 @@ namespace DigitalRise.Animation.Character
 			var boneAActualRotationAbsolute = skeletonA.GetBonePoseAbsolute(boneIndexA).Rotation;
 			var boneABindRotationAbsolute = skeletonA.Skeleton.GetBindPoseAbsoluteInverse(boneIndexA).Rotation;
 
-			var boneBBindRotationAbsolute = skeletonB.Skeleton.GetBindPoseAbsoluteInverse(boneIndexB).Rotation.Inverse;
+			var boneBBindRotationAbsolute = skeletonB.Skeleton.GetBindPoseAbsoluteInverse(boneIndexB).Rotation.Inverse();
 
 			var relativeRotation = boneAActualRotationAbsolute * boneABindRotationAbsolute;
 

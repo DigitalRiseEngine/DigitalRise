@@ -10,6 +10,7 @@ using DigitalRise.Collections;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Interpolation;
 using Microsoft.Xna.Framework;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation
@@ -68,7 +69,7 @@ namespace DigitalRise.Animation
 			// Create Scale channel if required.
 			foreach (var keyFrame in keyFrames)
 			{
-				if (!Vector3.AreNumericallyEqual(keyFrame.Value.Scale, Vector3.One))
+				if (!MathHelper.AreNumericallyEqual(keyFrame.Value.Scale, Vector3.One))
 				{
 					scaleAnimation = new Vector3KeyFrameAnimation();
 					break;
@@ -78,7 +79,7 @@ namespace DigitalRise.Animation
 			// Create Rotation channel if required.
 			foreach (var keyFrame in keyFrames)
 			{
-				if (!Quaternion.AreNumericallyEqual(keyFrame.Value.Rotation, Quaternion.Identity))
+				if (!MathHelper.AreNumericallyEqual(keyFrame.Value.Rotation, Quaternion.Identity))
 				{
 					rotationAnimation = new QuaternionKeyFrameAnimation();
 					break;
@@ -88,7 +89,7 @@ namespace DigitalRise.Animation
 			// Create Translation channel if required.
 			foreach (var keyFrame in keyFrames)
 			{
-				if (!keyFrame.Value.Translation.IsNumericallyZero)
+				if (!keyFrame.Value.Translation.IsNumericallyZero())
 				{
 					translationAnimation = new Vector3KeyFrameAnimation();
 					break;
@@ -281,14 +282,14 @@ namespace DigitalRise.Animation
 		private static float ComputeError(Vector3 current, Vector3 start, Vector3 end, float parameter)
 		{
 			Vector3 lerpedValue = InterpolationHelper.Lerp(start, end, parameter);
-			return (current - lerpedValue).Length;
+			return (current - lerpedValue).Length();
 		}
 
 
 		private static float ComputeError(Quaternion current, Quaternion start, Quaternion end, float parameter)
 		{
 			Quaternion lerpedValue = InterpolationHelper.Lerp(start, end, parameter);
-			return Quaternion.GetAngle(current, lerpedValue);
+			return MathHelper.GetAngle(current, lerpedValue);
 		}
 	}
 }

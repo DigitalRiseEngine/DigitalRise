@@ -470,7 +470,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			//  // A TransformedShape is used if the shape needs to be translated or rotated.
 			//  if (sphereVolume < boxVolume)
 			//  {
-			//    if (center.IsNumericallyZero)
+			//    if (center.IsNumericallyZero())
 			//      boundingShape = sphere;
 			//    else
 			//      boundingShape = new TransformedShape(new GeometricObject(sphere, new Pose(center)));

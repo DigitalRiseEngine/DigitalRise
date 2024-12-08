@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation.Character
@@ -178,13 +179,13 @@ namespace DigitalRise.Animation.Character
 					int boneIndex = _boneIndices[i];
 					int childIndex = _boneIndices[i + 1];
 					var boneVector = SkeletonPose.GetBonePoseAbsolute(childIndex).Translation - SkeletonPose.GetBonePoseAbsolute(boneIndex).Translation;
-					float boneLength = boneVector.Length;
+					float boneLength = boneVector.Length();
 					_boneLengths.Add(boneLength);
 					_totalChainLength += boneLength;
 				}
 
 				// Tip bone.
-				_boneLengths.Add((SkeletonPose.GetBonePoseAbsolute(TipBoneIndex).Scale * TipOffset).Length);
+				_boneLengths.Add((SkeletonPose.GetBonePoseAbsolute(TipBoneIndex).Scale * TipOffset).Length());
 				_totalChainLength += _boneLengths[numberOfBones - 1];
 
 				// Initialize _bones list with dummy values.
@@ -229,7 +230,7 @@ namespace DigitalRise.Animation.Character
 			// If TipOffset is 0, then the last bone defines the tip but is not rotated.
 			// --> numberOfBones is set to the number of affected bones.
 			Vector3 tipAbsolute;
-			if (TipOffset.IsNumericallyZero)
+			if (TipOffset.IsNumericallyZero())
 			{
 				numberOfBones--;
 				tipAbsolute = SkeletonPose.GetBonePoseAbsolute(TipBoneIndex).Translation;
@@ -266,7 +267,7 @@ namespace DigitalRise.Animation.Character
 
 				// The bone to tip vector of the aligned chain (without other IK rotations!).
 				boneToTip = tipAbsolute - _bones[i].Translation;
-				float boneToTipLength = boneToTip.Length;
+				float boneToTipLength = boneToTip.Length();
 				boneToTip /= boneToTipLength; // TODO: Check for division by 0?
 
 				if (i > 0)
@@ -278,14 +279,14 @@ namespace DigitalRise.Animation.Character
 
 				// The bone to target vector of the new chain configuration.
 				boneToTarget = targetAbsolute - _bones[i].Translation;
-				float boneToTargetLength = boneToTarget.Length;
+				float boneToTargetLength = boneToTarget.Length();
 				boneToTarget /= boneToTargetLength;
 
 				if (i == 0)
 				{
 					// This is the first bone: Compute rotation that aligns the whole initial chain with
 					// the target.
-					chainRotation = Quaternion.CreateRotation(boneToTip, boneToTarget);
+					chainRotation = MathHelper.CreateRotation(boneToTip, boneToTarget);
 
 					// Update tip.
 					tipAbsolute = _bones[i].Translation + (boneToTarget * boneToTipLength);
@@ -301,7 +302,7 @@ namespace DigitalRise.Animation.Character
 					// TODO: Find an explanation/derivation of this additional rotation.
 					_bones[i] = new SrtTransform(
 					  _bones[i].Scale,
-					  Quaternion.CreateRotation(boneToTip, boneToTarget) * chainRotation * _bones[i].Rotation,
+					  MathHelper.CreateRotation(boneToTip, boneToTarget) * chainRotation * _bones[i].Rotation,
 					  _bones[i].Translation);
 				}
 
@@ -391,7 +392,7 @@ namespace DigitalRise.Animation.Character
 					// Apply the rotation to the current bones 
 					_bones[i] = new SrtTransform(
 					  _bones[i].Scale,
-					  (Quaternion.CreateRotation(rotationAxis, deltaAngle) * _bones[i].Rotation).Normalized,
+					  (MathHelper.CreateRotation(rotationAxis, deltaAngle) * _bones[i].Rotation).Normalized(),
 					  _bones[i].Translation);
 				}
 			}

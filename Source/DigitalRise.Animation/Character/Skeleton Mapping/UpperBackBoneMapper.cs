@@ -3,8 +3,9 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
-using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
+using DigitalRise.Mathematics;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.Animation.Character
@@ -281,7 +282,7 @@ namespace DigitalRise.Animation.Character
 		{
 			CacheDerivedData();
 
-			DoWork(SkeletonMapper.RotationOffset.Conjugated, SkeletonMapper.SkeletonPoseB, SkeletonMapper.SkeletonPoseA,
+			DoWork(SkeletonMapper.RotationOffset.Conjugated(), SkeletonMapper.SkeletonPoseB, SkeletonMapper.SkeletonPoseA,
 				   SpineBoneIndexB, NeckBoneIndexB, LeftShoulderBoneIndexB, RightShoulderBoneIndexB,
 				   SpineBoneIndexA, NeckBoneIndexA, LeftShoulderBoneIndexA, RightShoulderBoneIndexA);
 		}
@@ -303,12 +304,12 @@ namespace DigitalRise.Animation.Character
 			var rightShoulderB = skeletonB.GetBonePoseAbsolute(rightShoulderBoneIndexB).Translation;
 
 			// Abort if any bone to bone distance is 0.
-			if (Vector3.AreNumericallyEqual(boneA, neckA)
-				|| Vector3.AreNumericallyEqual(boneA, rightShoulderA)
-				|| Vector3.AreNumericallyEqual(leftShoulderA, rightShoulderA)
-				|| Vector3.AreNumericallyEqual(boneB, neckB)
-				|| Vector3.AreNumericallyEqual(boneB, rightShoulderB)
-				|| Vector3.AreNumericallyEqual(leftShoulderB, rightShoulderB))
+			if (MathHelper.AreNumericallyEqual(boneA, neckA)
+				|| MathHelper.AreNumericallyEqual(boneA, rightShoulderA)
+				|| MathHelper.AreNumericallyEqual(leftShoulderA, rightShoulderA)
+				|| MathHelper.AreNumericallyEqual(boneB, neckB)
+				|| MathHelper.AreNumericallyEqual(boneB, rightShoulderB)
+				|| MathHelper.AreNumericallyEqual(leftShoulderB, rightShoulderB))
 			{
 				return;
 			}
@@ -319,7 +320,7 @@ namespace DigitalRise.Animation.Character
 			var shoulderAxisB = rightShoulderB - leftShoulderB;
 
 			// Create a twist rotation from the shoulder vectors.
-			var shoulderRotation = Quaternion.CreateRotation(shoulderAxisB, shoulderAxisA);
+			var shoulderRotation = MathHelper.CreateRotation(shoulderAxisB, shoulderAxisA);
 
 			// Apply this twist to the spine. (Modifies the neckB position.)
 			neckB = boneB + shoulderRotation.Rotate(neckB - boneB);
@@ -330,7 +331,7 @@ namespace DigitalRise.Animation.Character
 			var spineAxisB = neckB - boneB;
 
 			// Create swing rotation from spine vectors.
-			var spineRotation = Quaternion.CreateRotation(spineAxisB, spineAxisA);
+			var spineRotation = MathHelper.CreateRotation(spineAxisB, spineAxisA);
 
 			// Apply the shoulder twist rotation followed by the spine swing rotation.
 			skeletonB.RotateBoneAbsolute(boneIndexB, spineRotation * shoulderRotation);

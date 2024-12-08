@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using DigitalRise.Animation.Traits;
 using DigitalRise.Mathematics;
+using Microsoft.Xna.Framework;
 
 
 namespace DigitalRise.Animation.Character

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <PackageId>DigitalRise.Mathematics.FNA</PackageId>
@@ -9,6 +9,7 @@
     <OutputPath>bin\FNA.Core\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DigitalRise.Common\DigitalRise.Common.FNA.Core.csproj" />
+    <ProjectReference Include="..\..\..\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\DigitalRise.Common\DigitalRise.Common.csproj" />
   </ItemGroup>
 </Project>

@@ -58,7 +58,7 @@ namespace DigitalRise.ConverterBase
 			if (s.Length == 0)
 			{
 				string message = GetExceptionMessage(element, "\"{0}\" attribute must not be empty.", name);
-				throw new InvalidContentException(message);
+				throw new Exception(message);
 			}
 
 			return s;
@@ -72,12 +72,11 @@ namespace DigitalRise.ConverterBase
 		/// <param name="defaultValue">
 		/// The default value, used if <paramref name="attribute"/> is null or empty.
 		/// </param>
-		/// <param name="identity">The content identity.</param>
 		/// <returns>The effect parameter value.</returns>
 		/// <exception cref="InvalidContentException">
 		/// Error parsing <paramref name="attribute"/>.
 		/// </exception>
-		public static object ToParameterValue(this XAttribute attribute, object defaultValue, ContentIdentity identity)
+		public static object ToParameterValue(this XAttribute attribute, object defaultValue)
 		{
 			// TODO: Add support for Int32, Quaternion, Matrix.
 			string value = (string)attribute;
@@ -154,7 +153,7 @@ namespace DigitalRise.ConverterBase
 			catch (Exception exception)
 			{
 				var message = GetExceptionMessage(attribute, "Could not parse parameter value: '{0}'", value);
-				throw new InvalidContentException(message, identity, exception);
+				throw new Exception(message, exception);
 			}
 		}
 
@@ -173,12 +172,11 @@ namespace DigitalRise.ConverterBase
 		/// <param name="defaultValue">
 		/// The default value, used if <paramref name="attribute"/> is null or empty.
 		/// </param>
-		/// <param name="identity">The content identity.</param>
 		/// <returns>The color value.</returns>
 		/// <exception cref="InvalidContentException">
 		/// Error parsing <paramref name="attribute"/>.
 		/// </exception>
-		public static Color ToColor(this XAttribute attribute, Color defaultValue, ContentIdentity identity)
+		public static Color ToColor(this XAttribute attribute, Color defaultValue)
 		{
 			string value = (string)attribute;
 			if (value == null)
@@ -208,13 +206,13 @@ namespace DigitalRise.ConverterBase
 				else
 				{
 					var message = GetExceptionMessage(attribute, "Could not parse color value: '{0}'", value);
-					throw new InvalidContentException(message, identity);
+					throw new Exception(message);
 				}
 			}
 			catch (Exception exception)
 			{
 				var message = GetExceptionMessage(attribute, "Could not parse color value: '{0}'", value);
-				throw new InvalidContentException(message, identity, exception);
+				throw new Exception(message, exception);
 			}
 		}
 
@@ -226,12 +224,11 @@ namespace DigitalRise.ConverterBase
 		/// <param name="defaultValue">
 		/// The default value, used if <paramref name="attribute"/> is null or empty.
 		/// </param>
-		/// <param name="identity">The content identity.</param>
 		/// <returns>The 3D vector.</returns>
 		/// <exception cref="InvalidContentException">
 		/// Error parsing <paramref name="attribute"/>.
 		/// </exception>
-		public static Vector3 ToVector3(this XAttribute attribute, Vector3 defaultValue, ContentIdentity identity)
+		public static Vector3 ToVector3(this XAttribute attribute, Vector3 defaultValue)
 		{
 			string value = (string)attribute;
 			if (value == null)
@@ -251,13 +248,13 @@ namespace DigitalRise.ConverterBase
 				else
 				{
 					var message = GetExceptionMessage(attribute, "Could not parse 3-dimensional vector: '{0}'", value);
-					throw new InvalidContentException(message, identity);
+					throw new Exception(message);
 				}
 			}
 			catch (Exception exception)
 			{
 				var message = GetExceptionMessage(attribute, "Could not parse 3-dimensional vector: '{0}'", value);
-				throw new InvalidContentException(message, identity, exception);
+				throw new Exception(message, exception);
 			}
 		}
 
@@ -269,12 +266,11 @@ namespace DigitalRise.ConverterBase
 		/// <param name="defaultValue">
 		/// The default value, used if <paramref name="attribute"/> is null or empty.
 		/// </param>
-		/// <param name="identity">The content identity.</param>
 		/// <returns>The texture format.</returns>
 		/// <exception cref="InvalidContentException">
 		/// Error parsing <paramref name="attribute"/>.
 		/// </exception>
-		public static DRTextureFormat ToTextureFormat(this XAttribute attribute, DRTextureFormat defaultValue, ContentIdentity identity)
+		public static DRTextureFormat ToTextureFormat(this XAttribute attribute, DRTextureFormat defaultValue)
 		{
 			string value = (string)attribute;
 			if (string.IsNullOrWhiteSpace(value))
@@ -294,7 +290,7 @@ namespace DigitalRise.ConverterBase
 					return DRTextureFormat.NormalInvertY;
 				default:
 					var message = GetExceptionMessage(attribute, "Could not parse texture format: '{0}'", value);
-					throw new InvalidContentException(message, identity);
+					throw new Exception(message);
 			}
 		}
 

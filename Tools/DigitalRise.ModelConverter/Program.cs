@@ -74,7 +74,9 @@ namespace DigitalRise.ModelConverter
 				Logger = Log
 			};
 
-			var drModelContent = processor.Process(modelContent);
+			var modelDescription = new ModelDescription();
+
+			var drModelContent = processor.Process(modelContent, modelDescription);
 
 			var k = 5;
 		}

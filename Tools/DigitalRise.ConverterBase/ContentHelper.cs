@@ -150,9 +150,9 @@ namespace DigitalRise.ConverterBase
 		/// <param name="path">
 		/// The name of the file. May include a relative or absolute path.
 		/// </param>
-		/// <param name="identity">The content identity.</param>
+		/// <param name="sourceFile">The content identity.</param>
 		/// <returns>The full path and file name.</returns>
-		public static string FindFile(string path, ContentIdentity identity)
+		public static string FindFile(string path, string sourceFile)
 		{
 			if (path == null)
 				throw new ArgumentNullException("path");
@@ -161,11 +161,11 @@ namespace DigitalRise.ConverterBase
 			if (Path.IsPathRooted(path) && File.Exists(path))
 				return Path.GetFullPath(path);
 
-			if (identity == null)
+			if (sourceFile == null)
 				throw new ArgumentNullException("identity");
 
 			// ----- 2. Check whether path is relative to asset.
-			string folder = Path.GetDirectoryName(identity.SourceFilename) ?? String.Empty;
+			string folder = Path.GetDirectoryName(sourceFile) ?? String.Empty;
 
 			// Try relative path.
 			string relativeFilename = Path.Combine(folder, path);
@@ -186,7 +186,7 @@ namespace DigitalRise.ConverterBase
 				return Path.GetFullPath(fileName);
 
 			string message = String.Format(CultureInfo.InvariantCulture, "File \"{0}\" not found.", path);
-			throw new InvalidContentException(message, identity);
+			throw new Exception(message);
 		}
 
 

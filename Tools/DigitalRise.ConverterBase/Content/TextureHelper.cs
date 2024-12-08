@@ -123,7 +123,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The floating point value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The signed integer value.</returns>
-		[CLSCompliant(false)]
 		public static uint FloatToSInt(float value, uint bitmask)
 		{
 			float max = bitmask >> 1;
@@ -138,7 +137,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The signed integer value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The floating point value.</returns>
-		[CLSCompliant(false)]
 		public static float SIntToFloat(uint value, uint bitmask)
 		{
 			uint signmask = (bitmask + 1) >> 1;
@@ -157,7 +155,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The floating point value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The unsigned integer value.</returns>
-		[CLSCompliant(false)]
 		public static uint FloatToUInt(float value, uint bitmask)
 		{
 			return (uint)ClampAndRound(value, 0, bitmask, MidpointRounding.ToEven);
@@ -170,7 +167,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The unsigned integer value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The floating point value.</returns>
-		[CLSCompliant(false)]
 		public static float UIntToFloat(uint value, uint bitmask)
 		{
 			value &= bitmask;
@@ -184,7 +180,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The floating point value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The signed normalized integer value.</returns>
-		[CLSCompliant(false)]
 		public static uint FloatToSNorm(float value, uint bitmask)
 		{
 			float max = bitmask >> 1;
@@ -199,7 +194,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The signed normalized integer value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The floating point value.</returns>
-		[CLSCompliant(false)]
 		public static float SNormToFloat(uint value, uint bitmask)
 		{
 			uint signmask = (bitmask + 1) >> 1;
@@ -228,7 +222,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The floating point value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The unsigned normalized integer value.</returns>
-		[CLSCompliant(false)]
 		public static uint FloatToUNorm(float value, uint bitmask)
 		{
 			value *= bitmask;
@@ -242,7 +235,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// <param name="value">The unsigned normalized integer value.</param>
 		/// <param name="bitmask">The bitmask of the integer value.</param>
 		/// <returns>The floating point value.</returns>
-		[CLSCompliant(false)]
 		public static float UNormToFloat(uint value, uint bitmask)
 		{
 			value &= bitmask;

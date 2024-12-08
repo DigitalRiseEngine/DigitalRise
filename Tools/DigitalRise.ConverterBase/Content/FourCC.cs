@@ -89,7 +89,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// Initializes a new instance of the <see cref="FourCC" /> struct.
 		/// </summary>
 		/// <param name="fourCC">The fourCC value as an uint.</param>
-		[CLSCompliant(false)]
 		public FourCC(uint fourCC)
 		{
 			_value = fourCC;
@@ -140,7 +139,6 @@ namespace DigitalRise.ConverterBase.Content
 		/// </summary>
 		/// <param name="descriptor">The descriptor.</param>
 		/// <returns>The result of the conversion.</returns>
-		[CLSCompliant(false)]
 		public static implicit operator FourCC(uint descriptor)
 		{
 			return new FourCC(descriptor);

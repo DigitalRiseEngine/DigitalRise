@@ -14,7 +14,6 @@ namespace DigitalRise.ConverterBase.Content
 	/// <remarks>
 	/// Reference: 
 	/// </remarks>
-	[CLSCompliant(false)]
 	internal static class HalfHelper
 	{
 		// Reference: Jeroen van der Zijp, "Fast Half Float Conversions",

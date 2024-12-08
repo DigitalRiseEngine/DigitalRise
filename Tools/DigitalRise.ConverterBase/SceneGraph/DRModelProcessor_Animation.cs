@@ -35,7 +35,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				if (animationDescription != null)
 				{
 					var animationFiles = animationDescription.MergeFiles;
-					AnimationMerger.Merge(animationFiles, _rootBone.Animations, Logger);
+					AnimationMerger.Merge(animationFiles, _modelDescription.FileName, _rootBone.Animations, Logger);
 				}
 			}
 		}

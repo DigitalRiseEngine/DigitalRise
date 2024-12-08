@@ -22,14 +22,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 	// If the XML file is missing, the model is built using the materials included
 	// in the model file ("local materials").
 
-	public class ModelDescription : ContentItem
+	public class ModelDescription
 	{
 		public string FileName { get; set; }
-		public string Importer { get; set; }
-		public float RotationX { get; set; }
-		public float RotationY { get; set; }
-		public float RotationZ { get; set; }
-		public float Scale { get; set; }
 		public bool GenerateTangentFrames { get; set; }
 		public bool SwapWindingOrder { get; set; }
 		public bool BoundingBoxEnabled { get; set; }
@@ -41,10 +36,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		public float MaxDistance { get; set; }
 
 
-		/// <summary>
-		/// Prevents a default instance of the <see cref="ModelDescription"/> class from being created.
-		/// </summary>
-		private ModelDescription()
+		public ModelDescription()
 		{
 		}
 
@@ -68,8 +60,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			if (fileName.Length == 0)
 				throw new ArgumentException("File name must not be empty.", "sourceFileName");
 
-			var modelDescription = new ModelDescription { Identity = new ContentIdentity(fileName) };
-
 			XDocument document;
 			try
 			{
@@ -78,54 +68,54 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			catch (Exception exception)
 			{
 				string message = string.Format(CultureInfo.InvariantCulture, "Could not load '{0}': {1}", fileName, exception.Message);
-				throw new InvalidContentException(message, modelDescription.Identity);
+				throw new Exception(message);
 			}
 
 			var modelElement = document.Root;
 			if (modelElement == null || modelElement.Name != "Model")
 			{
 				string message = string.Format(CultureInfo.InvariantCulture, "Root element \"<Model>\" is missing in XML.");
-				throw new InvalidContentException(message, modelDescription.Identity);
+				throw new Exception(message);
 			}
 
 			// Model attributes.
-			modelDescription.Name = (string)modelElement.Attribute("Name") ?? Path.GetFileNameWithoutExtension(fileName);
-			modelDescription.FileName = (string)modelElement.Attribute("File") ?? (string)modelElement.Attribute("FileName");
-			modelDescription.Importer = (string)modelElement.Attribute("Importer");
-			modelDescription.RotationX = (float?)modelElement.Attribute("RotationX") ?? 0.0f;
-			modelDescription.RotationY = (float?)modelElement.Attribute("RotationY") ?? 0.0f;
-			modelDescription.RotationZ = (float?)modelElement.Attribute("RotationZ") ?? 0.0f;
-			modelDescription.Scale = (float?)modelElement.Attribute("Scale") ?? 1.0f;
-			modelDescription.GenerateTangentFrames = (bool?)modelElement.Attribute("GenerateTangentFrames") ?? false;
-			modelDescription.SwapWindingOrder = (bool?)modelElement.Attribute("SwapWindingOrder") ?? false;
-			modelDescription.PremultiplyVertexColors = (bool?)modelElement.Attribute("PremultiplyVertexColors") ?? true;
-			modelDescription.MaxDistance = (float?)modelElement.Attribute("MaxDistance") ?? 0.0f;
+			var modelDescription = new ModelDescription
+			{
+				FileName = (string)modelElement.Attribute("File") ?? (string)modelElement.Attribute("FileName"),
+				GenerateTangentFrames = (bool?)modelElement.Attribute("GenerateTangentFrames") ?? false,
+				SwapWindingOrder = (bool?)modelElement.Attribute("SwapWindingOrder") ?? false,
+				PremultiplyVertexColors = (bool?)modelElement.Attribute("PremultiplyVertexColors") ?? true,
+				MaxDistance = (float?)modelElement.Attribute("MaxDistance") ?? 0.0f
+			};
 
 			var aabbMinimumAttribute = modelElement.Attribute("BoundingBoxMinimum");
 			var aabbMaximumAttribute = modelElement.Attribute("BoundingBoxMaximum");
 			if (aabbMinimumAttribute != null && aabbMaximumAttribute != null)
 			{
 				modelDescription.BoundingBoxEnabled = true;
-				modelDescription.BoundingBoxMinimum = aabbMinimumAttribute.ToVector3(Vector3.Zero, modelDescription.Identity);
-				modelDescription.BoundingBoxMaximum = aabbMaximumAttribute.ToVector3(Vector3.One, modelDescription.Identity);
+				modelDescription.BoundingBoxMinimum = aabbMinimumAttribute.ToVector3(Vector3.Zero);
+				modelDescription.BoundingBoxMaximum = aabbMaximumAttribute.ToVector3(Vector3.One);
 			}
 
 			// Mesh elements.
 			modelDescription.Meshes = new List<MeshDescription>();
 			foreach (var meshElement in modelElement.Elements("Mesh"))
 			{
-				var meshDescription = new MeshDescription();
-				meshDescription.Name = (string)meshElement.Attribute("Name") ?? string.Empty;
-				meshDescription.GenerateTangentFrames = (bool?)meshElement.Attribute("GenerateTangentFrames") ?? modelDescription.GenerateTangentFrames;
-				meshDescription.MaxDistance = (float?)meshElement.Attribute("MaxDistance") ?? modelDescription.MaxDistance;
-				meshDescription.LodDistance = (float?)meshElement.Attribute("LodDistance") ?? 0.0f;
+				var meshDescription = new MeshDescription
+				{
+					Name = (string)meshElement.Attribute("Name") ?? string.Empty,
+					GenerateTangentFrames = (bool?)meshElement.Attribute("GenerateTangentFrames") ?? modelDescription.GenerateTangentFrames,
+					MaxDistance = (float?)meshElement.Attribute("MaxDistance") ?? modelDescription.MaxDistance,
+					LodDistance = (float?)meshElement.Attribute("LodDistance") ?? 0.0f,
 
-				meshDescription.Submeshes = new List<SubmeshDescription>();
+					Submeshes = new List<SubmeshDescription>()
+				};
 				foreach (var submeshElement in meshElement.Elements("Submesh"))
 				{
-					var submeshDescription = new SubmeshDescription();
-					submeshDescription.GenerateTangentFrames = (bool?)meshElement.Attribute("GenerateTangentFrames") ?? meshDescription.GenerateTangentFrames;
-					submeshDescription.Material = (string)submeshElement.Attribute("Material");
+					var submeshDescription = new SubmeshDescription
+					{
+						GenerateTangentFrames = (bool?)meshElement.Attribute("GenerateTangentFrames") ?? meshDescription.GenerateTangentFrames
+					};
 
 					meshDescription.Submeshes.Add(submeshDescription);
 				}
@@ -139,7 +129,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			{
 				var animationDescription = new AnimationDescription();
 				animationDescription.MergeFiles = (string)animationsElement.Attribute("MergeFiles");
-				animationDescription.Splits = AnimationSplitter.ParseAnimationSplitDefinitions(animationsElement, modelDescription.Identity, context);
+				animationDescription.Splits = AnimationSplitter.ParseAnimationSplitDefinitions(animationsElement);
 				animationDescription.ScaleCompression = (float?)animationsElement.Attribute("ScaleCompression") ?? -1;
 				animationDescription.RotationCompression = (float?)animationsElement.Attribute("RotationCompression") ?? -1;
 				animationDescription.TranslationCompression = (float?)animationsElement.Attribute("TranslationCompression") ?? -1;

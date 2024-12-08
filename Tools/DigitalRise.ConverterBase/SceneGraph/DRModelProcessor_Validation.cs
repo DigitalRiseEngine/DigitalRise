@@ -243,22 +243,11 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			// Check if SkinnedEffect is used and SkinnedEffect.MaxBones is exceeded.
 			if (_skeleton != null && _skeleton.NumberOfBones > SkinnedEffect.MaxBones)
 			{
-				bool usesSkinnedEffect =
-				  _model.GetSubtree()
-						.OfType<DRMeshNodeContent>()
-						.SelectMany(meshNode => meshNode.Mesh.Submeshes)
-						.Where(submesh => submesh.ExternalMaterial == null    // Ignore external materials.
-										  && submesh.LocalMaterial != null)
-						.SelectMany(submesh => submesh.LocalMaterial.Passes.Values)
-						.Any(binding => binding.EffectType == DREffectType.SkinnedEffect);
-				if (usesSkinnedEffect)
-				{
-					var message = string.Format(
-					  CultureInfo.InvariantCulture,
-					  "Skeleton has {0} bones, but the maximum supported is {1}.",
-					  _skeleton.NumberOfBones, SkinnedEffect.MaxBones);
-					throw new InvalidContentException(message, _rootBone.Identity);
-				}
+				var message = string.Format(
+				  CultureInfo.InvariantCulture,
+				  "Skeleton has {0} bones, but the maximum supported is {1}.",
+				  _skeleton.NumberOfBones, SkinnedEffect.MaxBones);
+				throw new Exception(message);
 			}
 #endif
 
@@ -268,10 +257,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			{
 				if (lodGroupNode.Levels.Count == 1)
 				{
-					_context.Logger.LogWarning(
-					  null, _input.Identity,
-					  "The LOD group \"{0}\" only has a single level of detail.",
-					  lodGroupNode.Name);
+					Log(string.Format("The LOD group \"{0}\" only has a single level of detail.", lodGroupNode.Name));
 
 					goto Next;
 				}
@@ -282,18 +268,16 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					{
 						if (Numeric.AreEqual(lodGroupNode.Levels[i].LodDistance, lodGroupNode.Levels[j].LodDistance))
 						{
-							_context.Logger.LogWarning(
-							  null, _input.Identity,
-							  "Please update the LOD distances of LOD group \"{0}\". Multiple LODs have the same distance.",
-							  lodGroupNode.Name);
+							Log(string.Format(
+								"Please update the LOD distances of LOD group \"{0}\". Multiple LODs have the same distance.",
+								lodGroupNode.Name));
 
 							goto Next;
 						}
 					}
 				}
 
-			Next:
-				;
+			Next:;
 			}
 		}
 

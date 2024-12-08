@@ -63,7 +63,7 @@ namespace DigitalRise.ConverterBase.Animations
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="contentIdentity"/> or <paramref name="context"/> is <see langword="null"/>.
 		/// </exception>
-		public static void Split(AnimationContentDictionary animationDictionary, string splitFile, Action<string> logger)
+		public static void Split(string splitFile, string sourceFile, AnimationContentDictionary animationDictionary, Action<string> logger)
 		{
 			if (animationDictionary == null)
 				return;
@@ -81,7 +81,7 @@ namespace DigitalRise.ConverterBase.Animations
 				logger?.Invoke("The model contains more than 1 animation. The animation splitting is performed on the first animation. Other animations are deleted!");
 
 			// Load XML file.
-			splitFile = ContentHelper.FindFile(splitFile, contentIdentity);
+			splitFile = ContentHelper.FindFile(splitFile, sourceFile);
 			XDocument document = XDocument.Load(splitFile, LoadOptions.SetLineInfo);
 
 			// Parse XML.

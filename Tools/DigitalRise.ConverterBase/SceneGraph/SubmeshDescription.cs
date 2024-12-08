@@ -7,6 +7,5 @@ namespace DigitalRise.ConverterBase.SceneGraph
 	public class SubmeshDescription
 	{
 		public bool GenerateTangentFrames { get; set; }
-		public string Material { get; set; }
 	}
 }

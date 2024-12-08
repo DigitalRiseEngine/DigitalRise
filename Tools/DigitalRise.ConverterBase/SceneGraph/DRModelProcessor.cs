@@ -1,10 +1,9 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -41,14 +40,17 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		// Input
 		private NodeContent _input;
 
+		// Optional model description (.drmdl file).
+		private ModelDescription _modelDescription;
+
 		// The model (= root node of the scene).
-		private DRModelNodeContent _model;
+		private DRSceneNodeContent _model;
 
 		// Skeleton and animations
 		private BoneContent _rootBone;
 #if ANIMATION
-    private Skeleton _skeleton;
-    private Dictionary<string, SkeletonKeyFrameAnimation> _animations;
+		private Skeleton _skeleton;
+		private Dictionary<string, SkeletonKeyFrameAnimation> _animations;
 #endif
 
 		// Vertex and index buffers
@@ -71,11 +73,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		public Action<string> Logger { get; set; }
 
-		public bool GenerateTangentFrames { get; set; }
-		public bool SwapWindingOrder { get; set; }
-		public bool PremultiplyVertexColors { get; set; }
-		public AnimationDescription Animation { get; set; }
-
 		#endregion
 
 
@@ -83,15 +80,21 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		#region Methods
 		//--------------------------------------------------------------
 
+		private void Log(string message) => Logger?.Invoke(message);
+
 		/// <summary>
 		/// Converts mesh content to model content.
 		/// </summary>
 		/// <param name="input">The root node content.</param>
+		/// <param name="modelDescription"></param>
 		/// <returns>The model content.</returns>
-		public DRModelNodeContent Process(NodeContent input)
+		public DRSceneNodeContent Process(NodeContent input, ModelDescription modelDescription)
 		{
 			if (input == null)
-				throw new ArgumentNullException("input");
+				throw new ArgumentNullException(nameof(input));
+
+			if (modelDescription == null)
+				throw new ArgumentNullException(nameof(modelDescription));
 
 			// The content processor may write text files. We want to use invariant culture number formats.
 			// TODO: Do not set Thread.CurrentThread.CurrentCulture. Make sure that all read/write operations explicitly use InvariantCulture.
@@ -108,6 +111,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 				// The model was imported.
 				_input = input;
+				_modelDescription = modelDescription;
+
+				_modelDescription.Validate(_input, Logger);
 
 				ValidateInput();
 
@@ -116,13 +122,18 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				if (_rootBone != null)
 				{
 #if ANIMATION
-          MergeAnimationFiles();
+					MergeAnimationFiles();
 #endif
 					BakeTransforms(input);
+					TransformModel();
 #if ANIMATION
-          BuildSkeleton();
-          BuildAnimations();
+					BuildSkeleton();
+					BuildAnimations();
 #endif
+				}
+				else
+				{
+					TransformModel();
 				}
 
 				BuildSceneGraph();
@@ -131,7 +142,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				CombineLodGroups();
 				ValidateOutput();
 
-				_model.Name = _input.Name;
+				_model.Name = Path.GetFileNameWithoutExtension(_modelDescription.Name);
 			}
 			finally
 			{
@@ -192,6 +203,26 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
+		private void TransformModel()
+		{
+			// Use MeshHelper to transform the whole scene node tree.
+			if (_modelDescription != null)
+			{
+				// ReSharper disable CompareOfFloatsByEqualityOperator
+				if (_modelDescription.RotationX != 0f
+					|| _modelDescription.RotationY != 0f
+					|| _modelDescription.RotationZ != 0f
+					|| _modelDescription.Scale != 1f)
+				{
+					Matrix rotationZ = Matrix.CreateRotationZ(MathHelper.ToRadians(_modelDescription.RotationZ));
+					Matrix rotationX = Matrix.CreateRotationX(MathHelper.ToRadians(_modelDescription.RotationX));
+					Matrix rotationY = Matrix.CreateRotationY(MathHelper.ToRadians(_modelDescription.RotationY));
+					Matrix transform = rotationZ * rotationX * rotationY * Matrix.CreateScale(_modelDescription.Scale);
+					Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.TransformScene(_input, transform);
+				}
+				// ReSharper restore CompareOfFloatsByEqualityOperator
+			}
+		}
 		#endregion
 	}
 }

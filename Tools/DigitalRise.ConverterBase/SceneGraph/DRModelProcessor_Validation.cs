@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -16,7 +16,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 {
 	partial class DRModelProcessor
 	{
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
 		private void ValidateInput()
 		{
 			if (_input is BoneContent)
@@ -48,8 +47,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					if (node.Parent is BoneContent)
 					{
 						// ----- Current node is a NodeContent or a MeshContent under a BoneContent.
-						Logger?.Invoke(string.Format(
-						  "Bone \"{0}\" contains node \"{1}\" which is not a bone. Bones must only have bones as children. The node might be ignored.",
+						Log(string.Format("Bone \"{0}\" contains node \"{1}\" which is not a bone. Bones must only have bones as children. The node might be ignored.",
 						  node.Parent.Name, node.Name));
 					}
 
@@ -223,9 +221,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			// Check whether morph target has children.
 			if (morphTarget.Children.Count > 0)
 			{
-				Logger?.Invoke(string.Format(
-				  "The children of the morph target \"{0}\" will be ignored.",
-				  morphTarget.Name));
+				Log(string.Format("The children of the morph target \"{0}\" will be ignored.", morphTarget.Name));
 			}
 		}
 
@@ -238,34 +234,32 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "LODs")]
 		private void ValidateOutput()
 		{
 			// Note: The material may be defined in an external XML file. The validation 
 			// below only checks local materials.
 
 #if ANIMATION
-      // Check if SkinnedEffect is used and SkinnedEffect.MaxBones is exceeded.
-      if (_skeleton != null && _skeleton.NumberOfBones > SkinnedEffect.MaxBones)
-      {
-        bool usesSkinnedEffect =
-          _model.GetSubtree()
-                .OfType<DRMeshNodeContent>()
-                .SelectMany(meshNode => meshNode.Mesh.Submeshes)
-                .Where(submesh => submesh.ExternalMaterial == null    // Ignore external materials.
-                                  && submesh.LocalMaterial != null)
-                .SelectMany(submesh => submesh.LocalMaterial.Passes.Values)
-                .Any(binding => binding.EffectType == DREffectType.SkinnedEffect);
-        if (usesSkinnedEffect)
-        {
-          var message = string.Format(
-            CultureInfo.InvariantCulture,
-            "Skeleton has {0} bones, but the maximum supported is {1}.",
-            _skeleton.NumberOfBones, SkinnedEffect.MaxBones);
-          throw new InvalidContentException(message, _rootBone.Identity);
-        }
-      }
+			// Check if SkinnedEffect is used and SkinnedEffect.MaxBones is exceeded.
+			if (_skeleton != null && _skeleton.NumberOfBones > SkinnedEffect.MaxBones)
+			{
+				bool usesSkinnedEffect =
+				  _model.GetSubtree()
+						.OfType<DRMeshNodeContent>()
+						.SelectMany(meshNode => meshNode.Mesh.Submeshes)
+						.Where(submesh => submesh.ExternalMaterial == null    // Ignore external materials.
+										  && submesh.LocalMaterial != null)
+						.SelectMany(submesh => submesh.LocalMaterial.Passes.Values)
+						.Any(binding => binding.EffectType == DREffectType.SkinnedEffect);
+				if (usesSkinnedEffect)
+				{
+					var message = string.Format(
+					  CultureInfo.InvariantCulture,
+					  "Skeleton has {0} bones, but the maximum supported is {1}.",
+					  _skeleton.NumberOfBones, SkinnedEffect.MaxBones);
+					throw new InvalidContentException(message, _rootBone.Identity);
+				}
+			}
 #endif
 
 			// Check LOD group nodes.
@@ -274,9 +268,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			{
 				if (lodGroupNode.Levels.Count == 1)
 				{
-					Logger?.Invoke(string.Format(
+					_context.Logger.LogWarning(
+					  null, _input.Identity,
 					  "The LOD group \"{0}\" only has a single level of detail.",
-					  lodGroupNode.Name));
+					  lodGroupNode.Name);
 
 					goto Next;
 				}
@@ -287,9 +282,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					{
 						if (Numeric.AreEqual(lodGroupNode.Levels[i].LodDistance, lodGroupNode.Levels[j].LodDistance))
 						{
-							Logger?.Invoke(string.Format(
+							_context.Logger.LogWarning(
+							  null, _input.Identity,
 							  "Please update the LOD distances of LOD group \"{0}\". Multiple LODs have the same distance.",
-							  lodGroupNode.Name));
+							  lodGroupNode.Name);
 
 							goto Next;
 						}

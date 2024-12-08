@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -22,7 +22,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <returns>The qualified name.</returns>
 		public override string GetRuntimeType(TargetPlatform targetPlatform)
 		{
-			return "DigitalRise.Graphics.SceneGraph.SceneNode, DigitalRise.Graphics, Version=1.2.0.0";
+			return "DigitalRune.Graphics.SceneGraph.SceneNode, DigitalRune.Graphics, Version=1.2.0.0";
 		}
 
 
@@ -33,7 +33,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <returns>Name of the runtime loader.</returns>
 		public override string GetRuntimeReader(TargetPlatform targetPlatform)
 		{
-			return "DigitalRise.Graphics.Content.SceneNodeReader, DigitalRise.Graphics, Version=1.2.0.0";
+			return "DigitalRune.Graphics.Content.SceneNodeReader, DigitalRune.Graphics, Version=1.2.0.0";
 		}
 
 
@@ -42,7 +42,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// </summary>
 		/// <param name="output">The content writer serializing the value.</param>
 		/// <param name="value">The value to write.</param>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void Write(ContentWriter output, DRSceneNodeContent value)
 		{
 			if (value.Children != null)

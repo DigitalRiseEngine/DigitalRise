@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -59,13 +59,11 @@ namespace DigitalRise.ConverterBase.Animations
 		/// The path of the XML file defining the splits. This path is relative to the folder of the 
 		/// model file. Usually it is simply the filename, e.g. "Dude_AnimationSplits.xml".
 		/// </param>
-		/// <param name="contentIdentity">The content identity.</param>
-		/// <param name="context">The content processor context.</param>
+		/// <param name="logger"></param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="contentIdentity"/> or <paramref name="context"/> is <see langword="null"/>.
 		/// </exception>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
-		public static void Split(AnimationContentDictionary animationDictionary, string splitFile, ContentIdentity contentIdentity, ContentProcessorContext context)
+		public static void Split(AnimationContentDictionary animationDictionary, string splitFile, Action<string> logger)
 		{
 			if (animationDictionary == null)
 				return;
@@ -73,47 +71,36 @@ namespace DigitalRise.ConverterBase.Animations
 			if (string.IsNullOrEmpty(splitFile))
 				return;
 
-			if (contentIdentity == null)
-				throw new ArgumentNullException("contentIdentity");
-
-			if (context == null)
-				throw new ArgumentNullException("context");
-
 			if (animationDictionary.Count == 0)
 			{
-				context.Logger.LogWarning(null, contentIdentity, "The model does not have an animation. Animation splitting is skipped.");
+				logger?.Invoke("The model does not have an animation. Animation splitting is skipped.");
 				return;
 			}
 
 			if (animationDictionary.Count > 1)
-				context.Logger.LogWarning(null, contentIdentity, "The model contains more than 1 animation. The animation splitting is performed on the first animation. Other animations are deleted!");
+				logger?.Invoke("The model contains more than 1 animation. The animation splitting is performed on the first animation. Other animations are deleted!");
 
 			// Load XML file.
 			splitFile = ContentHelper.FindFile(splitFile, contentIdentity);
 			XDocument document = XDocument.Load(splitFile, LoadOptions.SetLineInfo);
 
-			// Let the content pipeline know that we depend on this file and we need to 
-			// rebuild the content if the file is modified.
-			context.AddDependency(splitFile);
-
 			// Parse XML.
 			var animationsElement = document.Element("Animations");
 			if (animationsElement == null)
 			{
-				context.Logger.LogWarning(null, contentIdentity, "The animation split file \"{0}\" does not contain an <Animations> root node.", splitFile);
+				logger?.Invoke(string.Format("The animation split file \"{0}\" does not contain an <Animations> root node.", splitFile));
 				return;
 			}
 
-			var wrappedContext = new ContentPipelineContext(context);
-			var splits = ParseAnimationSplitDefinitions(animationsElement, contentIdentity, wrappedContext);
+			var splits = ParseAnimationSplitDefinitions(animationsElement);
 			if (splits == null || splits.Count == 0)
 			{
-				context.Logger.LogWarning(null, contentIdentity, "The XML file with the animation split definitions is invalid or empty. Animation is not split.");
+				logger?.Invoke("The XML file with the animation split definitions is invalid or empty. Animation is not split.");
 				return;
 			}
 
 			// Split animations.
-			Split(animationDictionary, splits, contentIdentity, context);
+			Split(animationDictionary, splits, logger);
 		}
 
 
@@ -122,13 +109,11 @@ namespace DigitalRise.ConverterBase.Animations
 		/// </summary>
 		/// <param name="animationDictionary">The animation dictionary.</param>
 		/// <param name="splits">The animation split definitions.</param>
-		/// <param name="contentIdentity">The content identity.</param>
-		/// <param name="context">The content processor context.</param>
+		/// <param name="logger"></param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="contentIdentity"/> or <paramref name="context"/> is <see langword="null"/>.
 		/// </exception>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
-		public static void Split(AnimationContentDictionary animationDictionary, IList<AnimationSplitDefinition> splits, ContentIdentity contentIdentity, ContentProcessorContext context)
+		public static void Split(AnimationContentDictionary animationDictionary, IList<AnimationSplitDefinition> splits, Action<string> logger)
 		{
 			if (splits == null || splits.Count == 0)
 				return;
@@ -136,20 +121,14 @@ namespace DigitalRise.ConverterBase.Animations
 			if (animationDictionary == null)
 				return;
 
-			if (contentIdentity == null)
-				throw new ArgumentNullException("contentIdentity");
-
-			if (context == null)
-				throw new ArgumentNullException("context");
-
 			if (animationDictionary.Count == 0)
 			{
-				context.Logger.LogWarning(null, contentIdentity, "The model does not have an animation. Animation splitting is skipped.");
+				logger?.Invoke("The model does not have an animation. Animation splitting is skipped.");
 				return;
 			}
 
 			if (animationDictionary.Count > 1)
-				context.Logger.LogWarning(null, contentIdentity, "The model contains more than 1 animation. The animation splitting is performed on the first animation. Other animations are deleted!");
+				logger?.Invoke("The model contains more than 1 animation. The animation splitting is performed on the first animation. Other animations are deleted!");
 
 			// Get first animation.
 			var originalAnimation = animationDictionary.First().Value;
@@ -197,13 +176,13 @@ namespace DigitalRise.ConverterBase.Animations
 				if (newAnimation.Channels.Count == 0)
 				{
 					var message = string.Format(CultureInfo.InvariantCulture, "The split animation '{0}' is empty.", split.Name);
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				if (animationDictionary.ContainsKey(split.Name))
 				{
 					var message = string.Format(CultureInfo.InvariantCulture, "Cannot add split animation '{0}' because an animation with the same name already exits.", split.Name);
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				animationDictionary.Add(split.Name, newAnimation);
@@ -215,21 +194,15 @@ namespace DigitalRise.ConverterBase.Animations
 		/// Parses the animation split definitions defined by the specified XML element.
 		/// </summary>
 		/// <param name="animationsElement">The XML element that defines the animation splits.</param>
-		/// <param name="contentIdentity">The content identity.</param>
-		/// <param name="context">The context.</param>
 		/// <returns>The list of animation split definitions.</returns>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="animationsElement"/>, <paramref name="contentIdentity"/>, or 
 		/// <paramref name="context"/> is <see langword="null"/>.
 		/// </exception>
-		internal static List<AnimationSplitDefinition> ParseAnimationSplitDefinitions(XElement animationsElement, ContentIdentity contentIdentity, ContentPipelineContext context)
+		internal static List<AnimationSplitDefinition> ParseAnimationSplitDefinitions(XElement animationsElement)
 		{
 			if (animationsElement == null)
 				throw new ArgumentNullException("animationsElement");
-			if (contentIdentity == null)
-				throw new ArgumentNullException("contentIdentity");
-			if (context == null)
-				throw new ArgumentNullException("context");
 
 			// The frame rate needs to be set, when the splits are defined in frames.
 			double? framerate = (double?)animationsElement.Attribute("Framerate");
@@ -238,7 +211,7 @@ namespace DigitalRise.ConverterBase.Animations
 			var splits = new List<AnimationSplitDefinition>();
 			foreach (var animationElement in animationsElement.Elements("Animation"))
 			{
-				var name = animationElement.GetMandatoryAttribute("Name", contentIdentity);
+				var name = animationElement.GetMandatoryAttribute("Name");
 
 				double? startTime = (double?)animationElement.Attribute("StartTime");
 				double? endTime = (double?)animationElement.Attribute("EndTime");
@@ -251,19 +224,19 @@ namespace DigitalRise.ConverterBase.Animations
 				if (startTime == null && startFrame == null)
 				{
 					string message = XmlHelper.GetExceptionMessage(animationElement, "The animation element does not contain a valid \"StartTime\" or \"StartFrame\" attribute.");
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				if (endTime == null && endFrame == null)
 				{
 					string message = XmlHelper.GetExceptionMessage(animationElement, "The animation element does not contain a valid \"EndTime\" or \"EndFrame\" attribute.");
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				if (framerate == null && (startTime == null || endTime == null))
 				{
 					string message = XmlHelper.GetExceptionMessage(animationsElement, "The animations element must have a <Framerate> element if start and end are specified in frames.");
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				startTime = startTime ?? startFrame.Value / framerate.Value;
@@ -274,7 +247,7 @@ namespace DigitalRise.ConverterBase.Animations
 				if (start > end)
 				{
 					string message = XmlHelper.GetExceptionMessage(animationElement, "Invalid animation element: The start time is larger than the end time.");
-					throw new InvalidContentException(message, contentIdentity);
+					throw new Exception(message);
 				}
 
 				splits.Add(new AnimationSplitDefinition { Name = name, StartTime = start, EndTime = end, AddLoopFrame = addLoopFrame });

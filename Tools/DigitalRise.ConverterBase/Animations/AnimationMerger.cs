@@ -1,4 +1,4 @@
-// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -27,10 +27,8 @@ namespace DigitalRise.ConverterBase.Animations
 		/// file). For example: "run.fbx;jump.fbx;turn.fbx".
 		/// </param>
 		/// <param name="animationDictionary">The animation dictionary.</param>
-		/// <param name="contentIdentity">The content identity.</param>
-		/// <param name="context">The content processor context.</param>
-		public static void Merge(string animationFiles, AnimationContentDictionary animationDictionary,
-								 ContentIdentity contentIdentity, ContentProcessorContext context)
+		/// <param name="logger"></param>
+		public static void Merge(string animationFiles, AnimationContentDictionary animationDictionary, Action<string> logger)
 		{
 			if (string.IsNullOrEmpty(animationFiles))
 				return;
@@ -41,28 +39,24 @@ namespace DigitalRise.ConverterBase.Animations
 									  .Where(s => !string.IsNullOrEmpty(s));
 			foreach (string file in files)
 			{
-				MergeAnimation(file, animationDictionary, contentIdentity, context);
+				MergeAnimation(file, animationDictionary, logger);
 			}
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
-		private static void MergeAnimation(string animationFile, AnimationContentDictionary animationDictionary,
-										   ContentIdentity contentIdentity, ContentProcessorContext context)
+		private static void MergeAnimation(string animationFile, AnimationContentDictionary animationDictionary, Action<string> logger)
 		{
 			if (string.IsNullOrEmpty(animationFile))
 				return;
 			if (animationDictionary == null)
 				throw new ArgumentNullException("animationDictionary");
-			if (context == null)
-				throw new ArgumentNullException("context");
 
 			// Use content pipeline to build the asset.
 			animationFile = ContentHelper.FindFile(animationFile, contentIdentity);
 			NodeContent mergeModel = context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(animationFile), null);
 
 			// Find the skeleton.
-			BoneContent mergeRoot = Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.FindSkeleton(mergeModel);
+			BoneContent mergeRoot = MeshHelper.FindSkeleton(mergeModel);
 			if (mergeRoot == null)
 			{
 				context.Logger.LogWarning(null, contentIdentity, "Animation model file '{0}' has no root bone. Cannot merge animations.", animationFile);

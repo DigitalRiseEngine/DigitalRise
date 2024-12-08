@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -17,10 +17,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <summary>
 		/// Compares scene nodes by LOD distance and LOD level.
 		/// </summary>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 		private class LodComparer : Singleton<LodComparer>, IComparer<DRSceneNodeContent>
 		{
-			[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 			public int Compare(DRSceneNodeContent x, DRSceneNodeContent y)
 			{
 				if (x.LodDistance < y.LodDistance)

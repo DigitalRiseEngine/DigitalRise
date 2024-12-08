@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -27,7 +27,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				throw new InvalidOperationException("Invalid root node.");
 			}
 
-			_model = new DRModelNodeContent();
+			_model = new DRSceneNodeContent();
 
 			// In most cases the root node is an empty node, which can be ignored.
 			if (root.GetType() == typeof(DRSceneNodeContent)

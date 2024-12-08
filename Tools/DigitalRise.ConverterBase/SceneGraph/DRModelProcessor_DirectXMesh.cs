@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -9,6 +9,7 @@ using System.Text;
 using DigitalRise.ConverterBase.Content;
 using DigitalRise.Geometry;
 using DigitalRise.Mathematics;
+using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -60,9 +61,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			Debug.Assert(!string.IsNullOrWhiteSpace(textureCoordinateChannelName));
 
 			var indices = geometry.Indices;
-			var positions = geometry.Vertices.Positions.Select(p => (Vector3)p).ToArray();
-			var normals = geometry.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal()).Select(n => (Vector3)n).ToArray();
-			var textureCoordinates = geometry.Vertices.Channels.Get<Vector2>(textureCoordinateChannelName).Select(n => (Vector2)n).ToArray();
+			var positions = geometry.Vertices.Positions.ToArray();
+			var normals = geometry.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal()).ToArray();
+			var textureCoordinates = geometry.Vertices.Channels.Get<Vector2>(textureCoordinateChannelName).ToArray();
 
 			Vector3[] tangents;
 			Vector3[] bitangents;

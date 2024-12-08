@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -9,11 +9,11 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 namespace DigitalRise.ConverterBase.SceneGraph
 {
 	/// <summary>
-	/// Writes a <see cref="DRModelNodeContent"/> to binary format that can be read by the
+	/// Writes a <see cref="DRSceneNodeContent"/> to binary format that can be read by the
 	/// <strong>ModelNodeReader</strong> to load a <strong>ModelNode</strong>.
 	/// </summary>
 	[ContentTypeWriter]
-	public class DRModelNodeWriter : ContentTypeWriter<DRModelNodeContent>
+	public class DRModelNodeWriter : ContentTypeWriter<DRSceneNodeContent>
 	{
 		/// <summary>
 		/// Gets the assembly qualified name of the runtime target type.
@@ -22,7 +22,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <returns>The qualified name.</returns>
 		public override string GetRuntimeType(TargetPlatform targetPlatform)
 		{
-			return "DigitalRise.Graphics.SceneGraph.ModelNode, DigitalRise.Graphics, Version=1.2.0.0";
+			return "DigitalRune.Graphics.SceneGraph.ModelNode, DigitalRune.Graphics, Version=1.2.0.0";
 		}
 
 
@@ -33,7 +33,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <returns>Name of the runtime loader.</returns>
 		public override string GetRuntimeReader(TargetPlatform targetPlatform)
 		{
-			return "DigitalRise.Graphics.Content.ModelNodeReader, DigitalRise.Graphics, Version=1.2.0.0";
+			return "DigitalRune.Graphics.Content.ModelNodeReader, DigitalRune.Graphics, Version=1.2.0.0";
 		}
 
 
@@ -42,8 +42,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// </summary>
 		/// <param name="output">The content writer serializing the value.</param>
 		/// <param name="value">The value to write.</param>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		protected override void Write(ContentWriter output, DRModelNodeContent value)
+		protected override void Write(ContentWriter output, DRSceneNodeContent value)
 		{
 			// Use the SceneNodeWriter.
 			output.WriteRawObject<DRSceneNodeContent>(value);

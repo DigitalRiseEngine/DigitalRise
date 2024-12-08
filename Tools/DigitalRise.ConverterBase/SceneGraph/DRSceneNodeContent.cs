@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -73,7 +73,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Gets or sets the LOD level.
 		/// </summary>
 		/// <value>The LOD level. The default value is 0.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
 		public int LodLevel { get; set; }       // Only relevant for DRLodGroupNodeContent.
 
 
@@ -81,7 +80,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Gets or sets the LOD distance.
 		/// </summary>
 		/// <value>The LOD distance. The default value is 0.</value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
 		public float LodDistance { get; set; }  // Only relevant for DRLodGroupNodeContent.
 
 
@@ -156,6 +154,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <summary>
 		/// Gets the scene node and its ancestors scene.
 		/// </summary>
+		/// <returns>The scene node and its ancestors of the scene.</returns>
 		public IEnumerable<DRSceneNodeContent> GetSelfAndAncestors()
 		{
 			return TreeHelper.GetSelfAndAncestors(this, node => node.Parent);

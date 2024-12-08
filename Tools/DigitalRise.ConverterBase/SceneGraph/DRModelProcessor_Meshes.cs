@@ -1,4 +1,4 @@
-﻿// DigitalRise Engine - Copyright (C) DigitalRise GmbH
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using DigitalRise.ConverterBase.Meshes;
 using DigitalRise.Mathematics;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
@@ -14,7 +15,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using DigitalRise.ConverterBase.Meshes;
 
 
 namespace DigitalRise.ConverterBase.SceneGraph
@@ -37,10 +37,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 		private class SubmeshInfoComparer : Singleton<SubmeshInfoComparer>, IComparer<SubmeshInfo>
 		{
-			[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 			public int Compare(SubmeshInfo x, SubmeshInfo y)
 			{
 				int result = x.VertexBufferIndex - y.VertexBufferIndex;
@@ -54,83 +52,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				return result;
 			}
 		}
-		#endregion
-
-
-		//--------------------------------------------------------------
-		#region Properties & Events
-		//--------------------------------------------------------------
-
-		/*
-		/// <summary>
-		/// Gets or sets the value of the <strong>Generate Tangent Frames</strong> processor parameter.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if binormals and tangents should be generated if none are found; 
-		/// otherwise <see langword="false"/>.
-		/// </value>
-		[DefaultValue(false)]
-		[DisplayName("Generate Tangent Frames")]
-		[Description("If enabled, binormals and tangents are generated if none were found; otherwise, any existing data remains unchanged.")]
-		public virtual bool GenerateTangentFrames { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>Swap Winding Order</strong> processor parameter.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if the winding order of the model should be swapped; otherwise 
-		/// <see langword="false"/>.
-		/// </value>
-		/// <remarks>
-		/// This is useful for models that appear to be drawn inside-out.
-		/// </remarks>
-		[DefaultValue(false)]
-		[DisplayName("Swap Winding Order")]
-		[Description("If enabled, the winding order of the model is swapped. Useful for models that appear to be drawn inside-out.")]
-		public virtual bool SwapWindingOrder { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>AABB Enabled</strong> processor parameter.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if the model's AABB should be computed using 
-		/// <see cref="BoundingBoxMinimum"/> and <see cref="BoundingBoxMaximum"/>; otherwise <see langword="false"/>. 
-		/// </value>
-		/// <remarks>
-		/// The bounding shape of the model is usually computed automatically, but mesh animation (mesh 
-		/// skinning, ragdolls, inverse kinematics, etc.) are not taken into account. The properties 
-		/// <see cref="BoundingBoxEnabled"/>, <see cref="BoundingBoxMinimum"/>, and <see cref="BoundingBoxMaximum"/> can be 
-		/// used to manually define a larger bounding shape which includes all possible animated states.
-		/// </remarks>
-		[DefaultValue(false)]
-		[DisplayName("AABB Enabled")]
-		[Description("If enabled, 'AABB Minimum' and 'AABB Maximum' can be used to specify a custom bounding shape.")]
-		public virtual bool BoundingBoxEnabled { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the minimum corner of the model's AABB.
-		/// </summary>
-		/// <value>
-		/// The minimum corner of the model's AABB. The AABB is ignored if any component is NaN.
-		/// </value>
-		/// <inheritdoc cref="BoundingBoxEnabled"/>
-		[DisplayName("AABB Minimum"), Description("The minimum corner for the axis-aligned bounding box of the whole model; for example, \"-2;-1;-2\". Only used if 'AABB Enabled' is true.")]
-		public virtual Vector3 BoundingBoxMinimum { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the maximum corner of the model's AABB.
-		/// </summary>
-		/// <value>
-		/// The maximum corner of the model's AABB. The AABB is ignored if any component is NaN.
-		/// </value>
-		/// <inheritdoc cref="BoundingBoxEnabled"/>
-		[DisplayName("AABB Maximum"), Description("The maximum corner for the axis-aligned bounding box of the whole model; for example, \"2;3;2\". Only used if 'AABB Enabled' is true.")]
-		public virtual Vector3 BoundingBoxMaximum { get; set; }
-		*/
 		#endregion
 
 
@@ -154,6 +75,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		private void BuildMesh(DRMeshNodeContent meshNode)
 		{
 			var mesh = meshNode.InputMesh;
+			var meshDescription = (_modelDescription != null) ? _modelDescription.GetMeshDescription(mesh.Name) : null;
 
 			// Before modifying the base mesh: Prepare morph targets.
 			bool hasMorphTargets = (meshNode.InputMorphTargets != null && meshNode.InputMorphTargets.Count > 0);
@@ -166,16 +88,25 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				AddVertexReorderChannel(mesh);
 			}
 
+			if (meshDescription != null)
+			{
+				meshNode.MaxDistance = meshDescription.MaxDistance;
+				meshNode.LodDistance = meshDescription.LodDistance;
+			}
+			else if (_modelDescription != null)
+			{
+				meshNode.MaxDistance = _modelDescription.MaxDistance;
+				meshNode.LodDistance = 0;
+			}
+
 			// Ensure that model has tangents and binormals if required.
-			AddTangentFrames(mesh);
+			AddTangentFrames(mesh, _modelDescription, meshDescription);
 
 			// Process vertex colors, bone weights and bone indices.
 			ProcessVertexChannels(mesh);
 
-			if (SwapWindingOrder)
-			{
-				MeshHelper.SwapWindingOrder(mesh);
-			}
+			if (_modelDescription != null && _modelDescription.SwapWindingOrder)
+				Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.SwapWindingOrder(mesh);
 
 			OptimizeForCache(mesh);
 
@@ -203,14 +134,14 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				BoundingShape = boundingShape,
 				Submeshes = submeshes,
 #if ANIMATION
-        Skeleton = _skeleton,
-        Animations = _animations,
+				Skeleton = _skeleton,
+				Animations = _animations,
 #endif
 			};
 		}
 
 
-		private void AddTangentFrames(MeshContent mesh)
+		private void AddTangentFrames(MeshContent mesh, ModelDescription modelDescription, MeshDescription meshDescription)
 		{
 			string textureCoordinateChannelName = VertexChannelNames.TextureCoordinate(0);
 			string tangentChannelName = VertexChannelNames.Tangent(0);
@@ -222,7 +153,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				var geometry = mesh.Geometry[i];
 
 				// Check whether tangent frames are required.
-				if (GenerateTangentFrames)
+				var submeshDescription = (meshDescription != null) ? meshDescription.GetSubmeshDescription(i) : null;
+				if (submeshDescription != null && submeshDescription.GenerateTangentFrames
+					|| meshDescription != null && meshDescription.GenerateTangentFrames
+					|| modelDescription != null && modelDescription.GenerateTangentFrames)
 				{
 					// Ensure that normals are set.
 					if (!normalsCalculated)
@@ -239,10 +173,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 						// Texture coordinates are required for calculating tangent frames.
 						if (!channels.Contains(textureCoordinateChannelName))
 						{
-							Logger?.Invoke(string.Format(
-							  "Texture coordinates missing in mesh '{0}', submesh {1}. Texture coordinates are required " +
-							  "for calculating tangent frames.",
-							  mesh.Name, i));
+							Log(string.Format("Texture coordinates missing in mesh '{0}', submesh {1}. Texture coordinates are required " +
+							  "for calculating tangent frames.", mesh.Name, i));
 
 							channels.Add<Vector2>(textureCoordinateChannelName, null);
 						}
@@ -437,15 +369,34 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			var mesh = meshNode.InputMesh;
 			if (mesh.Positions.Count > 0)
 			{
-				// Non-rotated bounding shape. This is usually larger but contains no rotations. 
-				// (TransformedShapes with rotated children cannot be used with non-uniform scaling.)
-				boundingShape = ComputeAxisAlignedBoundingShape(mesh);
+				if (_modelDescription != null && _modelDescription.BoundingBoxEnabled)
+				{
+					// We assume that the AABB is given in the local space.
+					Vector3 aabbMinimum = (Vector3)_modelDescription.BoundingBoxMinimum;
+					Vector3 aabbMaximum = (Vector3)_modelDescription.BoundingBoxMaximum;
+					Vector3 center = (aabbMaximum + aabbMinimum) / 2;
+					Vector3 extent = aabbMaximum - aabbMinimum;
+					if (center.IsNumericallyZero())
+						boundingShape = new BoxShape(extent);
+					else
+						boundingShape = new TransformedShape(new BoxShape(extent), new Pose(center));
+				}
+				else
+				{
+					// Best fit bounding shape.
+					//boundingShape = ComputeBestFitBoundingShape(mesh);
+
+					// Non-rotated bounding shape. This is usually larger but contains no rotations. 
+					// (TransformedShapes with rotated children cannot be used with non-uniform scaling.)
+					boundingShape = ComputeAxisAlignedBoundingShape(mesh);
+				}
 			}
 
 			return boundingShape;
 		}
 
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static Shape ComputeBestFitBoundingShape(MeshContent mesh)
 		{
 			List<Vector3> points = mesh.Positions.Select(position => (Vector3)position).ToList();
@@ -470,7 +421,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			//  // A TransformedShape is used if the shape needs to be translated or rotated.
 			//  if (sphereVolume < boxVolume)
 			//  {
-			//    if (center.IsNumericallyZero())
+			//    if (center.IsNumericallyZero)
 			//      boundingShape = sphere;
 			//    else
 			//      boundingShape = new TransformedShape(new GeometricObject(sphere, new Pose(center)));

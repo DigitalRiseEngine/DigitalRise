@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
@@ -14,7 +13,6 @@ namespace DigitalRise.ConverterBase.Meshes
   /// <summary>
   /// Stores the processed data for a <strong>Submesh</strong> asset.
   /// </summary>
-  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
   public class DRSubmeshContent
   {
     /// <summary>
@@ -44,7 +42,6 @@ namespace DigitalRise.ConverterBase.Meshes
     /// Gets or sets the index buffer associated with this submesh.
     /// </summary>
     /// <value>The index buffer associated with this submesh.</value>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
     [ContentSerializer(ElementName = "IndexBuffer", SharedResource = true)]
     public IndexCollection IndexBuffer { get; set; }
 
@@ -67,36 +64,7 @@ namespace DigitalRise.ConverterBase.Meshes
     /// Gets or sets the morph targets associated with this submesh.
     /// </summary>
     /// <value>The morph targets. The default value is <see langword="null"/>.</value>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
     public List<DRMorphTargetContent> MorphTargets { get; set; }
-
-
-    /// <summary>
-    /// Gets or sets the external material of this submesh.
-    /// </summary>
-    /// <value>The external material of this submesh.</value>
-    /// <remarks>
-    /// The material is assigned to the submesh using the model description (XML file). The material
-    /// is defined in an external material definition (XML file). Materials can be shared between
-    /// models. If <see cref="ExternalMaterial"/> is set, the property <see cref="LocalMaterial"/>
-    /// can be ignored.
-    /// </remarks>
-    public ExternalReference<DRMaterialContent> ExternalMaterial { get; set; }
-
-
-    /// <summary>
-    /// Gets or sets the local material of this submesh, which is used if the model description (XML
-    /// file) is missing or incomplete.
-    /// </summary>
-    /// <value>
-    /// The local material of this submesh, which is used if the model description (XML file) is 
-    /// missing or incomplete.
-    /// </value>
-    /// <remarks>
-    /// This property is only used, if <see cref="ExternalMaterial"/> is <see langword="null"/>.
-    /// </remarks>
-    public DRMaterialContent LocalMaterial { get; set; }
 
 
     /// <summary>

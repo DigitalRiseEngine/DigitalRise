@@ -252,11 +252,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 						// Texture coordinates are required for calculating tangent frames.
 						if (!channels.Contains(textureCoordinateChannelName))
 						{
-							_context.Logger.LogWarning(
-							  null, mesh.Identity,
+							Logger?.Invoke(string.Format(
 							  "Texture coordinates missing in mesh '{0}', submesh {1}. Texture coordinates are required " +
 							  "for calculating tangent frames.",
-							  mesh.Name, i);
+							  mesh.Name, i));
 
 							channels.Add<Vector2>(textureCoordinateChannelName, null);
 						}
@@ -321,7 +320,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				submeshInfo.VertexBufferIndex = GetVertexBufferIndex(submeshInfo.VertexBuffer.VertexDeclaration);
 
 				// Get material file or local material.
-				object material = (object)GetExternalMaterial(mesh, geometry) ?? geometry.Material;
+				object material = geometry.Material;
 				if (material == null)
 				{
 					var message = string.Format(CultureInfo.InvariantCulture, "Mesh \"{0}\" does not have a material.", mesh);
@@ -427,9 +426,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					_indices.AddRange(geometry.Indices);
 				}
 
-				// Build material.
-				object material = BuildMaterial(submeshInfo.Material);
-
 				// Create Submesh.
 				DRSubmeshContent submesh = new DRSubmeshContent
 				{
@@ -440,8 +436,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					VertexBuffer = vertexBuffer,
 					StartVertex = vertexOffset,
 					MorphTargets = submeshInfo.MorphTargets,
-					ExternalMaterial = material as ExternalReference<DRMaterialContent>,
-					LocalMaterial = material as DRMaterialContent,
 				};
 				submeshes.Add(submesh);
 			}

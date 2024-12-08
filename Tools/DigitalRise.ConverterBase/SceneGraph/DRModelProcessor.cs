@@ -22,9 +22,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 	/// <summary>
 	/// Processes a game asset mesh to a model content that is optimal for runtime.
 	/// </summary>
-	[SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
-	[ContentProcessor(DisplayName = "Model - DigitalRise Graphics")]
-	public partial class DRModelProcessor : ContentProcessor<NodeContent, DRModelNodeContent>
+	public partial class DRModelProcessor
 	{
 		// Notes:
 		// - Mesh instancing: 
@@ -42,7 +40,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		// Input
 		private NodeContent _input;
-		private ContentProcessorContext _context;
 
 		// Optional model description (.drmdl file).
 		private ModelDescription _modelDescription;
@@ -73,109 +70,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		private Dictionary<object, object> _materials;
 		#endregion
 
+		#region Properties
 
-		//--------------------------------------------------------------
-		#region Properties & Events
-		//--------------------------------------------------------------
+		public Action<string> Logger { get; set; }
 
-		/// <summary>
-		/// Gets or sets the value of the <strong>Create Missing Model Description</strong> 
-		/// processor parameter.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if a default model description file (*.drmdl) should be created if no
-		/// model description file could be found.
-		/// </value>
-		[DefaultValue(true)]
-		[DisplayName("Create Missing Model Description")]
-		[Description("If enabled, a default model description file (*.drmdl) is created when no user-defined file was found.")]
-		public bool CreateMissingModelDescription
-		{
-			get { return _createMissingModelDescription; }
-			set { _createMissingModelDescription = value; }
-		}
-		private bool _createMissingModelDescription = true;
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>Create Missing Material Definition</strong> 
-		/// processor parameter.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if material description file (*.drmat) should be created for
-		/// submeshes if no material definition file could be found.
-		/// </value>
-		[DefaultValue(true)]
-		[DisplayName("Create Missing Material Definition")]
-		[Description("If enabled, material definition files (*.drmat) are created when no user-defined file was found.")]
-		public bool CreateMissingMaterialDefinition
-		{
-			get { return _createMissingMaterialDefinition; }
-			set { _createMissingMaterialDefinition = value; }
-		}
-		private bool _createMissingMaterialDefinition = true;
-
-
-		/*
-		/// <summary>
-		/// Gets or sets the value of the <strong>X Axis Rotation</strong> processor parameter.
-		/// </summary>
-		/// <value>The amount of rotation, in degrees, around the x-axis.</value>
-		[DefaultValue(0f)]
-		[DisplayName("X Axis Rotation")]
-		[Description("Rotates the model a specified number of degrees around the x-axis.")]
-		public virtual float RotationX
-		{
-		  get { return _rotationX; }
-		  set { _rotationX = value; }
-		}
-		private float _rotationX;
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>Y Axis Rotation</strong> processor parameter.
-		/// </summary>
-		/// <value>The amount of rotation, in degrees, around the y-axis.</value>
-		[DefaultValue(0f)]
-		[DisplayName("Y Axis Rotation")]
-		[Description("Rotates the model a specified number of degrees around the y-axis.")]
-		public virtual float RotationY
-		{
-		  get { return _rotationY; }
-		  set { _rotationY = value; }
-		}
-		private float _rotationY;
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>Z Axis Rotation</strong> processor parameter.
-		/// </summary>
-		/// <value>The amount of rotation, in degrees, around the z-axis.</value>
-		[DefaultValue(0f)]
-		[DisplayName("Z Axis Rotation")]
-		[Description("Rotates the model a specified number of degrees around the z-axis.")]
-		public virtual float RotationZ
-		{
-		  get { return _rotationZ; }
-		  set { _rotationZ = value; }
-		}
-		private float _rotationZ;
-
-
-		/// <summary>
-		/// Gets or sets the value of the <strong>Scale</strong> processor parameter.
-		/// </summary>
-		/// <value>The scaling factor to be applied.</value>
-		[DefaultValue(1f)]
-		[DisplayName("Scale")]
-		[Description("Scales the model uniformly along all three axes.")]
-		public virtual float Scale
-		{
-		  get { return _scale; }
-		  set { _scale = value; }
-		}
-		private float _scale = 1f;
-		*/
 		#endregion
 
 
@@ -187,14 +85,11 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Converts mesh content to model content.
 		/// </summary>
 		/// <param name="input">The root node content.</param>
-		/// <param name="context">Contains any required custom process parameters.</param>
 		/// <returns>The model content.</returns>
-		public override DRModelNodeContent Process(NodeContent input, ContentProcessorContext context)
+		public DRModelNodeContent Process(NodeContent input)
 		{
 			if (input == null)
 				throw new ArgumentNullException("input");
-			if (context == null)
-				throw new ArgumentNullException("context");
 
 			// The content processor may write text files. We want to use invariant culture number formats.
 			// TODO: Do not set Thread.CurrentThread.CurrentCulture. Make sure that all read/write operations explicitly use InvariantCulture.
@@ -209,36 +104,16 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				// Uncomment this to visualize the content tree.
 				//ContentHelper.PrintContentTree(input, context);
 
-				_context = context;
-
-				var delayedNode = input as DeferredNodeContent;
-				if (delayedNode != null)
-				{
-					// Model description was imported.
-					_modelDescription = delayedNode.ModelDescription;
-
-					// Load the model.
-					delayedNode.Import(context);
-					_input = input;
-				}
-				else
-				{
-					// The model was imported.
-					_input = input;
-
-					// Load the model description.
-					var wrappedContext = new ContentPipelineContext(context);
-					/*if (input.Identity != null && input.Identity.SourceFilename != null)
-						_modelDescription = ModelDescription.Load(input.Identity.SourceFilename, wrappedContext, CreateMissingModelDescription);*/
-				}
+				// The model was imported.
+				_input = input;
 
 				if (_modelDescription != null)
-					_modelDescription.Validate(_input, _context);
+					_modelDescription.Validate(_input, Logger);
 
 				ValidateInput();
 
 				// Try to find skeleton root bone.
-				_rootBone = Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.FindSkeleton(input);
+				_rootBone = MeshHelper.FindSkeleton(input);
 				if (_rootBone != null)
 				{
 #if ANIMATION
@@ -250,7 +125,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
           BuildSkeleton();
           BuildAnimations();
 #endif
-					SetSkinnedMaterial();
 				}
 				else
 				{
@@ -258,13 +132,12 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				}
 
 				BuildSceneGraph();
-				PrepareMaterials();
 				BuildMeshes();
 				BuildOccluders();
 				CombineLodGroups();
 				ValidateOutput();
 
-				_model.Name = Path.GetFileNameWithoutExtension(context.OutputFilename);
+				_model.Name = _input.Name;
 			}
 			finally
 			{

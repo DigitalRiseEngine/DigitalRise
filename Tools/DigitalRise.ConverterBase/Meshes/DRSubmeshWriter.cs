@@ -43,7 +43,6 @@ namespace DigitalRise.ConverterBase.Meshes
     /// </summary>
     /// <param name="output">The content writer serializing the value.</param>
     /// <param name="value">The value to write.</param>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
     protected override void Write(ContentWriter output, DRSubmeshContent value)
     {
       output.WriteSharedResource(value.VertexBuffer);
@@ -63,19 +62,6 @@ namespace DigitalRise.ConverterBase.Meshes
       else
       {
         output.Write(0);
-      }
-
-      if (value.ExternalMaterial != null)
-      {
-        // Submesh uses external material.
-        output.Write(true);
-        output.WriteExternalReference(value.ExternalMaterial);
-      }
-      else
-      {
-        // Submesh uses local material.
-        output.Write(false);
-        output.WriteSharedResource(value.LocalMaterial);
       }
 
       output.WriteSharedResource(value.UserData);

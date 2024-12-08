@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Common", "Sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Common.Tests", "Tests\DigitalRise.Common.Tests\DigitalRise.Common.Tests.csproj", "{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRise.ModelConverter", "Tools\DigitalRise.ModelConverter\DigitalRise.ModelConverter.csproj", "{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +117,7 @@ Global
 		{33AED6EA-83DC-43E7-9301-1F7E95B9BB80} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
 		{98DC21CB-6EC0-4ABC-9DD6-72AEFE54C017} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 		{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD} = {9E6E150B-162E-4D9A-8782-9BAFA9DE73FB}
+		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35ACDF4E-2CE2-46B1-A19F-35DC131069A1}

@@ -48,10 +48,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					if (node.Parent is BoneContent)
 					{
 						// ----- Current node is a NodeContent or a MeshContent under a BoneContent.
-						_context.Logger.LogWarning(
-						  null, _input.Identity,
+						Logger?.Invoke(string.Format(
 						  "Bone \"{0}\" contains node \"{1}\" which is not a bone. Bones must only have bones as children. The node might be ignored.",
-						  node.Parent.Name, node.Name);
+						  node.Parent.Name, node.Name));
 					}
 
 					var mesh = node as MeshContent;
@@ -74,14 +73,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		{
 			foreach (var geometry in mesh.Geometry)
 			{
-				if (GetExternalMaterial(mesh, geometry) != null)
-				{
-					// ----- External material.
-					// The material is defined in an external XML file!
-					// Ignore local material.
-					continue;
-				}
-
 				// ----- Local material.
 				// Submesh uses the material included in the model.
 				var material = geometry.Material;
@@ -232,10 +223,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			// Check whether morph target has children.
 			if (morphTarget.Children.Count > 0)
 			{
-				_context.Logger.LogWarning(
-				  null, _input.Identity,
+				Logger?.Invoke(string.Format(
 				  "The children of the morph target \"{0}\" will be ignored.",
-				  morphTarget.Name);
+				  morphTarget.Name));
 			}
 		}
 
@@ -284,10 +274,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			{
 				if (lodGroupNode.Levels.Count == 1)
 				{
-					_context.Logger.LogWarning(
-					  null, _input.Identity,
+					Logger?.Invoke(string.Format(
 					  "The LOD group \"{0}\" only has a single level of detail.",
-					  lodGroupNode.Name);
+					  lodGroupNode.Name));
 
 					goto Next;
 				}
@@ -298,10 +287,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					{
 						if (Numeric.AreEqual(lodGroupNode.Levels[i].LodDistance, lodGroupNode.Levels[j].LodDistance))
 						{
-							_context.Logger.LogWarning(
-							  null, _input.Identity,
+							Logger?.Invoke(string.Format(
 							  "Please update the LOD distances of LOD group \"{0}\". Multiple LODs have the same distance.",
-							  lodGroupNode.Name);
+							  lodGroupNode.Name));
 
 							goto Next;
 						}

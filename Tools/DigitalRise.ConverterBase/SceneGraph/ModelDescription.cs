@@ -51,8 +51,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Checks whether the imported model matches the model description.
 		/// </summary>
 		/// <param name="input">The root node content.</param>
-		/// <param name="context">Contains any required custom process parameters.</param>
-		public void Validate(NodeContent input, ContentProcessorContext context)
+		/// <param name="logger"></param>
+		public void Validate(NodeContent input, Action<string> logger)
 		{
 			foreach (var meshDescription in Meshes)
 			{
@@ -62,10 +62,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 								 .OfType<MeshContent>()
 								 .All(mc => mc.Name != meshDescription.Name))
 				{
-					context.Logger.LogWarning(
-					  null, input.Identity,
+					logger?.Invoke(string.Format(
 					  "Model description (.drmdl file) contains description for mesh '{0}' which was not found in the asset.",
-					  meshDescription.Name);
+					  meshDescription.Name));
 				}
 			}
 		}

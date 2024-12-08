@@ -13,7 +13,7 @@ namespace DigitalRise.Animation
 	/// (Only available in the XNA-compatible build.)
 	/// </summary>
 	/// <inheritdoc/>
-	public class Vector2romToByAnimation : FromToByAnimation<Vector2>
+	public class Vector2FromToByAnimation : FromToByAnimation<Vector2>
 	{
 		/// <inheritdoc/>
 		public override IAnimationValueTraits<Vector2> Traits

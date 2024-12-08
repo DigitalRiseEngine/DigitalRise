@@ -482,6 +482,22 @@ namespace DigitalRise.Mathematics
 				   && MathHelper.AreNumericallyEqual(srtA.Scale, srtB.Scale);
 		}
 
+		/// <summary>
+		/// Determines whether two SRT transforms are equal (within a numerical tolerance).
+		/// </summary>
+		/// <param name="srtA">The first transform.</param>
+		/// <param name="srtB">The second transform.</param>
+		/// <returns>
+		/// <see langword="true"/> if the given transforms are numerically equal; otherwise, 
+		/// <see langword="false"/>.
+		/// </returns>
+		public static bool AreNumericallyEqual(SrtTransform srtA, SrtTransform srtB, float epsilon)
+		{
+			return MathHelper.AreNumericallyEqual(srtA.Rotation, srtB.Rotation, epsilon)
+				   && MathHelper.AreNumericallyEqual(srtA.Translation, srtB.Translation, epsilon)
+				   && MathHelper.AreNumericallyEqual(srtA.Scale, srtB.Scale, epsilon);
+		}
+
 
 		/// <overloads>
 		/// <summary>

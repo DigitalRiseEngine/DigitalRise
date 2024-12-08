@@ -13,7 +13,7 @@ namespace DigitalRise.Animation
 	/// (Only available in the XNA-compatible build.)
 	/// </summary>
 	/// <inheritdoc/>
-	public class QuaternionromToByAnimation : FromToByAnimation<Quaternion>
+	public class QuaternionFromToByAnimation : FromToByAnimation<Quaternion>
 	{
 		/// <inheritdoc/>
 		public override IAnimationValueTraits<Quaternion> Traits

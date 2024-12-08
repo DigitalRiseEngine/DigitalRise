@@ -3,4 +3,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("DigitalRune.Animation.Tests")]
+[assembly: InternalsVisibleTo("DigitalRise.Animation.Tests")]

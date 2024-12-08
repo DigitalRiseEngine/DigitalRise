@@ -266,7 +266,7 @@ namespace DigitalRise.Animation.Character.Tests
 			m2 = srt;
 			Assert.IsTrue(Matrix44F.AreNumericallyEqual(m, m2));
 
-			Matrix mXna = srt.ToXna();
+			Matrix mXna = srt.ToMatrix();
 			Assert.IsTrue(Matrix44F.AreNumericallyEqual(m, (Matrix44F)mXna));
 
 			mXna = srt;

@@ -253,6 +253,12 @@ namespace DigitalRise.Mathematics
 			Rotation = MathHelper.CreateRotation(rotation);
 			Translation = translation;
 		}
+
+		public SrtTransform(Matrix m)
+		{
+			m.Decompose(out Scale, out Rotation, out Translation);
+		}
+
 		#endregion
 
 
@@ -421,7 +427,7 @@ namespace DigitalRise.Mathematics
 		/// This method is available only in the XNA-compatible build of the DigitalRune.Animation.dll.
 		/// </para>
 		/// </remarks>
-		public Matrix ToXna()
+		public Matrix ToMatrix()
 		{
 			Vector3 s = Scale;
 			Matrix33F r = Rotation.ToRotationMatrix33();
@@ -1144,7 +1150,90 @@ namespace DigitalRise.Mathematics
 							  srt.Scale.Z * (twoYW + twoXZ), srt.Scale.Z * (twoYZ - twoXW), srt.Scale.Z * (1 - (twoXX + twoYY)), 0,
 							  srt.Translation.X, srt.Translation.Y, srt.Translation.Z, 1);
 		}
-		
+
+		///<summary>	
+		/// Interpolates between 2 poses using the specified algorithm
+		///</summary>	
+		///<param name="pose1">First pose</param>
+		///<param name="pose2">Second pose</param>	
+		///<param name="amount">Amount of blendign between pose 1 and pose 2</param>	
+		///<param name="translationInterpolation">How to blend the translation</param>	
+		///<param name="orientationInterpolation">How to blend the orientation</param>
+		///<param name="scaleInterpolation">How to blend the scale</param>
+		///<returns>The interpolated pose</returns>
+		///<exception cref="ArgumentException">If any of the Blend types are not supported</exception>
+		public static SrtTransform Interpolate(SrtTransform pose1, SrtTransform pose2, float amount,
+			InterpolationMode translationInterpolation, InterpolationMode orientationInterpolation,
+			InterpolationMode scaleInterpolation)
+		{
+			SrtTransform resultPose;
+
+			if (amount < 0 || amount > 1)
+				throw new ArgumentException("Amount must be between 0.0 and 1.0 inclusive.");
+
+			switch (translationInterpolation)
+			{
+				case InterpolationMode.None:
+					resultPose.Translation = pose1.Translation;
+					break;
+
+				case InterpolationMode.Linear:
+					Vector3.Lerp(ref pose1.Translation, ref pose2.Translation, amount,
+						out resultPose.Translation);
+					break;
+
+				case InterpolationMode.Cubic:
+					Vector3.SmoothStep(ref pose1.Translation, ref pose2.Translation, amount,
+						out resultPose.Translation);
+					break;
+
+				default:
+					throw new ArgumentException("Translation interpolation method not supported");
+			}
+
+			switch (orientationInterpolation)
+			{
+				case InterpolationMode.None:
+					resultPose.Rotation = pose1.Rotation;
+					break;
+
+				case InterpolationMode.Linear:
+					Quaternion.Lerp(ref pose1.Rotation, ref pose2.Rotation, amount,
+						out resultPose.Rotation);
+					break;
+
+				case InterpolationMode.Spherical:
+					Quaternion.Slerp(ref pose1.Rotation, ref pose2.Rotation, amount,
+						out resultPose.Rotation);
+					break;
+
+				default:
+					throw new ArgumentException("Orientation interpolation method not supported");
+			}
+
+			switch (scaleInterpolation)
+			{
+				case InterpolationMode.None:
+					resultPose.Scale = pose1.Scale;
+					break;
+
+				case InterpolationMode.Linear:
+					Vector3.Lerp(ref pose1.Scale, ref pose2.Scale, amount,
+						out resultPose.Scale);
+					break;
+
+				case InterpolationMode.Cubic:
+					Vector3.SmoothStep(ref pose1.Scale, ref pose2.Scale, amount,
+						out resultPose.Scale);
+					break;
+
+				default:
+					throw new ArgumentException("Scale interpolation method not supported");
+			}
+
+			return resultPose;
+		}
+
 		#endregion
 	}
 }

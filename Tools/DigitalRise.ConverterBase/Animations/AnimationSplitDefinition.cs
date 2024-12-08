@@ -10,7 +10,7 @@ namespace DigitalRise.ConverterBase.Animations
 	/// <summary>
 	/// Defines a region in the original (merged) animation.
 	/// </summary>
-	internal class AnimationSplitDefinition
+	public class AnimationSplitDefinition
 	{
 		/// <summary>
 		/// The name of the animation.

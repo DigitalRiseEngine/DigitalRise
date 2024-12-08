@@ -114,7 +114,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				throw new InvalidContentException(message, exception);
 			}
 
-			if (_modelDescription == null || _modelDescription.PremultiplyVertexColors)
+			if (PremultiplyVertexColors)
 			{
 				var channel = channels.Get<Color>(vertexChannelIndex);
 				for (int i = 0; i < channel.Count; i++)

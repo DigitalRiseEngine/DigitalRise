@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace DigitalRise.ConverterBase.SceneGraph
 {
-	internal class AnimationDescription
+	public class AnimationDescription
 	{
 		public string MergeFiles { get; set; }
 		public List<AnimationSplitDefinition> Splits { get; set; }

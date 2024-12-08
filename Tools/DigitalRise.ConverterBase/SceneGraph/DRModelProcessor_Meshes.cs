@@ -154,7 +154,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		private void BuildMesh(DRMeshNodeContent meshNode)
 		{
 			var mesh = meshNode.InputMesh;
-			var meshDescription = (_modelDescription != null) ? _modelDescription.GetMeshDescription(mesh.Name) : null;
 
 			// Before modifying the base mesh: Prepare morph targets.
 			bool hasMorphTargets = (meshNode.InputMorphTargets != null && meshNode.InputMorphTargets.Count > 0);
@@ -167,25 +166,16 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				AddVertexReorderChannel(mesh);
 			}
 
-			if (meshDescription != null)
-			{
-				meshNode.MaxDistance = meshDescription.MaxDistance;
-				meshNode.LodDistance = meshDescription.LodDistance;
-			}
-			else if (_modelDescription != null)
-			{
-				meshNode.MaxDistance = _modelDescription.MaxDistance;
-				meshNode.LodDistance = 0;
-			}
-
 			// Ensure that model has tangents and binormals if required.
-			AddTangentFrames(mesh, _modelDescription, meshDescription);
+			AddTangentFrames(mesh);
 
 			// Process vertex colors, bone weights and bone indices.
 			ProcessVertexChannels(mesh);
 
-			if (_modelDescription != null && _modelDescription.SwapWindingOrder)
-				Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.SwapWindingOrder(mesh);
+			if (SwapWindingOrder)
+			{
+				MeshHelper.SwapWindingOrder(mesh);
+			}
 
 			OptimizeForCache(mesh);
 
@@ -220,7 +210,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		private void AddTangentFrames(MeshContent mesh, ModelDescription modelDescription, MeshDescription meshDescription)
+		private void AddTangentFrames(MeshContent mesh)
 		{
 			string textureCoordinateChannelName = VertexChannelNames.TextureCoordinate(0);
 			string tangentChannelName = VertexChannelNames.Tangent(0);
@@ -232,10 +222,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				var geometry = mesh.Geometry[i];
 
 				// Check whether tangent frames are required.
-				var submeshDescription = (meshDescription != null) ? meshDescription.GetSubmeshDescription(i) : null;
-				if (submeshDescription != null && submeshDescription.GenerateTangentFrames
-					|| meshDescription != null && meshDescription.GenerateTangentFrames
-					|| modelDescription != null && modelDescription.GenerateTangentFrames)
+				if (GenerateTangentFrames)
 				{
 					// Ensure that normals are set.
 					if (!normalsCalculated)
@@ -450,34 +437,15 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			var mesh = meshNode.InputMesh;
 			if (mesh.Positions.Count > 0)
 			{
-				if (_modelDescription != null && _modelDescription.BoundingBoxEnabled)
-				{
-					// We assume that the AABB is given in the local space.
-					Vector3 aabbMinimum = (Vector3)_modelDescription.BoundingBoxMinimum;
-					Vector3 aabbMaximum = (Vector3)_modelDescription.BoundingBoxMaximum;
-					Vector3 center = (aabbMaximum + aabbMinimum) / 2;
-					Vector3 extent = aabbMaximum - aabbMinimum;
-					if (center.IsNumericallyZero())
-						boundingShape = new BoxShape(extent);
-					else
-						boundingShape = new TransformedShape(new BoxShape(extent), new Pose(center));
-				}
-				else
-				{
-					// Best fit bounding shape.
-					//boundingShape = ComputeBestFitBoundingShape(mesh);
-
-					// Non-rotated bounding shape. This is usually larger but contains no rotations. 
-					// (TransformedShapes with rotated children cannot be used with non-uniform scaling.)
-					boundingShape = ComputeAxisAlignedBoundingShape(mesh);
-				}
+				// Non-rotated bounding shape. This is usually larger but contains no rotations. 
+				// (TransformedShapes with rotated children cannot be used with non-uniform scaling.)
+				boundingShape = ComputeAxisAlignedBoundingShape(mesh);
 			}
 
 			return boundingShape;
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static Shape ComputeBestFitBoundingShape(MeshContent mesh)
 		{
 			List<Vector3> points = mesh.Positions.Select(position => (Vector3)position).ToList();

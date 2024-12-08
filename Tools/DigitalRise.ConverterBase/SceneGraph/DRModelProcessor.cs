@@ -41,9 +41,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		// Input
 		private NodeContent _input;
 
-		// Optional model description (.drmdl file).
-		private ModelDescription _modelDescription;
-
 		// The model (= root node of the scene).
 		private DRModelNodeContent _model;
 
@@ -73,6 +70,11 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		#region Properties
 
 		public Action<string> Logger { get; set; }
+
+		public bool GenerateTangentFrames { get; set; }
+		public bool SwapWindingOrder { get; set; }
+		public bool PremultiplyVertexColors { get; set; }
+		public AnimationDescription Animation { get; set; }
 
 		#endregion
 
@@ -107,9 +109,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				// The model was imported.
 				_input = input;
 
-				if (_modelDescription != null)
-					_modelDescription.Validate(_input, Logger);
-
 				ValidateInput();
 
 				// Try to find skeleton root bone.
@@ -120,15 +119,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
           MergeAnimationFiles();
 #endif
 					BakeTransforms(input);
-					TransformModel();
 #if ANIMATION
           BuildSkeleton();
           BuildAnimations();
 #endif
-				}
-				else
-				{
-					TransformModel();
 				}
 
 				BuildSceneGraph();
@@ -198,26 +192,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		private void TransformModel()
-		{
-			// Use MeshHelper to transform the whole scene node tree.
-			if (_modelDescription != null)
-			{
-				// ReSharper disable CompareOfFloatsByEqualityOperator
-				if (_modelDescription.RotationX != 0f
-					|| _modelDescription.RotationY != 0f
-					|| _modelDescription.RotationZ != 0f
-					|| _modelDescription.Scale != 1f)
-				{
-					Matrix rotationZ = Matrix.CreateRotationZ(MathHelper.ToRadians(_modelDescription.RotationZ));
-					Matrix rotationX = Matrix.CreateRotationX(MathHelper.ToRadians(_modelDescription.RotationX));
-					Matrix rotationY = Matrix.CreateRotationY(MathHelper.ToRadians(_modelDescription.RotationY));
-					Matrix transform = rotationZ * rotationX * rotationY * Matrix.CreateScale(_modelDescription.Scale);
-					Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.TransformScene(_input, transform);
-				}
-				// ReSharper restore CompareOfFloatsByEqualityOperator
-			}
-		}
 		#endregion
 	}
 }

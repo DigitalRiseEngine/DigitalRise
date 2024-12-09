@@ -2,21 +2,17 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
-using System.Globalization;
-using DigitalRise.ConverterBase.Animations;
-using DigitalRise.Mathematics;
-
-
-#if ANIMATION
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DigitalRise.Animation.Character;
+using DigitalRise.ConverterBase.Animations;
 using DigitalRise.Linq;
+using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace DigitalRise.ConverterBase.SceneGraph
 {
@@ -232,4 +228,3 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		#endregion
 	}
 }
-#endif

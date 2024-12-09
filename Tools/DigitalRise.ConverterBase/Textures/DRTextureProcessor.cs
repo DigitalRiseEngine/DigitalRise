@@ -72,7 +72,6 @@ namespace DigitalRise.ConverterBase.Textures
 		/// <value>
 		/// <see langword="true"/> if mipmap generation is enabled; <see langword="false"/> otherwise.
 		/// </value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
 		[DefaultValue(true)]
 		[DisplayName("Generate Mipmaps")]
 		[Description("If enabled, a full mipmap chain is generated for the texture. Existing mipmaps are not replaced.")]

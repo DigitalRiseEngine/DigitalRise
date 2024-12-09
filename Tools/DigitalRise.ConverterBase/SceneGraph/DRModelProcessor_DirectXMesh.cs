@@ -9,7 +9,6 @@ using System.Text;
 using DigitalRise.ConverterBase.Content;
 using DigitalRise.Geometry;
 using DigitalRise.Mathematics;
-using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using DigitalRise.ConverterBase.Meshes;
 using DigitalRise.Mathematics;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
@@ -15,6 +14,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using DigitalRise.ModelStorage.Meshes;
+using DigitalRise.ModelStorage.SceneGraph;
+using System.Collections.ObjectModel;
+using DigitalRise.ConverterBase.Utils;
 
 
 namespace DigitalRise.ConverterBase.SceneGraph
@@ -25,11 +28,22 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		#region Nested Types
 		//--------------------------------------------------------------
 
+		private class MeshNodeEx
+		{
+			public MeshContent InputMesh { get; set; }
+			public List<MeshContent> InputMorphTargets { get; set; }
+
+			public MeshNodeEx(MeshContent inputMesh)
+			{
+				InputMesh = inputMesh ?? throw new ArgumentNullException(nameof(inputMesh));
+			}
+		}
+
 		private class SubmeshInfo
 		{
 			public GeometryContent Geometry;
 			public int OriginalIndex;                 // The index of the Submesh/GeometryContent in the owning mesh.
-			public VertexBufferContent VertexBuffer;
+			public DRVertexBufferContent VertexBuffer;
 			public int VertexBufferIndex;             // Index into _vertexBuffers of the processor.
 			public List<DRMorphTargetContent> MorphTargets;
 			public object Material;                   // The XML file (string) or the local material (MaterialContent).
@@ -61,8 +75,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		private void BuildMeshes()
 		{
-			_vertexBuffers = new List<VertexBufferContent>();
-			_indices = new IndexCollection();
+			_vertexBuffers = new List<DRVertexBufferContent>();
+			_indices = new List<int>();
 			_morphTargetVertexBuffer = CreateMorphTargetVertexBuffer();
 			_materials = new Dictionary<object, object>();
 
@@ -74,15 +88,16 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		private void BuildMesh(DRMeshNodeContent meshNode)
 		{
-			var mesh = meshNode.InputMesh;
+			var meshEx = (MeshNodeEx)meshNode.UserData;
+			var mesh = meshEx.InputMesh;
 			var meshDescription = (_modelDescription != null) ? _modelDescription.GetMeshDescription(mesh.Name) : null;
 
 			// Before modifying the base mesh: Prepare morph targets.
-			bool hasMorphTargets = (meshNode.InputMorphTargets != null && meshNode.InputMorphTargets.Count > 0);
+			bool hasMorphTargets = (meshEx.InputMorphTargets != null && meshEx.InputMorphTargets.Count > 0);
 			if (hasMorphTargets)
 			{
 				// Convert absolute morph targets to relative morph targets ("delta blend shapes").
-				MakeRelativeMorphTargets(mesh, meshNode.InputMorphTargets);
+				MakeRelativeMorphTargets(mesh, meshEx.InputMorphTargets);
 
 				// Add "VertexReorder" channel to base mesh.
 				AddVertexReorderChannel(mesh);
@@ -106,7 +121,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			ProcessVertexChannels(mesh);
 
 			if (_modelDescription != null && _modelDescription.SwapWindingOrder)
-				Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.SwapWindingOrder(mesh);
+				MeshHelper.SwapWindingOrder(mesh);
 
 			OptimizeForCache(mesh);
 
@@ -117,7 +132,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				_vertexReorderMaps = GetVertexReorderMaps(mesh);
 			}
 
-			var submeshInfos = BuildSubmeshInfos(mesh, meshNode.InputMorphTargets);
+			var submeshInfos = BuildSubmeshInfos(mesh, meshEx.InputMorphTargets);
 
 			// Sort submeshes by vertex declaration, material, and original index.
 			Array.Sort(submeshInfos, SubmeshInfoComparer.Instance);
@@ -133,10 +148,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				Name = mesh.Name,
 				BoundingShape = boundingShape,
 				Submeshes = submeshes,
-#if ANIMATION
 				Skeleton = _skeleton,
 				Animations = _animations,
-#endif
 			};
 		}
 
@@ -233,10 +246,10 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				{
 					Geometry = geometry,
 					OriginalIndex = i,
-					VertexBuffer = geometry.Vertices.CreateVertexBuffer(),
+					VertexBuffer = geometry.Vertices.ToDRVertexBufferContent(),
 					MorphTargets = morphTargets
 				};
-				submeshInfo.VertexBufferIndex = GetVertexBufferIndex(submeshInfo.VertexBuffer.VertexDeclaration);
+				submeshInfo.VertexBufferIndex = GetVertexBufferIndex(submeshInfo.VertexBuffer);
 
 				// Get material file or local material.
 				object material = geometry.Material;
@@ -265,32 +278,27 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		// Returns the index of the vertex buffer (in _vertexBuffers) for the given vertex declaration.
 		// If there is no matching vertex buffer, a new vertex buffer is added to _vertexBuffers.
-		private int GetVertexBufferIndex(VertexDeclarationContent vertexDeclaration)
+		private int GetVertexBufferIndex(DRVertexBufferContent vertexBuffer)
 		{
 			for (int i = 0; i < _vertexBuffers.Count; i++)
 			{
-				VertexDeclarationContent otherVertexDeclaration = _vertexBuffers[i].VertexDeclaration;
+				var otherVertexDeclaration = _vertexBuffers[i];
 
 				// Compare vertex element count.
-				if ((otherVertexDeclaration.VertexElements.Count != vertexDeclaration.VertexElements.Count))
+				if (otherVertexDeclaration.Channels.Count != vertexBuffer.Channels.Count)
 					continue;
-
-				int? vertexStride = vertexDeclaration.VertexStride;
-				int? otherVertexStride = otherVertexDeclaration.VertexStride;
 
 				// Compare vertex strides.
-				if (vertexStride.GetValueOrDefault() != otherVertexStride.GetValueOrDefault())
-					continue;
-
-				// Check if either both have a vertex stride or not.
-				if (vertexStride.HasValue == otherVertexStride.HasValue)
+				if (vertexBuffer.VertexStride != otherVertexDeclaration.VertexStride)
 					continue;
 
 				// Compare each vertex element structure.
 				bool matchFound = true;
-				for (int j = 0; j < otherVertexDeclaration.VertexElements.Count; j++)
+				for (int j = 0; j < otherVertexDeclaration.Channels.Count; j++)
 				{
-					if (vertexDeclaration.VertexElements[j] != otherVertexDeclaration.VertexElements[j])
+					var channel = vertexBuffer.Channels[j];
+					var otherChannel = otherVertexDeclaration.Channels[j];
+					if (channel.Usage != otherChannel.Usage || channel.Format != otherChannel.Format)
 					{
 						matchFound = false;
 						break;
@@ -303,7 +311,14 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 			// An identical vertex declaration has not been found.
 			// --> Add vertex declaration to list.
-			_vertexBuffers.Add(new VertexBufferContent { VertexDeclaration = vertexDeclaration });
+			var newVertexBuffer = new DRVertexBufferContent();
+			for (var i = 0; i < vertexBuffer.Channels.Count; ++i)
+			{
+				var vertexElement = vertexBuffer.Channels[i];
+				newVertexBuffer.Channels.Add(DRVertexChannelContentBase.CreateChannel(vertexElement.Usage, vertexElement.Format));
+			}
+
+			_vertexBuffers.Add(newVertexBuffer);
 
 			return _vertexBuffers.Count - 1;
 		}
@@ -318,21 +333,22 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				var geometry = submeshInfo.Geometry;
 
 				// Append vertices to one of the _vertexBuffers.
-				VertexBufferContent vertexBuffer = null;
+				DRVertexBufferContent vertexBuffer = null;
 				int vertexCount = 0;
 				int vertexOffset = 0;
-				if (submeshInfo.VertexBuffer.VertexData.Length > 0)
+				if (submeshInfo.VertexBuffer.VertexCount > 0)
 				{
 					vertexBuffer = _vertexBuffers[submeshInfo.VertexBufferIndex];
-					if (!vertexBuffer.VertexDeclaration.VertexStride.HasValue)
+					if (vertexBuffer.VertexStride == 0)
 					{
 						string message = string.Format(CultureInfo.InvariantCulture, "Vertex declaration of \"{0}\" does not have a vertex stride.", mesh);
 						throw new InvalidContentException(message, mesh.Identity);
 					}
 
 					vertexCount = submeshInfo.Geometry.Vertices.VertexCount;
-					vertexOffset = vertexBuffer.VertexData.Length / vertexBuffer.VertexDeclaration.VertexStride.Value;
-					vertexBuffer.Write(vertexBuffer.VertexData.Length, 1, submeshInfo.VertexBuffer.VertexData);
+					vertexOffset = vertexBuffer.VertexCount;
+
+					vertexBuffer.Write(submeshInfo.VertexBuffer);
 				}
 
 				// Append indices to _indices.
@@ -348,7 +364,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				// Create Submesh.
 				DRSubmeshContent submesh = new DRSubmeshContent
 				{
-					IndexBuffer = _indices,
+					Indices = _indices,
 					VertexCount = vertexCount,
 					StartIndex = startIndex,
 					PrimitiveCount = primitiveCount,
@@ -366,7 +382,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		{
 			Shape boundingShape = Shape.Empty;
 
-			var mesh = meshNode.InputMesh;
+			var meshEx = (MeshNodeEx)meshNode.UserData;
+			var mesh = meshEx.InputMesh;
 			if (mesh.Positions.Count > 0)
 			{
 				if (_modelDescription != null && _modelDescription.BoundingBoxEnabled)
@@ -396,7 +413,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static Shape ComputeBestFitBoundingShape(MeshContent mesh)
 		{
 			List<Vector3> points = mesh.Positions.Select(position => (Vector3)position).ToList();

@@ -4,9 +4,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using DigitalRise.ConverterBase.Occluder;
 using DigitalRise.Geometry;
 using DigitalRise.Mathematics;
+using DigitalRise.ModelStorage.Occluder;
+using DigitalRise.ModelStorage.SceneGraph;
 using Microsoft.Xna.Framework;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
@@ -46,7 +47,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		private /*static*/ void BuildOccluder(DROccluderNodeContent occluderNode)
 		{
-			var mesh = occluderNode.InputMesh;
+			var meshEx = (MeshNodeEx)occluderNode.UserData;
+			var mesh = meshEx.InputMesh;
 
 			MergeDuplicatePositions(mesh, Numeric.EpsilonF);
 

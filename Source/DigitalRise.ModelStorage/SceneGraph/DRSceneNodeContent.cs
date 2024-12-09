@@ -3,13 +3,16 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using DigitalRise.Geometry;
 using DigitalRise.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+using Newtonsoft.Json;
 
 
-namespace DigitalRise.ConverterBase.SceneGraph
+namespace DigitalRise.ModelStorage.SceneGraph
 {
 	/// <summary>
 	/// Stores the processed data for a <strong>SceneNode</strong> asset.
@@ -24,6 +27,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Gets or sets the parent of this node.
 		/// </summary>
 		/// <value>The parent of this node.</value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public DRSceneNodeContent Parent { get; set; }
 
 
@@ -87,7 +92,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// Gets or sets a user-defined tag object.
 		/// </summary>
 		/// <value>User-defined tag object.</value>
-		[ContentSerializer(ElementName = "UserData", SharedResource = true)]
+		[Browsable(false)]
+		[JsonIgnore] 
 		public object UserData { get; set; }
 		#endregion
 
@@ -238,6 +244,35 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			return TreeHelper.GetLeaves(this, node => node.GetChildren());
 		}
 		#endregion
+
+		public static JsonSerializerSettings CreateOptions()
+		{
+			var result = new JsonSerializerSettings
+			{
+				Culture = CultureInfo.InvariantCulture,
+				Formatting = Formatting.Indented,
+				TypeNameHandling = TypeNameHandling.Auto,
+				DefaultValueHandling = DefaultValueHandling.Ignore,
+			};
+
+			return result;
+		}
+
+		public static void SerializeToFile<T>(string path, JsonSerializerSettings options, T data)
+		{
+			var s = JsonConvert.SerializeObject(data, typeof(T), options);
+			File.WriteAllText(path, s);
+		}
+
+		public static T DeserializeFromString<T>(string data, JsonSerializerSettings options)
+		{
+			return JsonConvert.DeserializeObject<T>(data, options);
+		}
+
+		public void SaveToJson(string path)
+		{
+			SerializeToFile(path, CreateOptions(), this);
+		}
 
 		#endregion
 	}

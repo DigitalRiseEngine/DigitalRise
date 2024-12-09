@@ -3,8 +3,10 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using DigitalRise.Mathematics;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Dynamic;
 
@@ -82,6 +84,8 @@ namespace DigitalRise.Animation.Character
 		/// Gets the number of bones in this skeleton.
 		/// </summary>
 		/// <value>The number of bones.</value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public int NumberOfBones { get { return Bones.Length; } }
 
 

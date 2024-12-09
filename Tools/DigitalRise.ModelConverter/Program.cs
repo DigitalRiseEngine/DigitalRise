@@ -4,6 +4,8 @@ using DigitalRise.ModelConverter.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace DigitalRise.ModelConverter
@@ -62,7 +64,12 @@ namespace DigitalRise.ModelConverter
 
 		static void Process(string[] args)
 		{
-			var inputFile = @"D:\Projects\DigitalRune\Samples\Content\Barrel\Barrel.fbx";
+			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Dude\Dude.drmdl";
+
+			var modelDescription = ModelDescription.Load(inputModel, Log);
+
+			var folder = Path.GetDirectoryName(inputModel);
+			var inputFile = Path.Combine(folder, modelDescription.FileName);
 
 			var importerContext = new ImporterContext();
 
@@ -74,10 +81,9 @@ namespace DigitalRise.ModelConverter
 				Logger = Log
 			};
 
-			var modelDescription = new ModelDescription();
-
 			var drModelContent = processor.Process(modelContent, modelDescription);
 
+			drModelContent.SaveToJson(@"D:\Barrel.jdrm");
 			var k = 5;
 		}
 

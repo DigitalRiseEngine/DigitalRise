@@ -35,11 +35,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Common", "Sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Common.Tests", "Tests\DigitalRise.Common.Tests\DigitalRise.Common.Tests.csproj", "{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRise.ModelConverter", "Tools\DigitalRise.ModelConverter\DigitalRise.ModelConverter.csproj", "{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelConverter", "Tools\DigitalRise.ModelConverter\DigitalRise.ModelConverter.csproj", "{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Animation.MonoGame", "Source\DigitalRise.Animation\DigitalRise.Animation.MonoGame.csproj", "{EBFAC53B-DECB-43C3-9DED-E12C91CF7B68}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Animation.Tests.MonoGame", "Tests\DigitalRise.Animation.Tests\DigitalRise.Animation.Tests.MonoGame.csproj", "{3DFEB3AD-85EB-4521-8F77-DC616B1B7649}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelStorage.MonoGame", "Source\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj", "{1B4B7B00-06ED-4B42-BA04-501A20844E8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,10 @@ Global
 		{3DFEB3AD-85EB-4521-8F77-DC616B1B7649}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DFEB3AD-85EB-4521-8F77-DC616B1B7649}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DFEB3AD-85EB-4521-8F77-DC616B1B7649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B4B7B00-06ED-4B42-BA04-501A20844E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B4B7B00-06ED-4B42-BA04-501A20844E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B4B7B00-06ED-4B42-BA04-501A20844E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B4B7B00-06ED-4B42-BA04-501A20844E8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,6 +138,7 @@ Global
 		{7FCB2833-AD5E-47D9-BFF6-DEC4D871C66B} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
 		{EBFAC53B-DECB-43C3-9DED-E12C91CF7B68} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 		{3DFEB3AD-85EB-4521-8F77-DC616B1B7649} = {9E6E150B-162E-4D9A-8782-9BAFA9DE73FB}
+		{1B4B7B00-06ED-4B42-BA04-501A20844E8E} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35ACDF4E-2CE2-46B1-A19F-35DC131069A1}

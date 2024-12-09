@@ -50,8 +50,8 @@ namespace DigitalRise.ConverterBase.Textures
 				if (texture != null)
 				{
 #if !MONOGAME
-          // When using the XNA content pipeline, check for MonoGame content.
-          if (!string.IsNullOrEmpty(ContentHelper.GetMonoGamePlatform()))
+					// When using the XNA content pipeline, check for MonoGame content.
+					if (!string.IsNullOrEmpty(ContentHelper.GetMonoGamePlatform()))
 #endif
 					{
 						// These formats are not (yet) available in MonoGame.

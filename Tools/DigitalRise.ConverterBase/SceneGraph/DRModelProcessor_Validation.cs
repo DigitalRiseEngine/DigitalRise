@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using DigitalRise.Linq;
 using DigitalRise.Mathematics;
+using DigitalRise.ModelStorage.SceneGraph;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
@@ -126,8 +127,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		private void ValidateMorphTarget(MeshContent morphTarget)
 		{
 			// Check whether morph target is the child of the base mesh.
@@ -226,8 +225,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters")]
 		private void ValidateOccluder(MeshContent mesh)
 		{
 			// Optional: Add checks for occluder.
@@ -239,7 +236,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			// Note: The material may be defined in an external XML file. The validation 
 			// below only checks local materials.
 
-#if ANIMATION
 			// Check if SkinnedEffect is used and SkinnedEffect.MaxBones is exceeded.
 			if (_skeleton != null && _skeleton.NumberOfBones > SkinnedEffect.MaxBones)
 			{
@@ -249,7 +245,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				  _skeleton.NumberOfBones, SkinnedEffect.MaxBones);
 				throw new Exception(message);
 			}
-#endif
 
 			// Check LOD group nodes.
 			var lodGroupNodes = _model.GetSubtree().OfType<DRLodGroupNodeContent>();
@@ -282,7 +277,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		private void ValidateOccluder(DROccluderNodeContent occluderNode)
 		{
 			int numberOfVertices = occluderNode.Occluder.Vertices.Count;

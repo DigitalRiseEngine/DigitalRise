@@ -11,6 +11,7 @@ using DigitalRise.Linq;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework;
+using DigitalRise.ModelStorage.SceneGraph;
 
 
 namespace DigitalRise.ConverterBase.SceneGraph
@@ -56,7 +57,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
 		private static DRSceneNodeContent BuildSceneGraph(NodeContent node, DRSceneNodeContent parent)
 		{
 			CheckForCyclicReferences(node);
@@ -85,12 +85,18 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				else if (ContentHelper.IsOccluder(mesh))
 				{
 					// ----- OccluderNode
-					sceneNode = new DROccluderNodeContent { InputMesh = mesh };
+					sceneNode = new DROccluderNodeContent
+					{
+						UserData = new MeshNodeEx(mesh)
+					};
 				}
 				else
 				{
 					// ----- MeshNode
-					sceneNode = new DRMeshNodeContent { InputMesh = mesh };
+					sceneNode = new DRMeshNodeContent
+					{
+						UserData = new MeshNodeEx(mesh)
+					};
 				}
 			}
 			else

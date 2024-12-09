@@ -4,17 +4,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-#if ANIMATION
+using DigitalRise.ModelStorage.SceneGraph;
 using DigitalRise.Animation.Character;
-#endif
+using DigitalRise.ModelStorage.Meshes;
 
 namespace DigitalRise.ConverterBase.SceneGraph
 {
@@ -48,15 +45,13 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		// Skeleton and animations
 		private BoneContent _rootBone;
-#if ANIMATION
 		private Skeleton _skeleton;
 		private Dictionary<string, SkeletonKeyFrameAnimation> _animations;
-#endif
 
 		// Vertex and index buffers
-		private List<VertexBufferContent> _vertexBuffers;     // One vertex buffer for each VertexDeclaration.
-		private IndexCollection _indices;                     // One index buffer for everything.
-		private VertexBufferContent _morphTargetVertexBuffer; // One vertex buffer for all morph targets.
+		private List<DRVertexBufferContent> _vertexBuffers;     // One vertex buffer for each VertexDeclaration.
+		private List<int> _indices;                     // One index buffer for everything.
+		private DRVertexBufferContent _morphTargetVertexBuffer; // One vertex buffer for all morph targets.
 		int[][] _vertexReorderMaps;                           // Vertex reorder map to match morph target with base mesh.
 
 		// Processed Materials:
@@ -189,7 +184,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 			if (node.Transform != Matrix.Identity)
 			{
-				Microsoft.Xna.Framework.Content.Pipeline.Graphics.MeshHelper.TransformScene(node, node.Transform);
+				MeshHelper.TransformScene(node, node.Transform);
 				node.Transform = Matrix.Identity;
 			}
 

@@ -2,17 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
-using DigitalRise.ConverterBase.SceneGraph;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 
-namespace DigitalRise.ConverterBase.Occluder
+namespace DigitalRise.ModelStorage.Occluder
 {
 	/// <summary>
 	/// Stores the processed data for an <strong>Occluder</strong> asset.
 	/// </summary>
-	public class DROccluderContent : DRSceneNodeContent
+	public class DROccluderContent
 	{
 		/// <summary>
 		/// Gets or sets the triangle vertices.

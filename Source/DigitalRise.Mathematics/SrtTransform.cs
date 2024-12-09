@@ -16,6 +16,8 @@ using System;
 using Microsoft.Xna.Framework;
 using System.Globalization;
 using DigitalRise.Mathematics.Algebra;
+using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace DigitalRise.Mathematics
 {
@@ -99,6 +101,8 @@ namespace DigitalRise.Mathematics
 		/// <see langword="true"/> if the scaling factor in any direction is not 1; otherwise, 
 		/// <see langword="false"/>.
 		/// </value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public bool HasScale
 		{
 			get
@@ -124,6 +128,8 @@ namespace DigitalRise.Mathematics
 		/// <see langword="false"/> if the rotation is not used (rotation angle is zero;
 		/// <see cref="Rotation"/> is the identity quaternion).
 		/// </value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public bool HasRotation
 		{
 			get
@@ -141,6 +147,8 @@ namespace DigitalRise.Mathematics
 		/// <see langword="true"/> if the translation describes a non-zero translation; otherwise, 
 		/// <see langword="false"/>.
 		/// </value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public bool HasTranslation
 		{
 			get { return !Translation.IsNumericallyZero(); }
@@ -151,6 +159,8 @@ namespace DigitalRise.Mathematics
 		/// Gets the inverse of this SRT transform.
 		/// </summary>
 		/// <value>The inverse of this SRT transform.</value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public SrtTransform Inverse
 		{
 			get

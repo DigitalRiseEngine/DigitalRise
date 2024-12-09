@@ -3,13 +3,14 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Xml.Serialization;
 using DigitalRise.Geometry.Meshes;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework;
-
+using Newtonsoft.Json;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 namespace DigitalRise.Geometry.Shapes
@@ -21,12 +22,6 @@ namespace DigitalRise.Geometry.Shapes
 	public class BoxShape : ConvexShape
 	{
 		// TODO: Optimize: The support vertex distance could be simply computed as Dot(v.absolute().Normalized, halfExtentVector).
-
-		//--------------------------------------------------------------
-		#region Fields
-		//--------------------------------------------------------------
-		#endregion
-
 
 		//--------------------------------------------------------------
 		#region Properties
@@ -41,6 +36,8 @@ namespace DigitalRise.Geometry.Shapes
 		/// <exception cref="ArgumentOutOfRangeException">
 		/// A component of <paramref name="value"/> is negative.
 		/// </exception>
+		[Browsable(false)]
+		[JsonIgnore]
 		[XmlIgnore]
 		public Vector3 Extent
 		{

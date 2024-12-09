@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using DigitalRise.ConverterBase.Meshes;
 using DigitalRise.Mathematics;
+using DigitalRise.ModelStorage.Meshes;
+using DigitalRise.ModelStorage.SceneGraph;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 
@@ -33,20 +33,24 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				throw new InvalidContentException(message, morphTarget.Identity);
 			}
 
-			if (meshNode.InputMorphTargets == null)
-				meshNode.InputMorphTargets = new List<MeshContent>();
+			var meshEx = (MeshNodeEx)meshNode.UserData;
+			if (meshEx.InputMorphTargets == null)
+			{
+				meshEx.InputMorphTargets = new List<MeshContent>();
+			}
 
-			meshNode.InputMorphTargets.Add(morphTarget);
+			meshEx.InputMorphTargets.Add(morphTarget);
 		}
 
 
-		private static VertexBufferContent CreateMorphTargetVertexBuffer()
+		private static DRVertexBufferContent CreateMorphTargetVertexBuffer()
 		{
-			var vertexDeclaration = new VertexDeclarationContent { VertexStride = 24 };
-			vertexDeclaration.VertexElements.Add(new Microsoft.Xna.Framework.Graphics.VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0));
-			vertexDeclaration.VertexElements.Add(new Microsoft.Xna.Framework.Graphics.VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0));
+			var buffer = new DRVertexBufferContent();
 
-			return new VertexBufferContent { VertexDeclaration = vertexDeclaration };
+			buffer.Channels.Add(new DRVertexChannelContent<Vector3>(VertexElementUsage.Position));
+			buffer.Channels.Add(new DRVertexChannelContent<Vector3>(VertexElementUsage.Normal));
+
+			return buffer;
 		}
 
 
@@ -128,27 +132,41 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				// Copy relative positions and normals into vertex buffer.
 				var positions = morphGeometry.Vertices.Positions;
 				var normals = morphGeometry.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
-				Vector3[] data = new Vector3[numberOfVertices * 2];
+				var tempBuffer = CreateMorphTargetVertexBuffer();
+				var positionChannel = tempBuffer.EnsureChannel<Vector3>(VertexElementUsage.Position);
+				var normalChannel = tempBuffer.EnsureChannel<Vector3>(VertexElementUsage.Normal);
 				for (int i = 0; i < numberOfVertices; i++)
 				{
 					int originalIndex = vertexReorderMap[i];
-					data[2 * i] = positions[originalIndex];
-					data[2 * i + 1] = normals[originalIndex];
+
+					positionChannel.Data.Add(positions[originalIndex]);
+					normalChannel.Data.Add(normals[originalIndex]);
 				}
 
 				// Determine if morph target is empty.
 				bool isEmpty = true;
-				for (int i = 0; i < data.Length; i++)
+				for (int i = 0; i < tempBuffer.VertexCount; i++)
 				{
 					// File formats and preprocessing can introduce some inaccuracies.
 					// --> Use a relative large epsilon. (The default Numeric.EpsilonF is too small.)
 					const float epsilon = 1e-4f;
-					if (!Numeric.IsZero(data[i].LengthSquared(), epsilon * epsilon))
+					if (!Numeric.IsZero(positionChannel.Data[i].LengthSquared(), epsilon * epsilon))
 					{
 						Debug.Write(string.Format(
 						  CultureInfo.InvariantCulture,
-						  "Morph target \"{0}\", submesh index {1}: Position/normal delta is {2}.",
-						  inputMorphTarget.Name, index, data[i].Length()));
+						  "Morph target \"{0}\", submesh index {1}: Position delta is {2}.",
+						  inputMorphTarget.Name, index, positionChannel.Data[i].Length()));
+
+						isEmpty = false;
+						break;
+					}
+
+					if (!Numeric.IsZero(normalChannel.Data[i].LengthSquared(), epsilon * epsilon))
+					{
+						Debug.Write(string.Format(
+						  CultureInfo.InvariantCulture,
+						  "Morph target \"{0}\", submesh index {1}: Normal delta is {2}.",
+						  inputMorphTarget.Name, index, normalChannel.Data[i].Length()));
 
 						isEmpty = false;
 						break;
@@ -157,13 +175,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 				if (!isEmpty)
 				{
-					// (Note: VertexStride is set explicitly in CreateMorphTargetVertexBuffer().)
-					// ReSharper disable once PossibleInvalidOperationException
-					int vertexOffset = _morphTargetVertexBuffer.VertexData.Length / _morphTargetVertexBuffer.VertexDeclaration.VertexStride.Value;
-					_morphTargetVertexBuffer.Write(
-					  _morphTargetVertexBuffer.VertexData.Length,
-					  12,     // The size of one Vector3 in data is 12.
-					  data);
+					int vertexOffset = _morphTargetVertexBuffer.VertexCount;
+					_morphTargetVertexBuffer.Write(tempBuffer);
 
 					morphTargets.Add(new DRMorphTargetContent
 					{

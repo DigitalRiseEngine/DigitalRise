@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
+using DigitalRise.ModelStorage.SceneGraph;
 using System.Collections.Generic;
 using System.Linq;
 

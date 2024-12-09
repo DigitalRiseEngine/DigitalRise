@@ -1,16 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace DigitalRise.ModelStorage.Meshes
 {
 	public abstract class DRVertexChannelContentBase
 	{
-		public abstract VertexElementFormat Format { get; }
+		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public VertexElementUsage Usage { get; set; }
+
+		[Browsable(false)]
+		[JsonIgnore]
+		public abstract VertexElementFormat Format { get; }
+
+		[Browsable(false)]
+		[JsonIgnore]
 		public abstract int Count { get; }
 
 		public DRVertexChannelContentBase()
@@ -75,7 +83,7 @@ namespace DigitalRise.ModelStorage.Meshes
 			return channel;
 		}
 
-		private static DRVertexChannelContentBase CreateAndCopy<T>(IList data)
+		private static DRVertexChannelContentBase CreateAndCopy<T>(object data)
 		{
 			var result = new DRVertexChannelContent<T>();
 
@@ -88,7 +96,7 @@ namespace DigitalRise.ModelStorage.Meshes
 			return result;
 		}
 
-		public static DRVertexChannelContentBase CreateChannel(VertexElementUsage usage, Type t, IList data)
+		public static DRVertexChannelContentBase CreateChannel(VertexElementUsage usage, Type t, object data)
 		{
 			DRVertexChannelContentBase channel;
 

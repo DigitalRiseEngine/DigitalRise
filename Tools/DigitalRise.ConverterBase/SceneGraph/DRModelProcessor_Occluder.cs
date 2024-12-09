@@ -4,12 +4,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using DigitalRise.Geometry;
 using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage.Occluder;
 using DigitalRise.ModelStorage.SceneGraph;
 using Microsoft.Xna.Framework;
-using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.ConverterBase.SceneGraph
@@ -32,10 +30,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			// If possible, assign occluder to parent mesh and remove occluder node.
 			foreach (var occluderNode in occluderNodes)
 			{
-				if (occluderNode.Parent is DRMeshNodeContent
-					&& Pose.AreNumericallyEqual(occluderNode.PoseLocal, Pose.Identity)
-					&& MathHelper.AreNumericallyEqual(occluderNode.ScaleLocal, Vector3.One)
-					&& (occluderNode.Children == null || occluderNode.Children.Count == 0))
+				if (occluderNode.Parent is DRMeshNodeContent &&
+					!occluderNode.IsTransformed &&
+					(occluderNode.Children == null || occluderNode.Children.Count == 0))
 				{
 					var meshNode = (DRMeshNodeContent)occluderNode.Parent;
 					meshNode.Mesh.Occluder = occluderNode.Occluder;

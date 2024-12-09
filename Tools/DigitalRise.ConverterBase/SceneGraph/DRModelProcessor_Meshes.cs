@@ -249,6 +249,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					VertexBuffer = geometry.Vertices.ToDRVertexBufferContent(),
 					MorphTargets = morphTargets
 				};
+
 				submeshInfo.VertexBufferIndex = GetVertexBufferIndex(submeshInfo.VertexBuffer);
 
 				// Get material file or local material.

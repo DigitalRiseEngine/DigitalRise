@@ -102,11 +102,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				}
 
 				// Replace LOD0 with LodGroupNode.
-				lodGroupNode.ScaleLocal = lod0.ScaleLocal;
-				lodGroupNode.PoseLocal = lod0.PoseLocal;
-				// We have to set PoseWorld too. PoseWorld/PoseLocal are separate properties in 
-				// DRSceneNodeContent, unlike SceneNode where they update each other.
-				lodGroupNode.PoseWorld = lod0.PoseWorld;
+				lodGroupNode.Translation = lod0.Translation;
+				lodGroupNode.Rotation = lod0.Rotation;
+				lodGroupNode.Scale = lod0.Scale;
 				lod0.Parent.Children.Add(lodGroupNode);
 
 				// Remove all LODs from scene graph.

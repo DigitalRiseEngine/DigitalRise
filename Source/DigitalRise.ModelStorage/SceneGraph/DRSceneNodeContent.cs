@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using DigitalRise.Geometry;
 using DigitalRise.Linq;
+using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
 namespace DigitalRise.ModelStorage.SceneGraph
@@ -45,27 +47,23 @@ namespace DigitalRise.ModelStorage.SceneGraph
 		/// <value>The name.</value>
 		public string Name { get; set; }
 
+		public Vector3 Translation { get; set; }
 
-		/// <summary>
-		/// Gets or sets the pose (position and orientation) relative to the parent node.
-		/// </summary>
-		/// <value>The pose (position and orientation) relative to the parent node.</value>
-		public Pose PoseLocal { get; set; }
+		public Quaternion Rotation { get; set; } = Quaternion.Identity;
 
+		public Vector3 Scale { get; set; } = Vector3.One;
 
-		/// <summary>
-		/// Gets or sets the scale.
-		/// </summary>
-		/// <value>The scale.</value>
-		public Vector3 ScaleLocal { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the pose (position and orientation) relative to world space.
-		/// </summary>
-		/// <value>The pose (position and orientation) relative to world space.</value>
-		public Pose PoseWorld { get; set; }
-
+		[Browsable(false)]
+		[JsonIgnore]
+		public bool IsTransformed
+		{
+			get
+			{
+				return !Translation.IsNumericallyZero() ||
+					!MathHelper.AreNumericallyEqual(Rotation, Quaternion.Identity) ||
+					!MathHelper.AreNumericallyEqual(Scale, Vector3.One);
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the maximum distance up to which the scene node is rendered.
@@ -93,24 +91,8 @@ namespace DigitalRise.ModelStorage.SceneGraph
 		/// </summary>
 		/// <value>User-defined tag object.</value>
 		[Browsable(false)]
-		[JsonIgnore] 
+		[JsonIgnore]
 		public object UserData { get; set; }
-		#endregion
-
-
-		//--------------------------------------------------------------
-		#region Creation & Cleanup
-		//--------------------------------------------------------------
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DRSceneNodeContent"/> class.
-		/// </summary>
-		public DRSceneNodeContent()
-		{
-			PoseLocal = Pose.Identity;
-			ScaleLocal = Vector3.One;
-			PoseWorld = Pose.Identity;
-		}
 		#endregion
 
 
@@ -254,6 +236,8 @@ namespace DigitalRise.ModelStorage.SceneGraph
 				TypeNameHandling = TypeNameHandling.Auto,
 				DefaultValueHandling = DefaultValueHandling.Ignore,
 			};
+
+			result.Converters.Add(new StringEnumConverter());
 
 			return result;
 		}

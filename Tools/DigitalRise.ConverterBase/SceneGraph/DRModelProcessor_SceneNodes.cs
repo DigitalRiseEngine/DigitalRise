@@ -31,10 +31,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			_model = new DRSceneNodeContent();
 
 			// In most cases the root node is an empty node, which can be ignored.
-			if (root.GetType() == typeof(DRSceneNodeContent)
-				&& root.PoseLocal == Pose.Identity
-				&& root.ScaleLocal == Vector3.One
-				&& root.UserData == null)
+			if (root.GetType() == typeof(DRSceneNodeContent) &&
+				!root.IsTransformed &&
+				root.UserData == null)
 			{
 				// Throw away root, only use children.
 				if (root.Children != null)
@@ -49,11 +48,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				_model.Children = new List<DRSceneNodeContent> { root };
 				root.Parent = _model;
 			}
-
-			// Go through scene graph and update PoseWorld from the root to the leaves.
-			_model.PoseWorld = _model.PoseLocal;
-			foreach (var node in _model.GetDescendants())
-				node.PoseWorld = node.Parent.PoseWorld * node.PoseLocal;
 		}
 
 
@@ -108,11 +102,15 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			if (sceneNode != null)
 			{
 				sceneNode.Name = node.Name;
-				Pose pose;
-				Vector3 scale;
-				DecomposeTransform(node, out pose, out scale);
-				sceneNode.PoseLocal = pose;
-				sceneNode.ScaleLocal = scale;
+
+				Vector3 translation, scale;
+				Quaternion rotation;
+				node.Transform.Decompose(out scale, out rotation, out translation);
+
+				sceneNode.Translation = translation;
+				sceneNode.Scale = scale;
+				sceneNode.Rotation = rotation;
+
 				if (node.Children.Count > 0)
 				{
 					// Process children.
@@ -146,21 +144,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				  node);
 				throw new InvalidOperationException(message);
 			}
-		}
-
-
-		private static void DecomposeTransform(NodeContent node, out Pose pose, out Vector3 scale)
-		{
-			// Get local transform of node.
-			Matrix44F transform = (Matrix44F)node.Transform;
-
-			// Decompose transform into scale, rotation, and translation.
-			Matrix33F rotation;
-			Vector3 translation;
-			transform.Decompose(out scale, out rotation, out translation);
-
-			// Return pose (position + orientation).
-			pose = new Pose(translation, rotation);
 		}
 	}
 }

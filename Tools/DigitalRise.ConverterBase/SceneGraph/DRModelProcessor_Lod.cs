@@ -103,8 +103,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 				// Replace LOD0 with LodGroupNode.
 				lodGroupNode.Translation = lod0.Translation;
-				lodGroupNode.Rotation = lod0.Rotation;
 				lodGroupNode.Scale = lod0.Scale;
+				lodGroupNode.Rotation = lod0.Rotation;
+
 				lod0.Parent.Children.Add(lodGroupNode);
 
 				// Remove all LODs from scene graph.

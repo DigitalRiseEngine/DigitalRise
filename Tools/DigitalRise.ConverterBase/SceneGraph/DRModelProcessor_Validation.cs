@@ -67,7 +67,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly")]
 		private void ValidateMesh(MeshContent mesh)
 		{
 			foreach (var geometry in mesh.Geometry)

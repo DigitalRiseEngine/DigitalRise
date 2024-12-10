@@ -4,13 +4,10 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using DigitalRise.Linq;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
@@ -227,35 +224,9 @@ namespace DigitalRise.ModelStorage.SceneGraph
 		}
 		#endregion
 
-		public static JsonSerializerSettings CreateOptions()
-		{
-			var result = new JsonSerializerSettings
-			{
-				Culture = CultureInfo.InvariantCulture,
-				Formatting = Formatting.Indented,
-				TypeNameHandling = TypeNameHandling.Auto,
-				DefaultValueHandling = DefaultValueHandling.Ignore,
-			};
-
-			result.Converters.Add(new StringEnumConverter());
-
-			return result;
-		}
-
-		public static void SerializeToFile<T>(string path, JsonSerializerSettings options, T data)
-		{
-			var s = JsonConvert.SerializeObject(data, typeof(T), options);
-			File.WriteAllText(path, s);
-		}
-
-		public static T DeserializeFromString<T>(string data, JsonSerializerSettings options)
-		{
-			return JsonConvert.DeserializeObject<T>(data, options);
-		}
-
 		public void SaveToJson(string path)
 		{
-			SerializeToFile(path, CreateOptions(), this);
+			JsonSerialization.SerializeToFile(path, this);
 		}
 
 		#endregion

@@ -64,7 +64,7 @@ namespace DigitalRise.ModelConverter
 
 		static void Process(string[] args)
 		{
-			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Ground\Ground.drmdl";
+			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Barrel\Barrel.drmdl";
 
 			var modelDescription = ModelDescription.Load(inputModel, Log);
 

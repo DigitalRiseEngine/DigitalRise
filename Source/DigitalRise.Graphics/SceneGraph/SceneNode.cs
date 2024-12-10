@@ -937,15 +937,12 @@ namespace DigitalRise.SceneGraph
 
 		public void SaveToFile(string path)
 		{
-			var options = JsonExtensions.CreateOptions();
-
-			JsonExtensions.SerializeToFile(path, options, this);
+			JsonSerialization.SerializeToFile(path, this);
 		}
 
 		public static SceneNode ReadFromString(string data, AssetManager assetManager)
 		{
-			var options = JsonExtensions.CreateOptions();
-			var result = JsonExtensions.DeserializeFromString<SceneNode>(data, options);
+			var result = JsonSerialization.DeserializeFromString<SceneNode>(data);
 
 			result.Load(assetManager);
 

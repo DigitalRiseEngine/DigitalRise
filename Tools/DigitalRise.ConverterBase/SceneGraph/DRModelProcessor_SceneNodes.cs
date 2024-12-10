@@ -6,9 +6,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
-using DigitalRise.Geometry;
 using DigitalRise.Linq;
-using DigitalRise.Mathematics.Algebra;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework;
 using DigitalRise.ModelStorage.SceneGraph;
@@ -28,7 +26,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				throw new InvalidOperationException("Invalid root node.");
 			}
 
-			_model = new DRSceneNodeContent();
+			_model = new DRModelNodeContent();
 
 			// In most cases the root node is an empty node, which can be ignored.
 			if (root.GetType() == typeof(DRSceneNodeContent) &&
@@ -51,6 +49,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		}
 
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
 		private static DRSceneNodeContent BuildSceneGraph(NodeContent node, DRSceneNodeContent parent)
 		{
 			CheckForCyclicReferences(node);
@@ -79,18 +78,20 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				else if (ContentHelper.IsOccluder(mesh))
 				{
 					// ----- OccluderNode
-					sceneNode = new DROccluderNodeContent
+					var meshEx = new MeshNodeEx
 					{
-						UserData = new MeshNodeEx(mesh)
+						InputMesh = mesh
 					};
+					sceneNode = new DROccluderNodeContent { UserData = meshEx };
 				}
 				else
 				{
 					// ----- MeshNode
-					sceneNode = new DRMeshNodeContent
+					var meshEx = new MeshNodeEx
 					{
-						UserData = new MeshNodeEx(mesh)
+						InputMesh = mesh
 					};
+					sceneNode = new DRMeshNodeContent { UserData = meshEx };
 				}
 			}
 			else
@@ -102,15 +103,13 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			if (sceneNode != null)
 			{
 				sceneNode.Name = node.Name;
-
 				Vector3 translation, scale;
 				Quaternion rotation;
-				node.Transform.Decompose(out scale, out rotation, out translation);
 
+				node.Transform.Decompose(out scale, out rotation, out translation);
 				sceneNode.Translation = translation;
 				sceneNode.Scale = scale;
 				sceneNode.Rotation = rotation;
-
 				if (node.Children.Count > 0)
 				{
 					// Process children.

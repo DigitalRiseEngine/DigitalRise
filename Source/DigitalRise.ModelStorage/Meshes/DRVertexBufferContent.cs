@@ -1,16 +1,20 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DigitalRise.ModelStorage.Meshes
 {
 	public class DRVertexBufferContent
 	{
 		private int? _vertexStride;
+		private readonly MemoryStream _stream = new MemoryStream();
 
 		[Browsable(false)]
 		[JsonIgnore]
@@ -25,24 +29,15 @@ namespace DigitalRise.ModelStorage.Meshes
 
 		[Browsable(false)]
 		[JsonIgnore]
-		public int VertexCount
-		{
-			get
-			{
-				if (Channels == null || Channels.Count == 0)
-				{
-					return 0;
-				}
+		public int SizeInBytes => (int)_stream.Length;
 
-				return Channels[0].Count;
-			}
-		}
+		public int VertexCount => SizeInBytes / VertexStride;
 
-		public ObservableCollection<DRVertexChannelContentBase> Channels { get; } = new ObservableCollection<DRVertexChannelContentBase>();
+		public ObservableCollection<DRVertexElement> Elements { get; } = new ObservableCollection<DRVertexElement>();
 
 		public DRVertexBufferContent()
 		{
-			Channels.CollectionChanged += Channels_CollectionChanged;
+			Elements.CollectionChanged += Channels_CollectionChanged;
 		}
 
 		private void Channels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -52,31 +47,7 @@ namespace DigitalRise.ModelStorage.Meshes
 
 		public bool HasChannel(VertexElementUsage usage)
 		{
-			return (from c in Channels where c.Usage == usage select c).Count() > 0;
-		}
-
-		public DRVertexChannelContent<T> FindChannel<T>(VertexElementUsage usage)
-		{
-			foreach (var channel in Channels)
-			{
-				if (channel.Usage == usage)
-				{
-					return (DRVertexChannelContent<T>)channel;
-				}
-			}
-
-			return null;
-		}
-
-		public DRVertexChannelContent<T> EnsureChannel<T>(VertexElementUsage usage)
-		{
-			var result = FindChannel<T>(usage);
-			if (result == null)
-			{
-				throw new Exception($"Unable to find channel with usage {usage}");
-			}
-
-			return result;
+			return (from c in Elements where c.Usage == usage select c).Count() > 0;
 		}
 
 		private void Update()
@@ -93,38 +64,12 @@ namespace DigitalRise.ModelStorage.Meshes
 		{
 			var result = 0;
 
-			foreach (var channel in Channels)
+			foreach (var channel in Elements)
 			{
 				result += GetTypeSize(channel.Format);
 			}
 
 			return result;
-		}
-
-		public void Write(DRVertexBufferContent source)
-		{
-			if (source.Channels.Count != Channels.Count)
-			{
-				throw new Exception($"Inconsistent channels count: source = {source.Channels.Count}, dest = {Channels.Count}");
-			}
-
-			if (source.VertexStride != VertexStride)
-			{
-				throw new Exception($"Inconsistent vertex stride: source = {source.VertexStride}, dest = {VertexStride}");
-			}
-
-			for (var i = 0; i < Channels.Count; ++i)
-			{
-				var sourceChannel = source.Channels[i];
-				var channel = Channels[i];
-
-				if (sourceChannel.Usage != channel.Usage)
-				{
-					throw new Exception($"Inconsistent channel usage: index = {i}, source = {sourceChannel.Usage}, dest = {channel.Usage}");
-				}
-
-				channel.Write(sourceChannel);
-			}
 		}
 
 		private static int GetTypeSize(VertexElementFormat elementFormat)
@@ -157,6 +102,12 @@ namespace DigitalRise.ModelStorage.Meshes
 					return 8;
 			}
 			return 0;
+		}
+
+		public void Write(int offset, ReadOnlySpan<byte> data)
+		{
+			_stream.Seek(offset, SeekOrigin.Begin);
+			_stream.Write(data);
 		}
 	}
 }

@@ -2,11 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
 using DigitalRise.ModelStorage.Meshes;
-using Microsoft.Xna.Framework.Content;
 
 
 namespace DigitalRise.ModelStorage.SceneGraph
@@ -21,5 +17,7 @@ namespace DigitalRise.ModelStorage.SceneGraph
 		/// </summary>
 		/// <value>The mesh.</value>
 		public DRMeshContent Mesh { get; set; }
+
+		public DRIndexBufferContent IndexBuffer { get; set; }
 	}
 }

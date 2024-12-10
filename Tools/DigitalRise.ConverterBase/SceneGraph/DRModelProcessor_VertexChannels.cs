@@ -218,7 +218,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			boneIndices[vertexIndex] = new Byte4(_tempIndices[0], _tempIndices[1], _tempIndices[2], _tempIndices[3]);
 			boneWeights[vertexIndex] = new Vector4(_tempWeights[0], _tempWeights[1], _tempWeights[2], _tempWeights[3]);
 		}
-		
 		#endregion
 	}
 }

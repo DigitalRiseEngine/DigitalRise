@@ -18,6 +18,8 @@ namespace DigitalRise.ModelStorage.Meshes
 	/// </summary>
 	public class DRMeshContent : INamedObject
 	{
+		public List<DRVertexBufferContent> VertexBuffers { get; set; }
+
 		/// <summary>
 		/// Gets or sets the bounding shape for this mesh.
 		/// </summary>

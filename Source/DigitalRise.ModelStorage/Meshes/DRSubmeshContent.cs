@@ -18,7 +18,7 @@ namespace DigitalRise.ModelStorage.Meshes
 		/// Gets or sets the vertex buffer associated with this submesh.
 		/// </summary>
 		/// <value>The vertex buffer associated with this submesh.</value>
-		public DRVertexBufferContent VertexBuffer { get; set; }
+		public int VertexBufferIndex { get; set; }
 
 
 		/// <summary>
@@ -34,13 +34,6 @@ namespace DigitalRise.ModelStorage.Meshes
 		/// </summary>
 		/// <value>The number of vertices used in this submesh.</value>
 		public int VertexCount { get; set; }
-
-
-		/// <summary>
-		/// Gets or sets the index buffer associated with this submesh.
-		/// </summary>
-		/// <value>The index buffer associated with this submesh.</value>
-		public List<int> Indices { get; set; }
 
 
 		/// <summary>
@@ -62,37 +55,5 @@ namespace DigitalRise.ModelStorage.Meshes
 		/// </summary>
 		/// <value>The morph targets. The default value is <see langword="null"/>.</value>
 		public List<DRMorphTargetContent> MorphTargets { get; set; }
-
-		public bool HasChannel(VertexElementUsage usage)
-		{
-			if (VertexBuffer == null)
-			{
-				return false;
-			}
-
-			return VertexBuffer.HasChannel(usage);
-		}
-
-		public DRVertexChannelContent<T> FindChannel<T>(VertexElementUsage usage)
-		{
-			if (VertexBuffer == null)
-			{
-				return null;
-			}
-
-			return VertexBuffer.FindChannel<T>(usage);
-		}
-
-		public DRVertexChannelContent<T> EnsureChannel<T>(VertexElementUsage usage)
-		{
-			var result = FindChannel<T>(usage);
-			if (result == null)
-			{
-				throw new Exception($"Unable to find channel with usage {usage}");
-			}
-
-			return result;
-		}
-
 	}
 }

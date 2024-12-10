@@ -2,16 +2,16 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
+using DigitalRise.Animation.Character;
+using DigitalRise.ModelStorage.Meshes;
+using DigitalRise.ModelStorage.SceneGraph;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using DigitalRise.ModelStorage.SceneGraph;
-using DigitalRise.Animation.Character;
-using DigitalRise.ModelStorage.Meshes;
 
 namespace DigitalRise.ConverterBase.SceneGraph
 {
@@ -41,7 +41,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		private ModelDescription _modelDescription;
 
 		// The model (= root node of the scene).
-		private DRSceneNodeContent _model;
+		private DRModelNodeContent _model;
 
 		// Skeleton and animations
 		private BoneContent _rootBone;
@@ -54,14 +54,6 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		private DRVertexBufferContent _morphTargetVertexBuffer; // One vertex buffer for all morph targets.
 		int[][] _vertexReorderMaps;                           // Vertex reorder map to match morph target with base mesh.
 
-		// Processed Materials:
-		// If material is defined in external XML file:
-		//   Key: string
-		//   Value: ExternalReference<DRMaterialContent>
-		// If local material is used:
-		//   Key: MaterialContent
-		//   Value: DRMaterialContent
-		private Dictionary<object, object> _materials;
 		#endregion
 
 		#region Properties
@@ -83,7 +75,7 @@ namespace DigitalRise.ConverterBase.SceneGraph
 		/// <param name="input">The root node content.</param>
 		/// <param name="modelDescription"></param>
 		/// <returns>The model content.</returns>
-		public DRSceneNodeContent Process(NodeContent input, ModelDescription modelDescription)
+		public DRModelNodeContent Process(NodeContent input, ModelDescription modelDescription)
 		{
 			if (input == null)
 				throw new ArgumentNullException(nameof(input));

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage.Meshes;
 using DigitalRise.ModelStorage.SceneGraph;
@@ -34,10 +35,14 @@ namespace DigitalRise.ConverterBase.SceneGraph
 			}
 
 			var meshEx = (MeshNodeEx)meshNode.UserData;
-			if (meshEx.InputMorphTargets == null)
+			if (meshEx == null)
 			{
-				meshEx.InputMorphTargets = new List<MeshContent>();
+				meshEx = new MeshNodeEx();
+				meshNode.UserData = meshEx;
 			}
+
+			if (meshEx.InputMorphTargets == null)
+				meshEx.InputMorphTargets = new List<MeshContent>();
 
 			meshEx.InputMorphTargets.Add(morphTarget);
 		}
@@ -45,12 +50,12 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 		private static DRVertexBufferContent CreateMorphTargetVertexBuffer()
 		{
-			var buffer = new DRVertexBufferContent();
+			var result = new DRVertexBufferContent();
 
-			buffer.Channels.Add(new DRVertexChannelContent<Vector3>(VertexElementUsage.Position));
-			buffer.Channels.Add(new DRVertexChannelContent<Vector3>(VertexElementUsage.Normal));
+			result.Elements.Add(new DRVertexElement(VertexElementUsage.Position, VertexElementFormat.Vector3));
+			result.Elements.Add(new DRVertexElement(VertexElementUsage.Normal, VertexElementFormat.Vector3));
 
-			return buffer;
+			return result;
 		}
 
 
@@ -132,41 +137,27 @@ namespace DigitalRise.ConverterBase.SceneGraph
 				// Copy relative positions and normals into vertex buffer.
 				var positions = morphGeometry.Vertices.Positions;
 				var normals = morphGeometry.Vertices.Channels.Get<Vector3>(VertexChannelNames.Normal());
-				var tempBuffer = CreateMorphTargetVertexBuffer();
-				var positionChannel = tempBuffer.EnsureChannel<Vector3>(VertexElementUsage.Position);
-				var normalChannel = tempBuffer.EnsureChannel<Vector3>(VertexElementUsage.Normal);
+				Vector3[] data = new Vector3[numberOfVertices * 2];
 				for (int i = 0; i < numberOfVertices; i++)
 				{
 					int originalIndex = vertexReorderMap[i];
-
-					positionChannel.Data.Add(positions[originalIndex]);
-					normalChannel.Data.Add(normals[originalIndex]);
+					data[2 * i] = positions[originalIndex];
+					data[2 * i + 1] = normals[originalIndex];
 				}
 
 				// Determine if morph target is empty.
 				bool isEmpty = true;
-				for (int i = 0; i < tempBuffer.VertexCount; i++)
+				for (int i = 0; i < data.Length; i++)
 				{
 					// File formats and preprocessing can introduce some inaccuracies.
 					// --> Use a relative large epsilon. (The default Numeric.EpsilonF is too small.)
 					const float epsilon = 1e-4f;
-					if (!Numeric.IsZero(positionChannel.Data[i].LengthSquared(), epsilon * epsilon))
+					if (!Numeric.IsZero(data[i].LengthSquared(), epsilon * epsilon))
 					{
 						Debug.Write(string.Format(
 						  CultureInfo.InvariantCulture,
-						  "Morph target \"{0}\", submesh index {1}: Position delta is {2}.",
-						  inputMorphTarget.Name, index, positionChannel.Data[i].Length()));
-
-						isEmpty = false;
-						break;
-					}
-
-					if (!Numeric.IsZero(normalChannel.Data[i].LengthSquared(), epsilon * epsilon))
-					{
-						Debug.Write(string.Format(
-						  CultureInfo.InvariantCulture,
-						  "Morph target \"{0}\", submesh index {1}: Normal delta is {2}.",
-						  inputMorphTarget.Name, index, normalChannel.Data[i].Length()));
+						  "Morph target \"{0}\", submesh index {1}: Position/normal delta is {2}.",
+						  inputMorphTarget.Name, index, data[i].Length()));
 
 						isEmpty = false;
 						break;
@@ -175,8 +166,12 @@ namespace DigitalRise.ConverterBase.SceneGraph
 
 				if (!isEmpty)
 				{
+					// (Note: VertexStride is set explicitly in CreateMorphTargetVertexBuffer().)
+					// ReSharper disable once PossibleInvalidOperationException
+
 					int vertexOffset = _morphTargetVertexBuffer.VertexCount;
-					_morphTargetVertexBuffer.Write(tempBuffer);
+					var asBytes = MemoryMarshal.AsBytes<Vector3>(data);
+					_morphTargetVertexBuffer.Write(_morphTargetVertexBuffer.SizeInBytes, asBytes);
 
 					morphTargets.Add(new DRMorphTargetContent
 					{

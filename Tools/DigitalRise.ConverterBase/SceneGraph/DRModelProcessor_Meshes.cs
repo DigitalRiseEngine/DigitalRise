@@ -355,8 +355,8 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					}
 
 					vertexCount = submeshInfo.Geometry.Vertices.VertexCount;
-					vertexOffset = vertexBuffer.VertexCount;
-					vertexBuffer.Write(vertexBuffer.SizeInBytes, submeshInfo.VertexBuffer.VertexData);
+					vertexOffset = vertexBuffer.MemoryVertexCount;
+					vertexBuffer.Write(vertexBuffer.MemorySizeInBytes, submeshInfo.VertexBuffer.VertexData);
 				}
 
 				// Append indices to _indices.

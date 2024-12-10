@@ -64,7 +64,7 @@ namespace DigitalRise.ModelConverter
 
 		static void Process(string[] args)
 		{
-			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Barrel\Barrel.drmdl";
+			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Dude\Dude.drmdl";
 
 			var modelDescription = ModelDescription.Load(inputModel, Log);
 
@@ -83,7 +83,7 @@ namespace DigitalRise.ModelConverter
 
 			var drModelContent = processor.Process(modelContent, modelDescription);
 
-			drModelContent.SaveToJson(@"D:\Barrel.jdrm");
+			drModelContent.Save(@"D:\", "Barrel");
 			var k = 5;
 		}
 

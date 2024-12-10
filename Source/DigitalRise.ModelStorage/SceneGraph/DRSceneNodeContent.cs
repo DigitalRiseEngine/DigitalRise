@@ -224,11 +224,6 @@ namespace DigitalRise.ModelStorage.SceneGraph
 		}
 		#endregion
 
-		public void SaveToJson(string path)
-		{
-			JsonSerialization.SerializeToFile(path, this);
-		}
-
 		#endregion
 	}
 }

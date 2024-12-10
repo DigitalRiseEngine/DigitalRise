@@ -19,5 +19,7 @@ namespace DigitalRise.ModelStorage.Meshes
 			Format = format;
 			UsageIndex = usageIndex;
 		}
+
+		public override string ToString() => $"{Usage}, {Format}, {UsageIndex}";
 	}
 }

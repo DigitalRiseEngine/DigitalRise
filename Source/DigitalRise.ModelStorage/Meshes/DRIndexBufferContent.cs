@@ -25,6 +25,8 @@ namespace DigitalRise.ModelStorage.Meshes
 		[JsonIgnore]
 		public byte[] Data { get; set; }
 
+		public int BufferOffset { get; set; }
+
 		public DRIndexBufferContent()
 		{
 		}

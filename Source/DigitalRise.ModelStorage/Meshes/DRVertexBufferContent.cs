@@ -1,13 +1,11 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace DigitalRise.ModelStorage.Meshes
 {
@@ -29,9 +27,15 @@ namespace DigitalRise.ModelStorage.Meshes
 
 		[Browsable(false)]
 		[JsonIgnore]
-		public int SizeInBytes => (int)_stream.Length;
+		public int MemorySizeInBytes => (int)_stream.Length;
 
-		public int VertexCount => SizeInBytes / VertexStride;
+		[Browsable(false)]
+		[JsonIgnore]
+		public int MemoryVertexCount => MemorySizeInBytes / VertexStride;
+
+		public int BufferOffset { get; set; }
+
+		public int VertexCount { get; set; }
 
 		public ObservableCollection<DRVertexElement> Elements { get; } = new ObservableCollection<DRVertexElement>();
 
@@ -109,5 +113,7 @@ namespace DigitalRise.ModelStorage.Meshes
 			_stream.Seek(offset, SeekOrigin.Begin);
 			_stream.Write(data);
 		}
+
+		public byte[] GetMemoryData() => _stream.GetBuffer();
 	}
 }

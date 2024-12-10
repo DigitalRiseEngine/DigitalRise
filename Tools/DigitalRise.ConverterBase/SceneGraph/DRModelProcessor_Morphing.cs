@@ -169,9 +169,9 @@ namespace DigitalRise.ConverterBase.SceneGraph
 					// (Note: VertexStride is set explicitly in CreateMorphTargetVertexBuffer().)
 					// ReSharper disable once PossibleInvalidOperationException
 
-					int vertexOffset = _morphTargetVertexBuffer.VertexCount;
+					int vertexOffset = _morphTargetVertexBuffer.MemoryVertexCount;
 					var asBytes = MemoryMarshal.AsBytes<Vector3>(data);
-					_morphTargetVertexBuffer.Write(_morphTargetVertexBuffer.SizeInBytes, asBytes);
+					_morphTargetVertexBuffer.Write(_morphTargetVertexBuffer.MemorySizeInBytes, asBytes);
 
 					morphTargets.Add(new DRMorphTargetContent
 					{

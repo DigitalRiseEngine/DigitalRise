@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AssetManagementBase;
 using DigitalRise.Animation;
+using DigitalRise.Animation.Character;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes;
 using DigitalRise.Mathematics;
@@ -15,7 +16,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using static glTFLoader.Schema.Accessor;
 using static glTFLoader.Schema.AnimationChannelTarget;
-using AnimationChannel = DigitalRise.Animation.AnimationChannel;
+using AnimationChannel = DigitalRise.Animation.Character.AnimationChannel;
 using Mesh = DigitalRise.Data.Meshes.Mesh;
 
 namespace DigitalRise.Data.Modelling
@@ -730,7 +731,7 @@ namespace DigitalRise.Data.Modelling
 							}
 						}
 
-						var animationChannel = new AnimationChannel(bone, keyframes.ToArray())
+						var animationChannel = new AnimationChannel(bone.Index, keyframes.ToArray())
 						{
 							TranslationMode = translationMode,
 							RotationMode = rotationMode,

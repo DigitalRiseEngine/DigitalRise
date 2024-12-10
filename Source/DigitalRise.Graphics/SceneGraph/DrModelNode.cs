@@ -1,4 +1,5 @@
 ﻿using AssetManagementBase;
+using DigitalRise.Animation.Character;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
@@ -41,7 +42,7 @@ namespace DigitalRise.SceneGraph
 	}
 
 	[EditorInfo("Model")]
-	public class DrModelNode : SceneNode
+	public class DrModelNode : SceneNode, ISkeleton
 	{
 		private class SkinInfo
 		{
@@ -347,5 +348,11 @@ namespace DigitalRise.SceneGraph
 				MeshMaterials = null;
 			}
 		}
+
+		public AnimationClip GetClip(string name) => Model.Animations[name];
+
+		public SrtTransform GetDefaultPose(int boneIndex) => Model.Bones[boneIndex].DefaultPose;
+
+		public void SetPose(int boneIndex, SrtTransform pose) => SetBoneLocalTransform(boneIndex, pose);
 	}
 }

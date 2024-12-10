@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using DigitalRise;
-using DigitalRise.Animation;
 using DigitalRise.Rendering;
 using System;
 using System.IO;
@@ -11,6 +10,7 @@ using System.Reflection;
 using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
 using System.Linq;
+using DigitalRise.Animation.Character;
 
 namespace SimpleScene
 {

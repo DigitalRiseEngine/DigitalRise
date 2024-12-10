@@ -1,6 +1,6 @@
-﻿using DigitalRise.ConverterBase.Content;
-using DigitalRise.ConverterBase.Textures;
-using DigitalRise.ConverterBase.Utils;
+﻿using DigitalRise.TextureConverter.Content;
+using DigitalRise.TextureConverter.Textures;
+using DigitalRise.TextureConverter.Utils;
 using DigitalRise.TextureConverter.Pipeline;
 using System;
 using System.IO;

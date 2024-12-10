@@ -1,4 +1,4 @@
-﻿using DigitalRise.ConverterBase.Textures;
+﻿using DigitalRise.TextureConverter.Textures;
 using System.ComponentModel;
 
 namespace DigitalRise.TextureConverter

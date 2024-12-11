@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DigitalRise.TextureConverter;
+using System;
 using System.Reflection;
 
 namespace DigitalRise.ModelConverter
@@ -29,36 +30,79 @@ namespace DigitalRise.ModelConverter
 			return args[i];
 		}
 
-		static float ParseFloat(string name, string[] args, ref int i)
+		static void ShowUsage()
 		{
-			var value = ParseString(name, args, ref i);
+			Console.WriteLine($"drmodconv {Version}");
+			Console.WriteLine("Usage: drmodconv <input> [options]");
+			Console.WriteLine();
+			Console.WriteLine("Options:");
 
-			float result;
-			if (!float.TryParse(value, out result))
-			{
-				throw new Exception($"Unable to parse float value '{args[i]}' for the argument '{name}'.");
-			}
+			var grid = new AsciiGrid();
 
-			return result;
-		}
+			grid.SetMaximumWidth(0, 30);
 
-		static T ParseEnum<T>(string name, string[] args, ref int i) where T : struct
-		{
-			var value = ParseString(name, args, ref i);
+			grid.SetValue(0, 0, "-o, -output <folder>");
+			grid.SetValue(1, 0, "Specifies the output folder.");
+			grid.SetValue(0, 1, "-t, --generateTangents");
+			grid.SetValue(1, 1, "If enabled, then the tangents and bitangents are generated.");
+			grid.SetValue(0, 2, "-f, --flipWindingOrder");
+			grid.SetValue(1, 2, "If enabled, then the winding order is flipped.");
 
-			T result;
-			if (!Enum.TryParse(value, true, out result))
-			{
-				throw new Exception($"Unable to parse enum value '{args[i]}' for the argument '{name}'.");
-			}
-
-			return result;
+			Console.WriteLine(grid.ToString());
 		}
 
 		static void Process(string[] args)
 		{
+			if (args.Length == 0 || args.Length == 1 && (args[0] == "-h" || args[0] == "--help"))
+			{
+				ShowUsage();
+				return;
+			}
+
+			var options = new Options();
+
+			for (var i = 0; i < args.Length; ++i)
+			{
+				var arg = args[i];
+
+				switch (arg)
+				{
+					case "-o":
+					case "--output":
+						options.OutputFolder = ParseString("output", args, ref i);
+						break;
+
+					case "-t":
+					case "--generateTangents":
+						options.GenerateTangentsAndBitangents = true;
+						break;
+
+					case "-f":
+					case "--flipWindingOrder":
+						options.FlipWindingOrder = true;
+						break;
+
+					default:
+						if (arg.StartsWith("-"))
+						{
+							throw new Exception($"Unknown argument '{arg}'");
+						}
+
+						options.InputFile = arg;
+						break;
+
+				}
+			}
+
+			if (string.IsNullOrEmpty(options.InputFile))
+			{
+				throw new Exception("Input file is not specified");
+			}
+
+			Log(options.ToString());
+
 			var converter = new Converter();
-			converter.Convert(args);
+			converter.Convert(options);
 		}
 
 

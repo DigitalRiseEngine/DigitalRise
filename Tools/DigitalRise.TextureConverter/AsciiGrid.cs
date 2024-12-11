@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Text;
 
-namespace DigitalRise.TextureConverter.Utils
+namespace DigitalRise.TextureConverter
 {
 	public class AsciiGrid
 	{

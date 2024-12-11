@@ -1,6 +1,5 @@
 ﻿using DigitalRise.TextureConverter.Content;
 using DigitalRise.TextureConverter.Textures;
-using DigitalRise.TextureConverter.Utils;
 using DigitalRise.TextureConverter.Pipeline;
 using System;
 using System.IO;
@@ -80,7 +79,7 @@ namespace DigitalRise.TextureConverter
 			return result;
 		}
 
-		static T ParseEnum<T>(string name, string[] args, ref int i) where T: struct
+		static T ParseEnum<T>(string name, string[] args, ref int i) where T : struct
 		{
 			var value = ParseString(name, args, ref i);
 
@@ -95,7 +94,7 @@ namespace DigitalRise.TextureConverter
 
 		static void Process(string[] args)
 		{
-			if (args.Length == 0 || 
+			if (args.Length == 0 ||
 				(args.Length == 1 && (args[0] == "-h" || args[0] == "--help")))
 			{
 				ShowUsage();
@@ -104,11 +103,11 @@ namespace DigitalRise.TextureConverter
 
 			var options = new Options();
 
-			for(var i = 0; i < args.Length; ++i)
+			for (var i = 0; i < args.Length; ++i)
 			{
 				var arg = args[i];
 
-				switch(arg)
+				switch (arg)
 				{
 					case "-o":
 					case "--output":

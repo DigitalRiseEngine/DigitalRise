@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace DigitalRise.ModelConverter
 {
@@ -29,7 +28,7 @@ namespace DigitalRise.ModelConverter
 
 			if (root.HasChildren)
 			{
-				for(var i = 0; i < root.ChildCount; ++i)
+				for (var i = 0; i < root.ChildCount; ++i)
 				{
 					BuildBonesIndices(root.Children[i], ref index);
 				}
@@ -317,7 +316,7 @@ namespace DigitalRise.ModelConverter
 
 		private void ProcessSkins(Scene scene)
 		{
-			for(var i = 0; i < scene.Meshes.Count; ++i)
+			for (var i = 0; i < scene.Meshes.Count; ++i)
 			{
 				var mesh = scene.Meshes[i];
 				if (!mesh.HasBones)
@@ -399,11 +398,9 @@ namespace DigitalRise.ModelConverter
 			}
 		}
 
-		public void Convert(string[] args)
+		public void Convert(Options options)
 		{
-			var inputModel = args[0];
-
-			Log($"Input file: {inputModel}");
+			Log($"Input file: {options.InputFile}");
 
 			_model = new ModelContent();
 			_bones.Clear();
@@ -424,9 +421,17 @@ namespace DigitalRise.ModelConverter
 					PostProcessSteps.OptimizeMeshes |
 					PostProcessSteps.Triangulate;
 
-				steps |= PostProcessSteps.CalculateTangentSpace;
+				if (!options.FlipWindingOrder)
+				{
+					steps |= PostProcessSteps.FlipWindingOrder;
+				}
 
-				var scene = importer.ImportFile(inputModel, steps);
+				if (options.GenerateTangentsAndBitangents)
+				{
+					steps |= PostProcessSteps.CalculateTangentSpace;
+				}
+
+				var scene = importer.ImportFile(options.InputFile, steps);
 
 				byte index = 0;
 				BuildBonesIndices(scene.RootNode, ref index);
@@ -438,7 +443,13 @@ namespace DigitalRise.ModelConverter
 				ProcessAnimations(scene);
 			}
 
-			_model.Save(@".", Path.GetFileNameWithoutExtension(inputModel));
+			var output = Path.GetFileNameWithoutExtension(options.InputFile);
+			if (!string.IsNullOrEmpty(options.OutputFolder))
+			{
+				output = Path.Combine(options.OutputFolder, output);
+			}
+
+			_model.Save(@".", Path.GetFileNameWithoutExtension(options.InputFile));
 		}
 	}
 }

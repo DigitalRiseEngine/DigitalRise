@@ -140,7 +140,7 @@ namespace DigitalRise.SceneGraph
 					{
 						var joint = skinInfo.Skin.Joints[j];
 
-						skinInfo.Transforms[j] = joint.InverseBindTransform * _worldTransforms[joint.Bone.Index];
+						skinInfo.Transforms[j] = joint.InverseBindTransform * _worldTransforms[joint.BoneIndex];
 					}
 				}
 

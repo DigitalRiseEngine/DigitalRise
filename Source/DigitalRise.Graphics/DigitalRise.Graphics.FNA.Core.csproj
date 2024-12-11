@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>DigitalRise</AssemblyName>
-	<RootNamespace>DigitalRise</RootNamespace>
+    <AssemblyName>DigitalRise.Graphics</AssemblyName>
+	<RootNamespace>DigitalRise.Graphics</RootNamespace>
     <PackageId>DigitalRise.FNA.Core</PackageId>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>$(DefineConstants);FNA</DefineConstants>

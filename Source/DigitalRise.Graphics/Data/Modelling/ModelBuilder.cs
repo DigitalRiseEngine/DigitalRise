@@ -1,23 +1,12 @@
-﻿using DigitalRise.Data.Meshes;
+﻿using DigitalRise.Animation.Character;
+using DigitalRise.Data.Meshes;
 using DigitalRise.Mathematics;
-using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DigitalRise.Data.Modelling
 {
-	public class SkinJointDesc
-	{
-		public int BoneIndex { get; set; }
-		public Matrix InverseBindTransform { get; set; }
-	}
-
-	public class SkinDesc
-	{
-		public readonly List<SkinJointDesc> Joints = new List<SkinJointDesc>();
-	}
-
 	/// <summary>
 	/// Model bone descriptor
 	/// </summary>
@@ -61,7 +50,7 @@ namespace DigitalRise.Data.Modelling
 		/// <param name="rootBoneIndex">Index of the root node</param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentOutOfRangeException"></exception>
-		public static DrModel Create(List<NursiaModelBoneDesc> bones, List<SkinDesc> skins, int rootBoneIndex = 0)
+		public static DrModel Create(List<NursiaModelBoneDesc> bones, List<Skin> skins, int rootBoneIndex = 0)
 		{
 			if (bones == null)
 			{
@@ -98,22 +87,6 @@ namespace DigitalRise.Data.Modelling
 				allBones.Add(bone);
 			}
 
-			// Create skins
-			List<Skin> allSkins = null;
-			if (skins != null && skins.Count > 0)
-			{
-				allSkins = new List<Skin>();
-				for (var i = 0; i < skins.Count; ++i)
-				{
-					var skin = new Skin((from j in skins[i].Joints select new SkinJoint(allBones[j.BoneIndex], j.InverseBindTransform)).ToArray())
-					{
-						SkinIndex = i
-					};
-
-					allSkins.Add(skin);
-				}
-			}
-
 			// Assign children and skins
 			for (var i = 0; i < bones.Count; ++i)
 			{
@@ -125,12 +98,12 @@ namespace DigitalRise.Data.Modelling
 
 				if (desc.SkinIndex != null)
 				{
-					bone.Skin = allSkins[desc.SkinIndex.Value];
+					bone.Skin = skins[desc.SkinIndex.Value];
 				}
 			}
 
 			// Create the model
-			return new DrModel(allBones.ToArray(), allSkins != null ? allSkins.ToArray() : null, rootBoneIndex);
+			return new DrModel(allBones.ToArray(), skins != null ? skins.ToArray() : null, rootBoneIndex);
 		}
 	}
 }

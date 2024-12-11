@@ -1,5 +1,5 @@
 {
-  "$type": "DigitalRise.SceneGraph.Scenes.Scene, DigitalRise",
+  "$type": "DigitalRise.SceneGraph.Scenes.Scene, DigitalRise.Graphics",
   "EnableMultithreading": true,
   "Camera": {
     "ViewVolume": {
@@ -18,9 +18,9 @@
   "Name": "Root",
   "Children": [
     {
-      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise",
+      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise.Graphics",
       "Light": {
-        "$type": "DigitalRise.Data.Lights.AmbientLight, DigitalRise",
+        "$type": "DigitalRise.Data.Lights.AmbientLight, DigitalRise.Graphics",
         "Color": "255, 255, 255, 255",
         "Intensity": 0.1,
         "HdrScale": 1.0,
@@ -32,13 +32,13 @@
       "ScaleLocal": "1, 1, 1"
     },
     {
-      "$type": "DigitalRise.SceneGraph.Primitives.Plane, DigitalRise",
+      "$type": "DigitalRise.SceneGraph.Primitives.Plane, DigitalRise.Graphics",
       "Size": "100, 100",
       "Tessellation": "1, 1",
       "GenerateBackface": true,
       "NormalDirection": 1,
       "Material": {
-        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise",
+        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
         "DiffuseColor": "255, 255, 255, 255",
         "DiffuseTexturePath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets\\Textures\\checker.dds"
       },
@@ -51,12 +51,12 @@
       "ScaleLocal": "1, 1, 1"
     },
     {
-      "$type": "DigitalRise.SceneGraph.Primitives.Capsule, DigitalRise",
+      "$type": "DigitalRise.SceneGraph.Primitives.Capsule, DigitalRise.Graphics",
       "Length": 1.0,
       "Radius": 0.5,
       "Tessellation": 8,
       "Material": {
-        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise",
+        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
         "DiffuseColor": "255, 255, 255, 255"
       },
       "UScale": 2.0,
@@ -69,9 +69,9 @@
       "PositionLocal": "8, 2, 10"
     },
     {
-      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise",
+      "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise.Graphics",
       "Light": {
-        "$type": "DigitalRise.Data.Lights.DirectionalLight, DigitalRise",
+        "$type": "DigitalRise.Data.Lights.DirectionalLight, DigitalRise.Graphics",
         "Color": "255, 255, 255, 255",
         "DiffuseIntensity": 1.0,
         "SpecularIntensity": 1.0,
@@ -111,14 +111,14 @@
       "PositionLocal": "0, 25, 0"
     },
     {
-      "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise",
+      "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise.Graphics",
       "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.glb",
       "Children": [
         {
           "Name": "_cameraMount",
           "Children": [
             {
-              "$type": "DigitalRise.SceneGraph.CameraNode, DigitalRise",
+              "$type": "DigitalRise.SceneGraph.CameraNode, DigitalRise.Graphics",
               "ViewVolume": {
                 "$type": "DigitalRise.Geometry.Shapes.PerspectiveViewVolume, DigitalRise.Geometry",
                 "FieldOfViewY": 60.0,

@@ -1,19 +1,18 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace DigitalRise.ModelStorage.Meshes
+namespace DigitalRise.ModelStorage
 {
 	public enum DRIndexType
 	{
 		UShort,
-		Int
+		UInt
 	}
 
-	public class DRIndexBufferContent
+	public class IndexBufferContent
 	{
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public DRIndexType IndexType { get; set; }
@@ -27,12 +26,12 @@ namespace DigitalRise.ModelStorage.Meshes
 
 		public int BufferOffset { get; set; }
 
-		public DRIndexBufferContent()
+		public IndexBufferContent()
 		{
 		}
 
 
-		public DRIndexBufferContent(List<int> indices)
+		public IndexBufferContent(List<uint> indices)
 		{
 			// Determine index type
 			IndexType = DRIndexType.UShort;
@@ -42,7 +41,7 @@ namespace DigitalRise.ModelStorage.Meshes
 			{
 				if (idx > ushort.MaxValue)
 				{
-					IndexType = DRIndexType.Int;
+					IndexType = DRIndexType.UInt;
 					break;
 				}
 			}
@@ -62,7 +61,7 @@ namespace DigitalRise.ModelStorage.Meshes
 				}
 				else
 				{
-					var bytes = MemoryMarshal.AsBytes<int>(indices.ToArray());
+					var bytes = MemoryMarshal.AsBytes<uint>(indices.ToArray());
 					ms.Write(bytes);
 				}
 

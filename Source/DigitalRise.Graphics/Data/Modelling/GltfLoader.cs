@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using AssetManagementBase;
-using DigitalRise.Animation;
 using DigitalRise.Animation.Character;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes;
@@ -18,6 +17,7 @@ using static glTFLoader.Schema.Accessor;
 using static glTFLoader.Schema.AnimationChannelTarget;
 using AnimationChannel = DigitalRise.Animation.Character.AnimationChannel;
 using Mesh = DigitalRise.Data.Meshes.Mesh;
+using Skin = DigitalRise.Animation.Character.Skin;
 
 namespace DigitalRise.Data.Modelling
 {
@@ -78,7 +78,7 @@ namespace DigitalRise.Data.Modelling
 		private readonly Dictionary<int, byte[]> _bufferCache = new Dictionary<int, byte[]>();
 		private readonly List<Mesh> _meshes = new List<Mesh>();
 		private readonly List<NursiaModelBoneDesc> _allBones = new List<NursiaModelBoneDesc>();
-		private readonly List<SkinDesc> _skins = new List<SkinDesc>();
+		private readonly List<Skin> _skins = new List<Skin>();
 
 		private byte[] FileResolver(string path)
 		{
@@ -512,7 +512,7 @@ namespace DigitalRise.Data.Modelling
 			}
 		}
 
-		private SkinDesc LoadSkin(int skinId)
+		private Skin LoadSkin(int skinId)
 		{
 			var gltfSkin = _gltf.Skins[skinId];
 			if (gltfSkin.Joints.Length > DRConstants.MaximumBones)
@@ -526,16 +526,13 @@ namespace DigitalRise.Data.Modelling
 				throw new Exception($"Skin {gltfSkin.Name} inconsistency. Joints amount: {gltfSkin.Joints.Length}, Inverse bind matrices amount: {transforms.Length}");
 			}
 
-			var result = new SkinDesc();
+			var joints = new List<SkinJoint>();
 			for (var i = 0; i < gltfSkin.Joints.Length; ++i)
 			{
 				var jointIndex = gltfSkin.Joints[i];
-				result.Joints.Add(new SkinJointDesc
-				{
-					BoneIndex = jointIndex,
-					InverseBindTransform = transforms[i]
-				});
+				joints.Add(new SkinJoint(jointIndex, transforms[i]));
 			}
+			var result = new Skin(joints.ToArray());
 
 			Debug.WriteLine($"Skin {gltfSkin.Name} has {gltfSkin.Joints.Length} joints");
 

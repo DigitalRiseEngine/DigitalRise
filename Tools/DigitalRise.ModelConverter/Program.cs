@@ -1,16 +1,9 @@
-﻿using Assimp;
-using DigitalRise.ConverterBase.SceneGraph;
-using DigitalRise.ModelConverter.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Reflection;
 
 namespace DigitalRise.ModelConverter
 {
-	internal class Program
+	internal static class Program
 	{
 		public static string Version
 		{
@@ -64,27 +57,8 @@ namespace DigitalRise.ModelConverter
 
 		static void Process(string[] args)
 		{
-			var inputModel = @"D:\Projects\DigitalRune\Samples\Content\Dude\Dude.drmdl";
-
-			var modelDescription = ModelDescription.Load(inputModel, Log);
-
-			var folder = Path.GetDirectoryName(inputModel);
-			var inputFile = Path.Combine(folder, modelDescription.FileName);
-
-			var importerContext = new ImporterContext();
-
-			var importer = new OpenAssetImporter();
-			var modelContent = importer.Import(inputFile, importerContext);
-
-			var processor = new DRModelProcessor
-			{
-				Logger = Log
-			};
-
-			var drModelContent = processor.Process(modelContent, modelDescription);
-
-			drModelContent.Save(@"D:\", "Barrel");
-			var k = 5;
+			var converter = new Converter();
+			converter.Convert(args);
 		}
 
 

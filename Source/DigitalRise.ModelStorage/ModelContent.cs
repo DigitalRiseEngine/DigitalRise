@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using System.IO;
 
 namespace DigitalRise.ModelStorage
@@ -24,11 +25,14 @@ namespace DigitalRise.ModelStorage
 			{
 				for(var i = 0; i < VertexBuffers.Count; ++i)
 				{
-					stream.Write(VertexBuffers[i].GetMemoryData());
+					var vertexBuffer = VertexBuffers[i];
+					vertexBuffer.BufferOffset = (int)stream.Position;
+					stream.Write(vertexBuffer.GetMemoryData());
 				}
 
 				if (IndexBuffer != null)
 				{
+					IndexBuffer.BufferOffset = (int)stream.Position;
 					stream.Write(IndexBuffer.Data);
 				}
 			}

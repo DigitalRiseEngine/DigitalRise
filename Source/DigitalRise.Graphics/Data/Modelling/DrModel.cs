@@ -7,43 +7,29 @@ namespace DigitalRise.Data.Modelling
 {
 	public class DrModel
 	{
+		public DrModelBone Root { get; }
 		public DrModelBone[] Bones { get; }
 		public DrModelBone[] MeshBones { get; }
 		public Skin[] Skins { get; }
-		public DrModelBone Root { get; }
-		public DrModelBone[] OrderedBones { get; }
 
 		public Dictionary<string, AnimationClip> Animations { get; } = new Dictionary<string, AnimationClip>();
 
-		internal DrModel(DrModelBone[] bones, Skin[] skins, int rootIndex = 0)
+		internal DrModel(DrModelBone root, Skin[] skins)
 		{
-			if (bones == null)
+			if (root == null)
 			{
-				throw new ArgumentNullException(nameof(bones));
+				throw new ArgumentNullException(nameof(root));
 			}
 
-			if (bones.Length == 0)
-			{
-				throw new ArgumentException(nameof(bones), "no bones");
-			}
-
-			if (rootIndex < 0 || rootIndex >= bones.Length)
-			{
-				throw new ArgumentOutOfRangeException(nameof(rootIndex));
-			}
-
-			Bones = bones;
-			MeshBones = (from bone in bones where bone.Mesh != null select bone).ToArray();
-			Skins = skins;
-			Root = bones[rootIndex];
+			Root = root;
 
 			// Build correct traverse order starting from root
 			var traverseOrder = new List<DrModelBone>();
-			TraverseNodes(n =>
-			{
-				traverseOrder.Add(n);
-			});
-			OrderedBones = traverseOrder.ToArray();
+			TraverseNodes(traverseOrder.Add);
+			Bones = traverseOrder.ToArray();
+
+			MeshBones = (from bone in Bones where bone.Mesh != null select bone).ToArray();
+			Skins = skins;
 		}
 
 		private void TraverseNodes(DrModelBone root, Action<DrModelBone> action)

@@ -177,6 +177,13 @@ namespace DigitalRise.ModelConverter
 
 				_submeshes.Add(submesh);
 			}
+
+			foreach(var vertexBuffer in _model.VertexBuffers)
+			{
+				vertexBuffer.VertexCount = vertexBuffer.MemoryVertexCount;
+			}
+
+			_model.IndexBuffer = new IndexBufferContent(_indices);
 		}
 
 		BoneContent Convert(Node node)

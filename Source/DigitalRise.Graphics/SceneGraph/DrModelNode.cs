@@ -100,9 +100,9 @@ namespace DigitalRise.SceneGraph
 				return;
 			}
 
-			for (var i = 0; i < Model.OrderedBones.Length; i++)
+			for (var i = 0; i < Model.Bones.Length; i++)
 			{
-				var bone = Model.OrderedBones[i];
+				var bone = Model.Bones[i];
 				_localTransforms[bone.Index] = bone.CalculateDefaultLocalTransform();
 			}
 
@@ -116,9 +116,9 @@ namespace DigitalRise.SceneGraph
 				return;
 			}
 
-			for (var i = 0; i < Model.OrderedBones.Length; i++)
+			for (var i = 0; i < Model.Bones.Length; i++)
 			{
-				var bone = Model.OrderedBones[i];
+				var bone = Model.Bones[i];
 
 				if (bone.Parent == null)
 				{

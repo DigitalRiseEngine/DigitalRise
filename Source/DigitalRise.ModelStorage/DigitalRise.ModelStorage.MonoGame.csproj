@@ -6,7 +6,7 @@
     <AssemblyName>DigitalRise.ModelStorage</AssemblyName>
     <RootNamespace>DigitalRise.ModelStorage</RootNamespace>
     <Description>DigitalRise.ModelStorage for MonoGame</Description>
-    <DefineConstants>$(DefineConstants);MONOGAME;ANIMATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
     <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
   </PropertyGroup>
 

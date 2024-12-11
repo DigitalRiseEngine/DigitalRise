@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -6,16 +7,10 @@ using System.Runtime.InteropServices;
 
 namespace DigitalRise.ModelStorage
 {
-	public enum DRIndexType
-	{
-		UShort,
-		UInt
-	}
-
 	public class IndexBufferContent
 	{
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
-		public DRIndexType IndexType { get; set; }
+		public IndexElementSize IndexType { get; set; }
 
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public int IndexCount { get; set; }
@@ -34,21 +29,21 @@ namespace DigitalRise.ModelStorage
 		public IndexBufferContent(List<uint> indices)
 		{
 			// Determine index type
-			IndexType = DRIndexType.UShort;
+			IndexType = IndexElementSize.SixteenBits;
 			IndexCount = indices.Count;
 
 			foreach (var idx in indices)
 			{
 				if (idx > ushort.MaxValue)
 				{
-					IndexType = DRIndexType.UInt;
+					IndexType = IndexElementSize.ThirtyTwoBits;
 					break;
 				}
 			}
 
 			using (var ms = new MemoryStream())
 			{
-				if (IndexType == DRIndexType.UShort)
+				if (IndexType == IndexElementSize.SixteenBits)
 				{
 					var indicesShort = new ushort[indices.Count];
 					for (var i = 0; i < indicesShort.Length; ++i)

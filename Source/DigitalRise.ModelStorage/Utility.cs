@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace DigitalRise.ModelStorage
@@ -11,13 +12,13 @@ namespace DigitalRise.ModelStorage
 
 			foreach (var channel in elements)
 			{
-				result += GetTypeSize(channel.Format);
+				result += GetSize(channel.Format);
 			}
 
 			return result;
 		}
 
-		private static int GetTypeSize(VertexElementFormat elementFormat)
+		public static int GetSize(this VertexElementFormat elementFormat)
 		{
 			switch (elementFormat)
 			{
@@ -46,7 +47,21 @@ namespace DigitalRise.ModelStorage
 				case VertexElementFormat.HalfVector4:
 					return 8;
 			}
-			return 0;
+
+			throw new Exception($"Unknown vertex element format {elementFormat}");
+		}
+
+		public static int GetSize(this IndexElementSize indexType)
+		{
+			switch (indexType)
+			{
+				case IndexElementSize.SixteenBits:
+					return 2;
+				case IndexElementSize.ThirtyTwoBits:
+					return 4;
+			}
+
+			throw new Exception($"Unknown index buffer type {indexType}");
 		}
 	}
 }

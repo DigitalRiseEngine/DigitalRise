@@ -15,18 +15,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="..\..\ThirdParty\glTFLoader\**\*.cs" LinkBase="glTFLoader" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\FontStashSharp\src\XNA\FontStashSharp.FNA.Core.csproj" />
     <ProjectReference Include="..\..\..\XNAssets\src\XNAssets.FNA.Core.csproj" />
     <ProjectReference Include="..\DigitalRise.Animation\DigitalRise.Animation.FNA.Core.csproj" />
     <ProjectReference Include="..\DigitalRise.Geometry\DigitalRise.Geometry.FNA.Core.csproj" />
+    <ProjectReference Include="..\DigitalRise.ModelStorage\DigitalRise.ModelStorage.FNA.Core.csproj" />
   </ItemGroup>
 </Project>

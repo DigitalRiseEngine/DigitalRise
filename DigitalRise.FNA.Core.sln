@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Animation.FNA.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.Common.Tests", "Tests\DigitalRise.Common.Tests\DigitalRise.Common.Tests.csproj", "{7DEAB1EF-A055-4ADD-A6AA-36EDAB111A08}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelStorage.FNA.Core", "Source\DigitalRise.ModelStorage\DigitalRise.ModelStorage.FNA.Core.csproj", "{01CB7D22-70ED-4D97-847F-B11678B53EA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{7DEAB1EF-A055-4ADD-A6AA-36EDAB111A08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DEAB1EF-A055-4ADD-A6AA-36EDAB111A08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DEAB1EF-A055-4ADD-A6AA-36EDAB111A08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01CB7D22-70ED-4D97-847F-B11678B53EA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01CB7D22-70ED-4D97-847F-B11678B53EA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01CB7D22-70ED-4D97-847F-B11678B53EA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01CB7D22-70ED-4D97-847F-B11678B53EA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,6 +163,7 @@ Global
 		{F8CD7640-1E15-40CB-98DE-809DDE90781F} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 		{6A92E29A-9265-4ABF-B1A5-D6E317FB9B15} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 		{7DEAB1EF-A055-4ADD-A6AA-36EDAB111A08} = {9B239E4E-6E23-4835-8D8E-F2AD5208F81C}
+		{01CB7D22-70ED-4D97-847F-B11678B53EA1} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35ACDF4E-2CE2-46B1-A19F-35DC131069A1}

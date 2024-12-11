@@ -46,7 +46,8 @@ namespace SimpleScene
 			_graphics = new GraphicsDeviceManager(this)
 			{
 				PreferredBackBufferWidth = 1200,
-				PreferredBackBufferHeight = 800
+				PreferredBackBufferHeight = 800,
+				GraphicsProfile = GraphicsProfile.HiDef
 			};
 
 			Window.AllowUserResizing = true;

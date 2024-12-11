@@ -34,6 +34,13 @@ namespace DigitalRise
 
 				if (_game != null)
 				{
+#if MONOGAME
+					if (_game.GraphicsDevice.GraphicsProfile != GraphicsProfile.HiDef)
+					{
+						throw new Exception("DigitalRise for MonoGame requires GraphicsProfile.HiDef.");
+					}
+#endif
+
 					_game.Disposed += GameOnDisposed;
 				}
 			}

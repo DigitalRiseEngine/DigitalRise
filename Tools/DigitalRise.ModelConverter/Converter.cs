@@ -17,6 +17,8 @@ namespace DigitalRise.ModelConverter
 		private readonly List<SubmeshContent> _submeshes = new List<SubmeshContent>();
 		private readonly List<BoneContent> _bones = new List<BoneContent>();
 
+		static void Log(string message) => Console.WriteLine(message);
+
 		private int FindVertexBuffer(List<VertexElementContent> vertexElements)
 		{
 			for (var i = 0; i < _model.VertexBuffers.Count; ++i)
@@ -270,7 +272,9 @@ namespace DigitalRise.ModelConverter
 
 		public void Convert(string[] args)
 		{
-			var inputModel = @"D:\Projects\Nursia\Samples\ThirdPerson\Assets\Models\mixamo_base.gltf";
+			var inputModel = args[0];
+
+			Log($"Input file: {inputModel}");
 
 			_model = new ModelContent();
 
@@ -287,9 +291,9 @@ namespace DigitalRise.ModelConverter
 				_model.RootBone = Convert(scene.RootNode);
 
 				ProcessAnimations(scene);
-
-				JsonSerialization.SerializeToFile(@"D:\Barrel.jdrm", _model);
 			}
+
+			_model.Save(@".", Path.GetFileNameWithoutExtension(inputModel));
 		}
 	}
 }

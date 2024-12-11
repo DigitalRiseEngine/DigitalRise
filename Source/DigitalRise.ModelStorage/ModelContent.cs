@@ -1,11 +1,10 @@
-﻿using DigitalRise.Animation.Character;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DigitalRise.ModelStorage
 {
 	public class ModelContent
 	{
-		public Dictionary<string, AnimationClip> Animations { get; } = new Dictionary<string, AnimationClip>();
+		public Dictionary<string, AnimationClipContent> Animations { get; } = new Dictionary<string, AnimationClipContent>();
 
 		public BoneContent RootBone { get; set; }
 

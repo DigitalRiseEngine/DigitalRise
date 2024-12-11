@@ -3,6 +3,7 @@
 using Assimp;
 using Microsoft.Xna.Framework;
 using System.IO;
+using Quaternion = Microsoft.Xna.Framework.Quaternion;
 
 namespace DigitalRise.ModelConverter
 {
@@ -38,6 +39,7 @@ namespace DigitalRise.ModelConverter
 		public static Vector2 ToXnaVector2(this Vector3D v) => new Vector2(v.X, v.Y);
 		public static Vector3 ToXna(this Vector3D v) => new Vector3(v.X, v.Y, v.Z);
 		public static Vector4 ToXna(this Color4D v) => new Vector4(v.R, v.G, v.B, v.A);
+		public static Quaternion ToXna(this Assimp.Quaternion v) => new Quaternion(v.X, v.Y, v.Z, v.W);
 
 		public static void Write(this BinaryWriter writer, Vector2 v)
 		{

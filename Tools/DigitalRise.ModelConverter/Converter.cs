@@ -1,12 +1,10 @@
 ﻿using Assimp;
 using Assimp.Configs;
-using DigitalRise.Animation.Character;
 using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 
@@ -212,15 +210,15 @@ namespace DigitalRise.ModelConverter
 
 		private void ProcessAnimations(Scene scene)
 		{
-			foreach(var animation in scene.Animations)
+			foreach (var animation in scene.Animations)
 			{
 				if (animation.HasMeshAnimations)
 				{
 					throw new Exception($"Mesh animations aren't supported. Animaton name='{animation.Name}'.");
 				}
 
-				var channels = new List<AnimationChannel>();
-				foreach(var sourceChannel in animation.NodeAnimationChannels)
+				var animationClip = new AnimationClipContent();
+				foreach (var sourceChannel in animation.NodeAnimationChannels)
 				{
 					var bone = (from b in _bones where b.Name == sourceChannel.NodeName select b).FirstOrDefault();
 					if (bone == null)
@@ -228,35 +226,45 @@ namespace DigitalRise.ModelConverter
 						throw new Exception($"Unable to find bone {sourceChannel.NodeName}");
 					}
 
-					var boneIndex = _bones.IndexOf(bone);
+					var channel = new AnimationChannelContent
+					{
+						BoneIndex = _bones.IndexOf(bone)
+					};
 
-					var animationData = new SortedDictionary<double, SrtTransform>();
-
-					// Translation
+					// Translations
 					if (sourceChannel.HasPositionKeys)
 					{
-						for(var i = 0; i < sourceChannel.PositionKeyCount; ++i)
+						for (var i = 0; i < sourceChannel.PositionKeyCount; ++i)
 						{
 							var pos = sourceChannel.PositionKeys[i];
-
-							animationData[pos.Time] = new SrtTransform
-							{
-								Translation = pos.Value.ToXna()
-							};
+							channel.Translations.Add(new VectorKeyframeContent(pos.Time, pos.Value.ToXna()));
 						}
 					}
 
-					var keyframes = new List<AnimationChannelKeyframe>();
-					foreach(var pair in animationData)
+					// Scales
+					if (sourceChannel.HasScalingKeys)
 					{
-						keyframes.Add(new AnimationChannelKeyframe(TimeSpan.FromSeconds(pair.Key), pair.Value));
+						for (var i = 0; i < sourceChannel.ScalingKeyCount; ++i)
+						{
+							var scale = sourceChannel.ScalingKeys[i];
+							channel.Scales.Add(new VectorKeyframeContent(scale.Time, scale.Value.ToXna()));
+						}
 					}
 
-					channels.Add(new AnimationChannel(boneIndex, keyframes.ToArray()));
+					// Rotations
+					if (sourceChannel.HasRotationKeys)
+					{
+						for (var i = 0; i < sourceChannel.RotationKeyCount; ++i)
+						{
+							var rotation = sourceChannel.RotationKeys[i];
+							channel.Rotations.Add(new QuaternionKeyframeContent(rotation.Time, rotation.Value.ToXna()));
+						}
+					}
+
+					animationClip.Channels.Add(channel);
 				}
 
-				var animationClip = new AnimationClip(animation.Name, TimeSpan.FromSeconds(0), channels.ToArray());
-				_model.Animations[animationClip.Name] = animationClip;
+				_model.Animations[animation.Name] = animationClip;
 			}
 		}
 

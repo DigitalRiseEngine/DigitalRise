@@ -3,7 +3,6 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -12,6 +11,7 @@ using System.IO;
 using AssetManagementBase;
 using DigitalRise.Attributes;
 using DigitalRise.Geometry;
+using DigitalRise.Mathematics;
 using DigitalRise.Misc;
 using DigitalRise.Rendering.Deferred;
 using DigitalRise.SceneGraph.Scenes;

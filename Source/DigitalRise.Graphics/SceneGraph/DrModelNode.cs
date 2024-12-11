@@ -299,7 +299,7 @@ namespace DigitalRise.SceneGraph
 				}
 			}
 
-			var model = assetManager.LoadGltf(ModelPath);
+			var model = assetManager.LoadJDRM(ModelPath);
 
 			SetModel(model, MeshMaterials == null);
 		}

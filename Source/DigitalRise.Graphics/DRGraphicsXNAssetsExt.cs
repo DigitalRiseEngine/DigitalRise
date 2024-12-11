@@ -5,9 +5,9 @@ namespace AssetManagementBase
 {
 	public static class DRGraphicsXNAssetsExt
 	{
-		private readonly static AssetLoader<DrModel> _gltfLoader = (manager, assetName, settings, tag) =>
+		private readonly static AssetLoader<DrModel> _jdrmLoader = (manager, assetName, settings, tag) =>
 		{
-			var loader = new GltfLoader();
+			var loader = new DrModelLoader();
 
 			return loader.Load(manager, assetName);
 		};
@@ -19,9 +19,9 @@ namespace AssetManagementBase
 		};
 
 
-		public static DrModel LoadGltf(this AssetManager assetManager, string path)
+		public static DrModel LoadJDRM(this AssetManager assetManager, string path)
 		{
-			return assetManager.UseLoader(_gltfLoader, path);
+			return assetManager.UseLoader(_jdrmLoader, path);
 		}
 
 		public static SceneNode LoadSceneNode(this AssetManager assetManager, string path) => assetManager.UseLoader(_sceneLoader, path);

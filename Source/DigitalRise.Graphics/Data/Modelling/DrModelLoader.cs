@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace DigitalRise.Data.Modelling
 {
-	internal class GltfLoader
+	internal class DrModelLoader
 	{
 		private struct SrtTransformOptional
 		{

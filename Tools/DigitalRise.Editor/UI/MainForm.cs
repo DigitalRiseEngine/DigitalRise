@@ -331,7 +331,7 @@ namespace DigitalRise.Editor.UI
 			else if (record.Type == typeof(DrModel))
 			{
 				return InternalCreateCustomEditor(record, obj, new[] { "glb", "gltf" },
-					path => AssetManager.LoadGltf(path));
+					path => AssetManager.LoadJDRM(path));
 			}
 			else if (record.Type == typeof(SceneNode))
 			{

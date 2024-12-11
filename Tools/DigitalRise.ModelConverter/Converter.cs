@@ -1,11 +1,14 @@
 ﻿using Assimp;
 using Assimp.Configs;
+using DigitalRise.Animation.Character;
 using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 
 namespace DigitalRise.ModelConverter
 {
@@ -14,6 +17,7 @@ namespace DigitalRise.ModelConverter
 		private ModelContent _model;
 		private readonly List<uint> _indices = new List<uint>();
 		private readonly List<SubmeshContent> _submeshes = new List<SubmeshContent>();
+		private readonly List<BoneContent> _bones = new List<BoneContent>();
 
 		private int FindVertexBuffer(List<VertexElementContent> vertexElements)
 		{
@@ -183,6 +187,8 @@ namespace DigitalRise.ModelConverter
 				DefaultPose = new SrtTransform(node.Transform.ToXna())
 			};
 
+			_bones.Add(result);
+
 			if (node.HasMeshes)
 			{
 				result.Mesh = new MeshContent();
@@ -204,6 +210,56 @@ namespace DigitalRise.ModelConverter
 			return result;
 		}
 
+		private void ProcessAnimations(Scene scene)
+		{
+			foreach(var animation in scene.Animations)
+			{
+				if (animation.HasMeshAnimations)
+				{
+					throw new Exception($"Mesh animations aren't supported. Animaton name='{animation.Name}'.");
+				}
+
+				var channels = new List<AnimationChannel>();
+				foreach(var sourceChannel in animation.NodeAnimationChannels)
+				{
+					var bone = (from b in _bones where b.Name == sourceChannel.NodeName select b).FirstOrDefault();
+					if (bone == null)
+					{
+						throw new Exception($"Unable to find bone {sourceChannel.NodeName}");
+					}
+
+					var boneIndex = _bones.IndexOf(bone);
+
+					var animationData = new SortedDictionary<double, SrtTransform>();
+
+					// Translation
+					if (sourceChannel.HasPositionKeys)
+					{
+						for(var i = 0; i < sourceChannel.PositionKeyCount; ++i)
+						{
+							var pos = sourceChannel.PositionKeys[i];
+
+							animationData[pos.Time] = new SrtTransform
+							{
+								Translation = pos.Value.ToXna()
+							};
+						}
+					}
+
+					var keyframes = new List<AnimationChannelKeyframe>();
+					foreach(var pair in animationData)
+					{
+						keyframes.Add(new AnimationChannelKeyframe(TimeSpan.FromSeconds(pair.Key), pair.Value));
+					}
+
+					channels.Add(new AnimationChannel(boneIndex, keyframes.ToArray()));
+				}
+
+				var animationClip = new AnimationClip(animation.Name, TimeSpan.FromSeconds(0), channels.ToArray());
+				_model.Animations[animationClip.Name] = animationClip;
+			}
+		}
+
 		public void Convert(string[] args)
 		{
 			var inputModel = @"D:\Projects\Nursia\Samples\ThirdPerson\Assets\Models\mixamo_base.gltf";
@@ -221,6 +277,8 @@ namespace DigitalRise.ModelConverter
 				ProcessMeshes(scene);
 
 				_model.RootBone = Convert(scene.RootNode);
+
+				ProcessAnimations(scene);
 
 				JsonSerialization.SerializeToFile(@"D:\Barrel.jdrm", _model);
 			}

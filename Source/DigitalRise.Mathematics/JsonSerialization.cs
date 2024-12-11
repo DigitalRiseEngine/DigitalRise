@@ -16,6 +16,68 @@ namespace DigitalRise.Mathematics
 			return float.Parse(s.Trim(), CultureInfo.InvariantCulture);
 		}
 
+		private static int ParseInt(string s)
+		{
+			return int.Parse(s.Trim());
+		}
+
+		private static byte ParseByte(string s)
+		{
+			return (byte)ParseInt(s);
+		}
+
+		public class PointConverter : JsonConverter<Point>
+		{
+			public static readonly PointConverter Instance = new PointConverter();
+
+			private PointConverter()
+			{
+
+			}
+
+			public override void WriteJson(JsonWriter writer, Point value, JsonSerializer serializer)
+			{
+				var str = string.Format(CultureInfo.InvariantCulture, "{0}, {1}", value.X, value.Y);
+				writer.WriteValue(str);
+			}
+
+			public override Point ReadJson(JsonReader reader, Type objectType, Point existingValue, bool hasExistingValue, JsonSerializer serializer)
+			{
+				string s = (string)reader.Value;
+
+				var p = s.Split(',');
+				var result = new Point(ParseInt(p[0]), ParseInt(p[1]));
+
+				return result;
+			}
+		}
+
+		public class ColorConverter : JsonConverter<Color>
+		{
+			public static readonly ColorConverter Instance = new ColorConverter();
+
+			private ColorConverter()
+			{
+
+			}
+
+			public override void WriteJson(JsonWriter writer, Color value, JsonSerializer serializer)
+			{
+				var str = string.Format(CultureInfo.InvariantCulture, "{0}, {1}, {2}, {3}", (int)value.R, (int)value.G, (int)value.B, (int)value.A);
+				writer.WriteValue(str);
+			}
+
+			public override Color ReadJson(JsonReader reader, Type objectType, Color existingValue, bool hasExistingValue, JsonSerializer serializer)
+			{
+				string s = (string)reader.Value;
+
+				var p = s.Split(',');
+				var result = new Color(ParseByte(p[0]), ParseByte(p[1]), ParseByte(p[2]), ParseByte(p[3]));
+
+				return result;
+			}
+		}
+
 		public class QuaternionConverter : JsonConverter<Quaternion>
 		{
 			public static readonly QuaternionConverter Instance = new QuaternionConverter();
@@ -89,6 +151,8 @@ namespace DigitalRise.Mathematics
 			};
 
 			result.Converters.Add(_stringEnumConverter);
+			result.Converters.Add(PointConverter.Instance);
+			result.Converters.Add(ColorConverter.Instance);
 			result.Converters.Add(QuaternionConverter.Instance);
 			result.Converters.Add(MatrixConverter.Instance);
 

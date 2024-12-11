@@ -15,7 +15,7 @@
 using System;
 using DigitalRise.Mathematics;
 
-namespace DigitalRise.Animation.Character
+namespace DigitalRise.Animation
 {
 	/// <summary>
 	/// Specifies how an animation clip is played.

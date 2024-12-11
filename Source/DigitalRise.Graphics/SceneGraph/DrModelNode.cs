@@ -1,5 +1,5 @@
 ﻿using AssetManagementBase;
-using DigitalRise.Animation.Character;
+using DigitalRise.Animation;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;

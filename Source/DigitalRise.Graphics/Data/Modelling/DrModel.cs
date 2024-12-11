@@ -1,4 +1,4 @@
-﻿using DigitalRise.Animation.Character;
+﻿using DigitalRise.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;

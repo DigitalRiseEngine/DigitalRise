@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace DigitalRise.Animation.Character
+namespace DigitalRise.Animation
 {
 	public class SkinJoint
 	{

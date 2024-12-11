@@ -121,6 +121,8 @@ namespace DigitalRise.ModelConverter
 
 			if (mesh.HasTangentBasis)
 			{
+				vertexElements.Add(new VertexElementContent(VertexElementUsage.Tangent, VertexElementFormat.Vector3));
+				vertexElements.Add(new VertexElementContent(VertexElementUsage.Binormal, VertexElementFormat.Vector3));
 			}
 
 			if (mesh.HasBones)
@@ -225,6 +227,8 @@ namespace DigitalRise.ModelConverter
 
 					if (mesh.HasTangentBasis)
 					{
+						writer.Write(mesh.Tangents[i].ToXna());
+						writer.Write(mesh.BiTangents[i].ToXna());
 					}
 
 					if (mesh.HasBones)
@@ -411,8 +415,17 @@ namespace DigitalRise.ModelConverter
 			{
 				importer.SetConfig(new VertexBoneWeightLimitConfig(4));
 
-				var steps = PostProcessSteps.LimitBoneWeights | PostProcessSteps.GenerateUVCoords;
-				steps |= PostProcessSteps.Triangulate;
+				var steps = PostProcessSteps.FindDegenerates |
+					PostProcessSteps.FindInvalidData |
+					PostProcessSteps.FlipUVs |              // Required for Direct3D
+					PostProcessSteps.FlipWindingOrder |     // Required for Direct3D
+					PostProcessSteps.JoinIdenticalVertices |
+					PostProcessSteps.ImproveCacheLocality |
+					PostProcessSteps.OptimizeMeshes |
+					PostProcessSteps.Triangulate;
+
+				steps |= PostProcessSteps.CalculateTangentSpace;
+
 				var scene = importer.ImportFile(inputModel, steps);
 
 				byte index = 0;

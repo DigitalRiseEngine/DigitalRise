@@ -15,7 +15,7 @@
 using DigitalRise.Mathematics;
 using System;
 
-namespace DigitalRise.Animation.Character
+namespace DigitalRise.Animation
 {
 	public struct AnimationChannelKeyframe
 	{

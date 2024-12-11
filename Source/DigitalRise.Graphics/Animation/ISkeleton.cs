@@ -1,6 +1,6 @@
 ﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.Animation.Character
+namespace DigitalRise.Animation
 {
 	public interface ISkeleton
 	{

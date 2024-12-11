@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using DigitalRise.Animation.Character;
+using DigitalRise.Animation;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes.Morphing;
 using DigitalRise.Misc;

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <PackageId>DigitalRise.Studio.MonoGame</PackageId>
+    <AssemblyName>DigitalRise.Studio</AssemblyName>
+    <RootNamespace>DigitalRise.Studio</RootNamespace>
+    <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
+    <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\**\*.*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Myra" Version="1.5.8" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Source\DigitalRise.Graphics\DigitalRise.Graphics.MonoGame.DirectX.csproj" />
+  </ItemGroup>
+</Project>

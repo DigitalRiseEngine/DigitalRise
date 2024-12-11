@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DigitalRise.Animation.Character
+namespace DigitalRise.Animation
 {
 	public class AnimationClip
 	{

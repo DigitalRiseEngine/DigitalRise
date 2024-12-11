@@ -10,7 +10,7 @@ using System.Reflection;
 using DigitalRise.SceneGraph;
 using DigitalRise.SceneGraph.Scenes;
 using System.Linq;
-using DigitalRise.Animation.Character;
+using DigitalRise.Animation;
 
 namespace SimpleScene
 {

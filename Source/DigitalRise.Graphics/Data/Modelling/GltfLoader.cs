@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using AssetManagementBase;
-using DigitalRise.Animation.Character;
+using DigitalRise.Animation;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes;
 using DigitalRise.Mathematics;
@@ -146,33 +146,6 @@ namespace DigitalRise.Data.Modelling
 			return result;
 		}
 
-
-		/*				private Skin LoadSkin(int skinId)
-						{
-							var gltfSkin = _gltf.Skins[skinId];
-							if (gltfSkin.Joints.Length > DRConstants.MaximumBones)
-							{
-								throw new Exception($"Skin {gltfSkin.Name} has {gltfSkin.Joints.Length} bones which exceeds maximum {DRConstants.MaximumBones}");
-							}
-
-							var transforms = GetAccessorAs<Matrix>(gltfSkin.InverseBindMatrices.Value);
-							if (gltfSkin.Joints.Length != transforms.Length)
-							{
-								throw new Exception($"Skin {gltfSkin.Name} inconsistency. Joints amount: {gltfSkin.Joints.Length}, Inverse bind matrices amount: {transforms.Length}");
-							}
-
-							var joints = new List<SkinJoint>();
-							for (var i = 0; i < gltfSkin.Joints.Length; ++i)
-							{
-								var jointIndex = gltfSkin.Joints[i];
-								joints.Add(new SkinJoint(jointIndex, transforms[i]));
-							}
-							var result = new Skin(joints.ToArray());
-
-							Debug.WriteLine($"Skin {gltfSkin.Name} has {gltfSkin.Joints.Length} joints");
-
-							return result;
-						}*/
 
 		private void LoadAnimations()
 		{

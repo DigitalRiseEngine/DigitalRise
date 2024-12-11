@@ -10,11 +10,10 @@ namespace DigitalRise.Data.Modelling
 		public DrModelBone Root { get; }
 		public DrModelBone[] Bones { get; }
 		public DrModelBone[] MeshBones { get; }
-		public Skin[] Skins { get; }
 
 		public Dictionary<string, AnimationClip> Animations { get; } = new Dictionary<string, AnimationClip>();
 
-		internal DrModel(DrModelBone root, Skin[] skins)
+		internal DrModel(DrModelBone root)
 		{
 			if (root == null)
 			{
@@ -29,7 +28,6 @@ namespace DigitalRise.Data.Modelling
 			Bones = traverseOrder.ToArray();
 
 			MeshBones = (from bone in Bones where bone.Mesh != null select bone).ToArray();
-			Skins = skins;
 		}
 
 		private void TraverseNodes(DrModelBone root, Action<DrModelBone> action)

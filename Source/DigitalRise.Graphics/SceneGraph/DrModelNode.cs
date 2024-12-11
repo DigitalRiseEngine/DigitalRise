@@ -56,8 +56,6 @@ namespace DigitalRise.SceneGraph
 			}
 		}
 
-
-
 		private bool _transformsDirty = true;
 		private Matrix[] _localTransforms;
 		private Matrix[] _worldTransforms;
@@ -166,22 +164,24 @@ namespace DigitalRise.SceneGraph
 			for (var i = 0; i < _model.MeshBones.Length; ++i)
 			{
 				var bone = _model.MeshBones[i];
-				// If mesh has bones, then parent node transform had been already
-				// applied to bones transform
-				// Thus to avoid applying parent transform twice, we use
-				// ordinary Transform(not AbsoluteTransform) for parts with bones
-				Matrix transform = bone.Skin != null ? rootTransform : _worldTransforms[bone.Index] * rootTransform;
-
-				// Apply the effect and render items
-				Matrix[] bones = null;
-				if (bone.Skin != null)
-				{
-					bones = _skinInfos[bone.Skin.SkinIndex].Transforms;
-				}
 
 				for (var j = 0; j < bone.Mesh.Submeshes.Count; ++j)
 				{
 					var submesh = bone.Mesh.Submeshes[j];
+
+					// If mesh has bones, then parent node transform had been already
+					// applied to bones transform
+					// Thus to avoid applying parent transform twice, we use
+					// ordinary Transform(not AbsoluteTransform) for parts with bones
+					Matrix transform = submesh.Skin != null ? rootTransform : _worldTransforms[bone.Index] * rootTransform;
+
+					// Apply the effect and render items
+					Matrix[] bones = null;
+					if (submesh.Skin != null)
+					{
+						bones = _skinInfos[submesh.Skin.SkinIndex].Transforms;
+					}
+
 					list.AddJob(submesh, MeshMaterials[i].Materials[j], transform, bones);
 				}
 			}
@@ -208,14 +208,25 @@ namespace DigitalRise.SceneGraph
 			{
 				_localTransforms = new Matrix[_model.Bones.Length];
 				_worldTransforms = new Matrix[_model.Bones.Length];
-				if (_model.Skins != null && _model.Skins.Length > 0)
+
+				var skinInfos = new List<SkinInfo>();
+				_model.TraverseNodes(n =>
 				{
-					_skinInfos = new SkinInfo[_model.Skins.Length];
-					for (var i = 0; i < _model.Skins.Length; ++i)
+					if (n.Mesh == null)
 					{
-						_skinInfos[i] = new SkinInfo(_model.Skins[i]);
+						return;
 					}
-				}
+
+					foreach(var submesh in n.Mesh.Submeshes)
+					{
+						if (submesh.Skin != null)
+						{
+							skinInfos.Add(new SkinInfo(submesh.Skin));
+						}
+					}
+				});
+
+				_skinInfos = skinInfos.ToArray();
 
 				ResetTransforms();
 
@@ -300,7 +311,7 @@ namespace DigitalRise.SceneGraph
 			var boundingBox = new BoundingBox();
 			foreach (var bone in _model.MeshBones)
 			{
-				var m = bone.Skin != null ? Matrix.Identity : _worldTransforms[bone.Index];
+				var m = /*bone.Skin != null ? Matrix.Identity :*/ _worldTransforms[bone.Index];
 				var bb = bone.Mesh.BoundingBox.Transform(ref m);
 				boundingBox = BoundingBox.CreateMerged(boundingBox, bb);
 			}

@@ -1,5 +1,4 @@
-﻿using DigitalRise.Animation.Character;
-using DigitalRise.Data.Meshes;
+﻿using DigitalRise.Data.Meshes;
 using DigitalRise.Mathematics;
 using Microsoft.Xna.Framework;
 
@@ -35,8 +34,6 @@ namespace DigitalRise.Data.Modelling
 		public Mesh Mesh { get; internal set; }
 
 		public SrtTransform DefaultPose = SrtTransform.Identity;
-
-		public Skin Skin { get; internal set; }
 
 		internal DrModelBone(int index, string name)
 		{

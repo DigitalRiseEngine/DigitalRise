@@ -2,7 +2,9 @@
 using Assimp.Configs;
 using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,8 +18,34 @@ namespace DigitalRise.ModelConverter
 		private readonly List<uint> _indices = new List<uint>();
 		private readonly List<SubmeshContent> _submeshes = new List<SubmeshContent>();
 		private readonly List<BoneContent> _bones = new List<BoneContent>();
+		private readonly Dictionary<string, byte> _bonesIndices = new Dictionary<string, byte>();
 
 		static void Log(string message) => Console.WriteLine(message);
+
+		private void BuildBonesIndices(Node root, ref byte index)
+		{
+			_bonesIndices[root.Name] = index;
+			++index;
+
+			if (root.HasChildren)
+			{
+				for(var i = 0; i < root.ChildCount; ++i)
+				{
+					BuildBonesIndices(root.Children[i], ref index);
+				}
+			}
+		}
+
+		private byte GetBoneIndex(string name)
+		{
+			byte result;
+			if (!_bonesIndices.TryGetValue(name, out result))
+			{
+				throw new Exception($"Unable to find bone {name}");
+			}
+
+			return result;
+		}
 
 		private int FindVertexBuffer(List<VertexElementContent> vertexElements)
 		{
@@ -93,7 +121,12 @@ namespace DigitalRise.ModelConverter
 
 			if (mesh.HasTangentBasis)
 			{
+			}
 
+			if (mesh.HasBones)
+			{
+				vertexElements.Add(new VertexElementContent(VertexElementUsage.BlendIndices, VertexElementFormat.Byte4));
+				vertexElements.Add(new VertexElementContent(VertexElementUsage.BlendWeight, VertexElementFormat.Vector4));
 			}
 
 
@@ -103,6 +136,62 @@ namespace DigitalRise.ModelConverter
 		private byte[] BuildVertexBufferData(Mesh mesh)
 		{
 			var vertexCount = mesh.Vertices.Count;
+
+			Byte4[] boneIndices = null;
+			Vector4[] boneWeights = null;
+
+			if (mesh.HasBones)
+			{
+				// Fill bone arrays
+				boneIndices = new Byte4[vertexCount];
+				boneWeights = new Vector4[vertexCount];
+
+				for (var j = 0; j < mesh.Bones.Count; ++j)
+				{
+					var bone = mesh.Bones[j];
+					var boneIndex = GetBoneIndex(bone.Name);
+					for (var k = 0; k < bone.VertexWeightCount; ++k)
+					{
+						var weight = bone.VertexWeights[k];
+
+						var bv = boneIndices[weight.VertexID].ToVector4();
+						var w = boneWeights[weight.VertexID];
+
+						var bx = (byte)bv.X;
+						var by = (byte)bv.Y;
+						var bz = (byte)bv.Z;
+						var bw = (byte)bv.W;
+
+						if (bx == 0 || weight.Weight > w.X)
+						{
+							bx = boneIndex;
+							w.X = weight.Weight;
+						}
+						else if (by == 0 || weight.Weight > w.Y)
+						{
+							by = boneIndex;
+							w.Y = weight.Weight;
+						}
+						else if (bz == 0 || weight.Weight > w.Z)
+						{
+							bz = boneIndex;
+							w.Z = weight.Weight;
+						}
+						else if (bw == 0 || weight.Weight > w.W)
+						{
+							bw = boneIndex;
+							w.W = weight.Weight;
+						}
+						else
+						{
+							throw new Exception($"Vertex {weight.VertexID} has more than 4 bones");
+						}
+
+						boneIndices[weight.VertexID] = new Byte4(bx, by, bz, bw);
+						boneWeights[weight.VertexID] = w;
+					}
+				}
+			}
 
 			using (var ms = new MemoryStream())
 			using (var writer = new BinaryWriter(ms))
@@ -136,7 +225,12 @@ namespace DigitalRise.ModelConverter
 
 					if (mesh.HasTangentBasis)
 					{
+					}
 
+					if (mesh.HasBones)
+					{
+						writer.Write(boneIndices[i].PackedValue);
+						writer.Write(boneWeights[i]);
 					}
 				}
 
@@ -178,7 +272,7 @@ namespace DigitalRise.ModelConverter
 				_submeshes.Add(submesh);
 			}
 
-			foreach(var vertexBuffer in _model.VertexBuffers)
+			foreach (var vertexBuffer in _model.VertexBuffers)
 			{
 				vertexBuffer.VertexCount = vertexBuffer.MemoryVertexCount;
 			}
@@ -217,6 +311,35 @@ namespace DigitalRise.ModelConverter
 			return result;
 		}
 
+		private void ProcessSkins(Scene scene)
+		{
+			for(var i = 0; i < scene.Meshes.Count; ++i)
+			{
+				var mesh = scene.Meshes[i];
+				if (!mesh.HasBones)
+				{
+					continue;
+				}
+
+				var skinContent = new SkinContent();
+				for (var j = 0; j < mesh.Bones.Count; ++j)
+				{
+					var bone = mesh.Bones[j];
+					var boneIndex = GetBoneIndex(bone.Name);
+
+					var skinJointContent = new SkinJointContent
+					{
+						BoneIndex = boneIndex,
+						InverseBindTransform = bone.OffsetMatrix.ToXna()
+					};
+
+					skinContent.Joints.Add(skinJointContent);
+				}
+
+				_submeshes[i].Skin = skinContent;
+			}
+		}
+
 		private void ProcessAnimations(Scene scene)
 		{
 			foreach (var animation in scene.Animations)
@@ -229,15 +352,10 @@ namespace DigitalRise.ModelConverter
 				var animationClip = new AnimationClipContent();
 				foreach (var sourceChannel in animation.NodeAnimationChannels)
 				{
-					var bone = (from b in _bones where b.Name == sourceChannel.NodeName select b).FirstOrDefault();
-					if (bone == null)
-					{
-						throw new Exception($"Unable to find bone {sourceChannel.NodeName}");
-					}
-
+					var boneIndex = GetBoneIndex(sourceChannel.NodeName);
 					var channel = new AnimationChannelContent
 					{
-						BoneIndex = _bones.IndexOf(bone)
+						BoneIndex = boneIndex
 					};
 
 					// Translations
@@ -284,6 +402,10 @@ namespace DigitalRise.ModelConverter
 			Log($"Input file: {inputModel}");
 
 			_model = new ModelContent();
+			_bones.Clear();
+			_bonesIndices.Clear();
+			_indices.Clear();
+			_submeshes.Clear();
 
 			using (AssimpContext importer = new AssimpContext())
 			{
@@ -293,10 +415,13 @@ namespace DigitalRise.ModelConverter
 				steps |= PostProcessSteps.Triangulate;
 				var scene = importer.ImportFile(inputModel, steps);
 
+				byte index = 0;
+				BuildBonesIndices(scene.RootNode, ref index);
 				ProcessMeshes(scene);
 
 				_model.RootBone = Convert(scene.RootNode);
 
+				ProcessSkins(scene);
 				ProcessAnimations(scene);
 			}
 

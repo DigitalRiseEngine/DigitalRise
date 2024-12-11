@@ -27,11 +27,6 @@ namespace DigitalRise.Data.Modelling
 		/// Children of the model bone
 		/// </summary>
 		public readonly List<DrModelBoneDesc> Children = new List<DrModelBoneDesc>();
-
-		/// <summary>
-		/// Skin of the bone meshes
-		/// </summary>
-		public int? SkinIndex { get; set; }
 	}
 
 	/// <summary>
@@ -39,7 +34,7 @@ namespace DigitalRise.Data.Modelling
 	/// </summary>
 	public static class DrModelBuilder
 	{
-		private static DrModelBone CreateBone(DrModelBoneDesc desc, ref int boneIndex, List<Skin> skins)
+		private static DrModelBone CreateBone(DrModelBoneDesc desc, ref int boneIndex)
 		{
 			var bone = new DrModelBone(boneIndex, desc.Name)
 			{
@@ -52,15 +47,10 @@ namespace DigitalRise.Data.Modelling
 			var children = new List<DrModelBone>();
 			foreach (var child in desc.Children)
 			{
-				children.Add(CreateBone(child, ref boneIndex, skins));
+				children.Add(CreateBone(child, ref boneIndex));
 			}
 
 			bone.Children = children.ToArray();
-
-			if (desc.SkinIndex != null)
-			{
-				bone.Skin = skins[desc.SkinIndex.Value];
-			}
 
 			return bone;
 
@@ -70,10 +60,9 @@ namespace DigitalRise.Data.Modelling
 		/// Creates the model
 		/// </summary>
 		/// <param name="rootBoneDesc"></param>
-		/// <param name="skins">Skins of the model</param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentOutOfRangeException"></exception>
-		public static DrModel Create(DrModelBoneDesc rootBoneDesc, List<Skin> skins)
+		public static DrModel Create(DrModelBoneDesc rootBoneDesc)
 		{
 			if (rootBoneDesc == null)
 			{
@@ -82,10 +71,10 @@ namespace DigitalRise.Data.Modelling
 
 			// Root bone
 			var boneIndex = 0;
-			var rootBone = CreateBone(rootBoneDesc, ref boneIndex, skins);
+			var rootBone = CreateBone(rootBoneDesc, ref boneIndex);
 
 			// Create the model
-			return new DrModel(rootBone, skins != null ? skins.ToArray() : null);
+			return new DrModel(rootBone);
 		}
 	}
 }

@@ -21,6 +21,8 @@ namespace DigitalRise.ModelStorage
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public int StartIndex { get; set; }
 
+		public SkinContent Skin { get; set; }
+
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public int PrimitiveCount { get; set; }
 		public BoundingBox BoundingBox { get; set; }

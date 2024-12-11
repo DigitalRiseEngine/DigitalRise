@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using DigitalRise.Animation.Character;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Meshes.Morphing;
 using DigitalRise.Misc;
@@ -130,6 +131,8 @@ namespace DigitalRise.Data.Meshes
 
 		[Category("Material")]
 		public IMaterial Material { get; set; }
+
+		public Skin Skin { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether this submesh has morph targets.

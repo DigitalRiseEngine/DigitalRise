@@ -166,6 +166,10 @@ namespace DigitalRise.ModelConverter
 						var vertexWeight = bone.VertexWeights[k];
 						var vertexId = vertexWeight.VertexID;
 						var weight = vertexWeight.Weight;
+						if (Numeric.IsZero(weight))
+						{
+							continue;
+						}
 
 						var bs = boneSets[vertexId];
 						var bi = boneIndices[vertexId].ToVector4();
@@ -202,12 +206,22 @@ namespace DigitalRise.ModelConverter
 						}
 						else
 						{
-							Log($"Warning: Vertex {vertexId} has more than 4 bones.");
-							//							throw new Exception($"Vertex {weight.VertexID} has more than 4 bones");
+							throw new Exception($"Vertex {vertexId} has more than 4 bones");
 						}
 
 						boneSets[vertexId] = bs;
 						boneIndices[vertexId] = new Byte4(bx, by, bz, bw);
+
+						// Normalize weight
+						var totalWeight = w.X + w.Y + w.Z + w.W;
+						if (!Numeric.IsZero(totalWeight))
+						{
+							w.X /= totalWeight;
+							w.Y /= totalWeight;
+							w.Z /= totalWeight;
+							w.W /= totalWeight;
+						}
+
 						boneWeights[vertexId] = w;
 					}
 				}

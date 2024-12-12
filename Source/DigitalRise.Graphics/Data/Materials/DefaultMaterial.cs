@@ -287,8 +287,6 @@ namespace DigitalRise.Data.Materials
 		public string NormalTexturePath { get; set; }
 
 
-		[Browsable(false)]
-		[JsonIgnore]
 		public bool Skinning
 		{
 			get => _skinning;

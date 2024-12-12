@@ -12,8 +12,8 @@
     "Children": [],
     "IsEnabled": true,
     "ScaleLocal": "1, 1, 1",
-    "RotationLocal": "-32.555195, -93.17157, 0",
-    "PositionLocal": "-7.1947956, 9.113006, 1.5104907"
+    "RotationLocal": "-33.1371, -65.65766, 0",
+    "PositionLocal": "-2.6722298, 4.695229, 3.0637937"
   },
   "Name": "Root",
   "Children": [
@@ -36,7 +36,7 @@
       "Size": "100, 100",
       "Tessellation": "1, 1",
       "GenerateBackface": true,
-      "NormalDirection": 1,
+      "NormalDirection": "UpY",
       "Material": {
         "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
         "DiffuseColor": "255, 255, 255, 255",
@@ -87,7 +87,7 @@
           "FilterRadius": 1.0,
           "JitterResolution": 2048.0,
           "FadeOutRange": 0.1,
-          "CascadeSelection": 1,
+          "CascadeSelection": "Best",
           "IsCascadeLocked": [
             false,
             false,
@@ -113,6 +113,28 @@
     {
       "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise.Graphics",
       "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.jdrm",
+      "MeshMaterials": [
+        {
+          "MeshName": "Beta_Joints",
+          "Materials": [
+            {
+              "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
+              "DiffuseColor": "255, 255, 255, 255",
+              "Skinning": true
+            }
+          ]
+        },
+        {
+          "MeshName": "Beta_Surface",
+          "Materials": [
+            {
+              "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
+              "DiffuseColor": "255, 255, 255, 255",
+              "Skinning": true
+            }
+          ]
+        }
+      ],
       "Children": [
         {
           "Name": "_cameraMount",

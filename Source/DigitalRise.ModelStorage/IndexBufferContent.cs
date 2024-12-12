@@ -15,11 +15,8 @@ namespace DigitalRise.ModelStorage
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public int IndexCount { get; set; }
 
-		[Browsable(false)]
-		[JsonIgnore]
 		public byte[] Data { get; set; }
 
-		public int BufferOffset { get; set; }
 
 		public IndexBufferContent()
 		{

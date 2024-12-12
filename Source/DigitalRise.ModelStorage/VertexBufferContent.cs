@@ -12,6 +12,7 @@ namespace DigitalRise.ModelStorage
 	public class VertexBufferContent
 	{
 		private int? _vertexStride;
+		private byte[] _data;
 		private readonly MemoryStream _stream = new MemoryStream();
 
 		[Browsable(false)]
@@ -33,9 +34,26 @@ namespace DigitalRise.ModelStorage
 		[JsonIgnore]
 		public int MemoryVertexCount => MemorySizeInBytes / VertexStride;
 
-		public int BufferOffset { get; set; }
-
 		public int VertexCount { get; set; }
+
+		public byte[] Data
+		{
+			get
+			{
+				if (_data == null)
+				{
+					_data = _stream.ToArray();
+				}
+
+				return _data;
+			}
+
+			set
+			{
+				_data = value;
+			}
+		}
+
 
 		public ObservableCollection<VertexElementContent> Elements { get; } = new ObservableCollection<VertexElementContent>();
 
@@ -67,6 +85,7 @@ namespace DigitalRise.ModelStorage
 		public void Write(ReadOnlySpan<byte> data)
 		{
 			_stream.Write(data);
+			_data = null;
 		}
 
 		public byte[] GetMemoryData() => _stream.GetBuffer();

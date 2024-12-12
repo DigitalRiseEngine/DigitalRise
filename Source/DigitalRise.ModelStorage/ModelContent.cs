@@ -18,25 +18,6 @@ namespace DigitalRise.ModelStorage
 		{
 			var output = Path.Combine(folder, name);
 
-			var binaryPath = Path.ChangeExtension(output, "bin");
-
-			// Write binary
-			using(var stream = File.OpenWrite(binaryPath))
-			{
-				for(var i = 0; i < VertexBuffers.Count; ++i)
-				{
-					var vertexBuffer = VertexBuffers[i];
-					vertexBuffer.BufferOffset = (int)stream.Position;
-					stream.Write(vertexBuffer.GetMemoryData());
-				}
-
-				if (IndexBuffer != null)
-				{
-					IndexBuffer.BufferOffset = (int)stream.Position;
-					stream.Write(IndexBuffer.Data);
-				}
-			}
-
 			var modelPath = Path.ChangeExtension(output, "jdrm");
 			JsonSerialization.SerializeToFile(modelPath, this);
 		}

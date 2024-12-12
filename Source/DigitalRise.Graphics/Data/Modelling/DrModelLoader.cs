@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using AssetManagementBase;
 using DigitalRise.Animation;
 using DigitalRise.Data.Materials;
@@ -9,7 +8,6 @@ using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace DigitalRise.Data.Modelling
 {
@@ -34,57 +32,32 @@ namespace DigitalRise.Data.Modelling
 
 		private void LoadVertexBuffers()
 		{
-			var binaryFile = Path.ChangeExtension(_assetName, "bin");
-
-			using (var stream = _assetManager.Open(binaryFile))
+			for (var i = 0; i < _modelContent.VertexBuffers.Count; ++i)
 			{
-				for (var i = 0; i < _modelContent.VertexBuffers.Count; ++i)
+				var vertexBufferContent = _modelContent.VertexBuffers[i];
+				var vertexElements = new List<VertexElement>();
+
+				var offset = 0;
+				foreach (var e in vertexBufferContent.Elements)
 				{
-					var vertexBufferContent = _modelContent.VertexBuffers[i];
-					var vertexElements = new List<VertexElement>();
+					var vertexElement = new VertexElement(offset, e.Format, e.Usage, e.UsageIndex);
+					vertexElements.Add(vertexElement);
 
-					var offset = 0;
-					foreach (var e in vertexBufferContent.Elements)
-					{
-						var vertexElement = new VertexElement(offset, e.Format, e.Usage, e.UsageIndex);
-						vertexElements.Add(vertexElement);
-
-						offset += e.Format.GetSize();
-					}
-
-					var vertexDeclaration = new VertexDeclaration(vertexElements.ToArray());
-
-					stream.Seek(vertexBufferContent.BufferOffset, SeekOrigin.Begin);
-					var size = vertexBufferContent.VertexCount * vertexBufferContent.VertexStride;
-					var data = new byte[size];
-					var result = stream.Read(data, 0, size);
-
-					if (result != size)
-					{
-						throw new Exception($"Can't read {i}th vertex buffer");
-					}
-
-					var vertexBuffer = new VertexBuffer(DR.GraphicsDevice, vertexDeclaration, vertexBufferContent.VertexCount, BufferUsage.None);
-					vertexBuffer.SetData(data);
-
-					_vertexBuffers.Add(vertexBuffer);
+					offset += e.Format.GetSize();
 				}
 
-				if (_modelContent.IndexBuffer != null)
-				{
-					stream.Seek(_modelContent.IndexBuffer.BufferOffset, SeekOrigin.Begin);
-					var size = _modelContent.IndexBuffer.IndexCount * _modelContent.IndexBuffer.IndexType.GetSize();
-					var data = new byte[size];
-					var result = stream.Read(data, 0, size);
+				var vertexDeclaration = new VertexDeclaration(vertexElements.ToArray());
 
-					if (result != size)
-					{
-						throw new Exception($"Can't read the index buffer");
-					}
+				var vertexBuffer = new VertexBuffer(DR.GraphicsDevice, vertexDeclaration, vertexBufferContent.VertexCount, BufferUsage.None);
+				vertexBuffer.SetData(vertexBufferContent.Data);
 
-					_indexBuffer = new IndexBuffer(DR.GraphicsDevice, _modelContent.IndexBuffer.IndexType, _modelContent.IndexBuffer.IndexCount, BufferUsage.None);
-					_indexBuffer.SetData(data);
-				}
+				_vertexBuffers.Add(vertexBuffer);
+			}
+
+			if (_modelContent.IndexBuffer != null)
+			{
+				_indexBuffer = new IndexBuffer(DR.GraphicsDevice, _modelContent.IndexBuffer.IndexType, _modelContent.IndexBuffer.IndexCount, BufferUsage.None);
+				_indexBuffer.SetData(_modelContent.IndexBuffer.Data);
 			}
 		}
 
@@ -119,7 +92,7 @@ namespace DigitalRise.Data.Modelling
 					if (submeshContent.Skin != null)
 					{
 						var joints = new List<SkinJoint>();
-						foreach(var skinJointContent in submeshContent.Skin.Joints)
+						foreach (var skinJointContent in submeshContent.Skin.Joints)
 						{
 							joints.Add(new SkinJoint(skinJointContent.BoneIndex, skinJointContent.InverseBindTransform));
 						}

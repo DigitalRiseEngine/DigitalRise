@@ -270,6 +270,7 @@ namespace DigitalRise.ModelConverter
 				}
 
 				var vertexElements = BuildVertexElement(mesh);
+
 				var vertexBufferIndex = FindVertexBuffer(vertexElements);
 				var vertexBuffer = _model.VertexBuffers[vertexBufferIndex];
 
@@ -280,6 +281,7 @@ namespace DigitalRise.ModelConverter
 
 				var startIndex = _indices.Count;
 				var indices = mesh.GetUnsignedIndices();
+
 				_indices.AddRange(indices);
 
 				var submesh = new SubmeshContent

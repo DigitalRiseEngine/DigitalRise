@@ -9,6 +9,7 @@ using DigitalRise.Mathematics;
 using DigitalRise.ModelStorage;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace DigitalRise.Data.Modelling
 {
@@ -29,6 +30,7 @@ namespace DigitalRise.Data.Modelling
 		private DrModel _model;
 		private readonly List<VertexBuffer> _vertexBuffers = new List<VertexBuffer>();
 		private IndexBuffer _indexBuffer;
+		private int _skinIndex;
 
 		private void LoadVertexBuffers()
 		{
@@ -123,6 +125,8 @@ namespace DigitalRise.Data.Modelling
 						}
 
 						submesh.Skin = new Skin(joints.ToArray());
+						submesh.Skin.SkinIndex = _skinIndex;
+						++_skinIndex;
 					}
 
 					var material = new DefaultMaterial
@@ -253,6 +257,7 @@ namespace DigitalRise.Data.Modelling
 		public DrModel Load(AssetManager manager, string assetName)
 		{
 			_vertexBuffers.Clear();
+			_skinIndex = 0;
 
 			_assetManager = manager;
 			_assetName = assetName;

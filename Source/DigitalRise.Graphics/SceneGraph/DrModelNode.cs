@@ -3,7 +3,6 @@ using DigitalRise.Animation;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
-using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Rendering.Deferred;
@@ -139,6 +138,7 @@ namespace DigitalRise.SceneGraph
 						var joint = skinInfo.Skin.Joints[j];
 
 						skinInfo.Transforms[j] = joint.InverseBindTransform * _worldTransforms[joint.BoneIndex];
+						// skinInfo.Transforms[j] = Matrix.Identity;
 					}
 				}
 
@@ -160,7 +160,6 @@ namespace DigitalRise.SceneGraph
 
 			// Render meshes
 			var rootTransform = CalculateGlobalTransform();
-
 			for (var i = 0; i < _model.MeshBones.Length; ++i)
 			{
 				var bone = _model.MeshBones[i];
@@ -230,7 +229,7 @@ namespace DigitalRise.SceneGraph
 
 				ResetTransforms();
 
-				Shape = CalculateBoundingBox().CreateShape();
+				Shape = Shape.Infinite;
 
 				if (setMaterialsFromModel)
 				{

@@ -202,10 +202,11 @@ namespace DigitalRise.Rendering.Deferred
 				foreach (var pass in effectBinding.CurrentTechnique.Passes)
 				{
 					pass.Apply();
-					device.DrawIndexedPrimitives(mesh.PrimitiveType, 0,
+					device.DrawIndexedPrimitives(mesh.PrimitiveType, 
+						mesh.StartVertex,
 						0,
 						mesh.VertexCount,
-						0,
+						mesh.StartIndex,
 						mesh.PrimitiveCount);
 
 					context.Statistics.VerticesDrawn += mesh.VertexCount;

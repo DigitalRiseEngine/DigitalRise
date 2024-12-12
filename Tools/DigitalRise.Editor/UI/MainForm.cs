@@ -330,7 +330,7 @@ namespace DigitalRise.Editor.UI
 			}
 			else if (record.Type == typeof(DrModel))
 			{
-				return InternalCreateCustomEditor(record, obj, new[] { "glb", "gltf" },
+				return InternalCreateCustomEditor(record, obj, new[] { "jdrm" },
 					path => AssetManager.LoadJDRM(path));
 			}
 			else if (record.Type == typeof(SceneNode))
@@ -616,7 +616,7 @@ namespace DigitalRise.Editor.UI
 
 		private void OnAddModel(SceneNode parent)
 		{
-			OnAddExternalResource(parent, new[] { "glb", "gltf" }, path => new DrModelNode
+			OnAddExternalResource(parent, new[] { "jdrm" }, path => new DrModelNode
 			{
 				ModelPath = path
 			});

@@ -22,12 +22,9 @@ namespace DigitalRise.ModelStorage
 
 		public override string ToString() => $"{Usage}, {Format}, {UsageIndex}";
 
-		public static bool Equals(VertexElementContent a, VertexElementContent b)
+		public static bool AreEqual(VertexElementContent a, VertexElementContent b)
 		{
 			return a.Usage == b.Usage && a.Format == b.Format && a.UsageIndex == b.UsageIndex;
 		}
-
-		public static bool operator ==(VertexElementContent a, VertexElementContent b) => Equals(a, b);
-		public static bool operator !=(VertexElementContent a, VertexElementContent b) => !Equals(a, b);
 	}
 }

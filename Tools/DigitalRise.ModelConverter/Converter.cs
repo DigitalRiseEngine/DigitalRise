@@ -68,7 +68,7 @@ namespace DigitalRise.ModelConverter
 				var match = true;
 				for (var j = 0; j < vertexElements.Count; ++j)
 				{
-					if (vertexBuffer.Elements[j] != vertexElements[j])
+					if (!VertexElementContent.AreEqual(vertexBuffer.Elements[j], vertexElements[j]))
 					{
 						match = false;
 						break;
@@ -168,13 +168,13 @@ namespace DigitalRise.ModelConverter
 						var weight = vertexWeight.Weight;
 
 						var bs = boneSets[vertexId];
-						var bv = boneIndices[vertexId].ToVector4();
+						var bi = boneIndices[vertexId].ToVector4();
 						var w = boneWeights[vertexId];
 
-						var bx = (byte)bv.X;
-						var by = (byte)bv.Y;
-						var bz = (byte)bv.Z;
-						var bw = (byte)bv.W;
+						var bx = (byte)bi.X;
+						var by = (byte)bi.Y;
+						var bz = (byte)bi.Z;
+						var bw = (byte)bi.W;
 
 						if (!bs.X || weight > w.X)
 						{

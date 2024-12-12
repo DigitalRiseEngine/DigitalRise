@@ -159,7 +159,7 @@ namespace DigitalRise.ModelConverter
 				for (var j = 0; j < mesh.Bones.Count; ++j)
 				{
 					var bone = mesh.Bones[j];
-					var boneIndex = GetBoneIndex(bone.Name);
+					var boneIndex = (byte)j;
 
 					for (var k = 0; k < bone.VertexWeightCount; ++k)
 					{

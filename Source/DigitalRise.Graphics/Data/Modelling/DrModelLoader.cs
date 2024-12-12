@@ -230,7 +230,7 @@ namespace DigitalRise.Data.Modelling
 							currentTransform.Rotation = optionalTransform.Rotation.Value;
 						}
 
-						keyframes.Add(new AnimationChannelKeyframe(TimeSpan.FromSeconds(pair2.Key), currentTransform));
+						keyframes.Add(new AnimationChannelKeyframe(TimeSpan.FromMilliseconds(pair2.Key), currentTransform));
 
 						if (pair2.Key > time)
 						{
@@ -248,7 +248,7 @@ namespace DigitalRise.Data.Modelling
 					channels.Add(animationChannel);
 				}
 
-				var animation = new AnimationClip(animationContent.Key, TimeSpan.FromSeconds(time), channels.ToArray());
+				var animation = new AnimationClip(animationContent.Key, TimeSpan.FromMilliseconds(time), channels.ToArray());
 				var id = animation.Name ?? "(default)";
 				_model.Animations[id] = animation;
 			}

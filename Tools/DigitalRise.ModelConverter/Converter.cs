@@ -146,14 +146,13 @@ namespace DigitalRise.ModelConverter
 		{
 			var vertexCount = mesh.Vertices.Count;
 
-			Bool4[] boneSets = null;
 			Byte4[] boneIndices = null;
 			Vector4[] boneWeights = null;
 
 			if (mesh.HasBones)
 			{
 				// Fill bone arrays
-				boneSets = new Bool4[vertexCount];
+				var boneSets = new Bool4[vertexCount];
 				boneIndices = new Byte4[vertexCount];
 				boneWeights = new Vector4[vertexCount];
 
@@ -164,50 +163,52 @@ namespace DigitalRise.ModelConverter
 
 					for (var k = 0; k < bone.VertexWeightCount; ++k)
 					{
-						var weight = bone.VertexWeights[k];
+						var vertexWeight = bone.VertexWeights[k];
+						var vertexId = vertexWeight.VertexID;
+						var weight = vertexWeight.Weight;
 
-						var bs = boneSets[weight.VertexID];
-						var bv = boneIndices[weight.VertexID].ToVector4();
-						var w = boneWeights[weight.VertexID];
+						var bs = boneSets[vertexId];
+						var bv = boneIndices[vertexId].ToVector4();
+						var w = boneWeights[vertexId];
 
 						var bx = (byte)bv.X;
 						var by = (byte)bv.Y;
 						var bz = (byte)bv.Z;
 						var bw = (byte)bv.W;
 
-						if (!bs.X || weight.Weight > w.X)
+						if (!bs.X || weight > w.X)
 						{
 							bs.X = true;
 							bx = boneIndex;
-							w.X = weight.Weight;
+							w.X = weight;
 						}
-						else if (!bs.Y || weight.Weight > w.Y)
+						else if (!bs.Y || weight > w.Y)
 						{
 							bs.Y = true;
 							by = boneIndex;
-							w.Y = weight.Weight;
+							w.Y = weight;
 						}
-						else if (!bs.Z || weight.Weight > w.Z)
+						else if (!bs.Z || weight > w.Z)
 						{
 							bs.Z = true;
 							bz = boneIndex;
-							w.Z = weight.Weight;
+							w.Z = weight;
 						}
-						else if (!bs.W || weight.Weight > w.W)
+						else if (!bs.W || weight > w.W)
 						{
 							bs.W = true;
 							bw = boneIndex;
-							w.W = weight.Weight;
+							w.W = weight;
 						}
 						else
 						{
-							Log($"Warning: Vertex {weight.VertexID} has more than 4 bones.");
-//							throw new Exception($"Vertex {weight.VertexID} has more than 4 bones");
+							Log($"Warning: Vertex {vertexId} has more than 4 bones.");
+							//							throw new Exception($"Vertex {weight.VertexID} has more than 4 bones");
 						}
 
-						boneSets[weight.VertexID] = bs;
-						boneIndices[weight.VertexID] = new Byte4(bx, by, bz, bw);
-						boneWeights[weight.VertexID] = w;
+						boneSets[vertexId] = bs;
+						boneIndices[vertexId] = new Byte4(bx, by, bz, bw);
+						boneWeights[vertexId] = w;
 					}
 				}
 			}

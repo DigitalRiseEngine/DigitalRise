@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using DigitalRise.ModelStorage.Binary;
+using Microsoft.Xna.Framework;
 using System.IO;
 
 namespace DigitalRise.ModelStorage
@@ -10,31 +10,21 @@ namespace DigitalRise.ModelStorage
 		public Matrix InverseBindTransform { get; set; }
 	}
 
-	public class SkinContent : IBinarySerializable
+	public class SkinContent : SerializableCollection<SkinJointContent>
 	{
-		public List<SkinJointContent> Joints { get; } = new List<SkinJointContent>();
-
-		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		protected override SkinJointContent LoadItem(BinaryReader reader)
 		{
-			var items = br.ReadCollection(reader =>
+			return new SkinJointContent
 			{
-				return new SkinJointContent
-				{
-					BoneIndex = reader.ReadInt32(),
-					InverseBindTransform = reader.ReadMatrix()
-				};
-			});
-
-			Joints.AddRange(items);
+				BoneIndex = reader.ReadInt32(),
+				InverseBindTransform = reader.ReadMatrix()
+			};
 		}
 
-		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		protected override void SaveItem(BinaryWriter writer, SkinJointContent item)
 		{
-			bw.WriteCollection(Joints, (writer, item) =>
-			{
-				bw.Write(item.BoneIndex);
-				bw.Write(item.InverseBindTransform);
-			});
+			writer.Write(item.BoneIndex);
+			writer.Write(item.InverseBindTransform);
 		}
 	}
 }

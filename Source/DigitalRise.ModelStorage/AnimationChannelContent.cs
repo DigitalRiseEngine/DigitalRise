@@ -1,9 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DigitalRise.ModelStorage.Binary;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace DigitalRise.ModelStorage
 {
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct VectorKeyframeContent
 	{
 		public double Time;
@@ -16,6 +19,7 @@ namespace DigitalRise.ModelStorage
 		}
 	}
 
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct QuaternionKeyframeContent
 	{
 		public double Time;
@@ -28,43 +32,54 @@ namespace DigitalRise.ModelStorage
 		}
 	}
 
-	public class AnimationChannelContent : IBinarySerializable
+	public class VectorKeyframeChannelContent : SerializableCollection<VectorKeyframeContent>
 	{
-		public int BoneIndex { get; set; }
-		public List<VectorKeyframeContent> Scales { get; } = new List<VectorKeyframeContent>();
-		public List<QuaternionKeyframeContent> Rotations { get; } = new List<QuaternionKeyframeContent>();
-		public List<VectorKeyframeContent> Translations { get; } = new List<VectorKeyframeContent>();
-
-		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		protected override VectorKeyframeContent LoadItem(BinaryReader reader)
 		{
-			BoneIndex = br.ReadInt32();
-
-			Scales.AddRange(br.ReadCollection(reader => new VectorKeyframeContent(reader.ReadDouble(), reader.ReadVector3())));
-			Rotations.AddRange(br.ReadCollection(reader => new QuaternionKeyframeContent(reader.ReadDouble(), reader.ReadQuaternion())));
-			Translations.AddRange(br.ReadCollection(reader => new VectorKeyframeContent(reader.ReadDouble(), reader.ReadVector3())));
+			return new VectorKeyframeContent(reader.ReadDouble(), reader.ReadVector3());
 		}
 
-		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		protected override void SaveItem(BinaryWriter writer, VectorKeyframeContent item)
 		{
-			bw.Write(BoneIndex);
+			writer.Write(item.Time);
+			writer.Write(item.Value);
+		}
+	}
 
-			bw.WriteCollection(Scales, (bw, item) =>
-			{
-				bw.Write(item.Time);
-				bw.Write(item.Value);
-			});
+	public class QuaternionKeyframeChannelContent : SerializableCollection<QuaternionKeyframeContent>
+	{
+		protected override QuaternionKeyframeContent LoadItem(BinaryReader reader)
+		{
+			return new QuaternionKeyframeContent(reader.ReadDouble(), reader.ReadQuaternion());
+		}
 
-			bw.WriteCollection(Rotations, (bw, item) =>
-			{
-				bw.Write(item.Time);
-				bw.Write(item.Value);
-			});
+		protected override void SaveItem(BinaryWriter writer, QuaternionKeyframeContent item)
+		{
+			writer.Write(item.Time);
+			writer.Write(item.Value);
+		}
+	}
 
-			bw.WriteCollection(Translations, (bw, item) =>
-			{
-				bw.Write(item.Time);
-				bw.Write(item.Value);
-			});
+	public class AnimationChannelContent
+	{
+		public int BoneIndex { get; set; }
+		public VectorKeyframeChannelContent Scales { get; set; } = new VectorKeyframeChannelContent();
+		public QuaternionKeyframeChannelContent Rotations { get; set; } = new QuaternionKeyframeChannelContent();
+		public VectorKeyframeChannelContent Translations { get; set; } = new VectorKeyframeChannelContent();
+
+
+		internal void LoadBinaryData(ReadContext ctx)
+		{
+			Scales.LoadBinaryData(ctx);
+			Rotations.LoadBinaryData(ctx);
+			Translations.LoadBinaryData(ctx);
+		}
+
+		internal void SaveBinaryData(WriteContext ctx)
+		{
+			Scales.SaveBinaryData(ctx);
+			Rotations.SaveBinaryData(ctx);
+			Translations.SaveBinaryData(ctx);
 		}
 	}
 }

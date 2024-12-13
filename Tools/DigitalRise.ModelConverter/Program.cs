@@ -24,7 +24,7 @@ namespace DigitalRise.ModelConverter
 			++i;
 			if (i >= args.Length)
 			{
-				throw new Exception($"Value isn't provided for '{name}'");
+				throw new ModelConverterException($"Value isn't provided for '{name}'");
 			}
 
 			return args[i];
@@ -33,7 +33,7 @@ namespace DigitalRise.ModelConverter
 		static void ShowUsage()
 		{
 			Console.WriteLine($"drmodconv {Version}");
-			Console.WriteLine("Usage: drmodconv <input> [options]");
+			Console.WriteLine("Usage: drmodconv <inputFile> <outputFile> [options]");
 			Console.WriteLine();
 			Console.WriteLine("Options:");
 
@@ -41,8 +41,6 @@ namespace DigitalRise.ModelConverter
 
 			grid.SetMaximumWidth(0, 30);
 
-			grid.SetValue(0, 0, "-o, -output <folder>");
-			grid.SetValue(1, 0, "Specifies the output folder.");
 			grid.SetValue(0, 1, "-t, --generateTangents");
 			grid.SetValue(1, 1, "If enabled, then the tangents and bitangents are generated.");
 			grid.SetValue(0, 2, "-f, --flipWindingOrder");
@@ -67,11 +65,6 @@ namespace DigitalRise.ModelConverter
 
 				switch (arg)
 				{
-					case "-o":
-					case "--output":
-						options.OutputFolder = ParseString("output", args, ref i);
-						break;
-
 					case "-t":
 					case "--generateTangents":
 						options.GenerateTangentsAndBitangents = true;
@@ -85,10 +78,28 @@ namespace DigitalRise.ModelConverter
 					default:
 						if (arg.StartsWith("-"))
 						{
-							throw new Exception($"Unknown argument '{arg}'");
+							throw new ModelConverterException($"Unknown argument '{arg}'");
 						}
 
-						options.InputFile = arg;
+						if (string.IsNullOrEmpty(options.InputFile))
+						{
+							options.InputFile = arg;
+						}
+						else if (string.IsNullOrEmpty(options.OutputFile))
+						{
+							if (!arg.EndsWith(".drm", StringComparison.OrdinalIgnoreCase) && !arg.EndsWith(".jdrm", StringComparison.OrdinalIgnoreCase))
+							{
+								throw new ModelConverterException($"Output file should have either '.drm' or '.jdrm' extension. Current value = '{arg}'.");
+							}
+
+							options.OutputFile = arg;
+						}
+						else
+						{
+							throw new ModelConverterException($"Unknown argument '{arg}'");
+						}
+
+
 						break;
 
 				}
@@ -96,7 +107,7 @@ namespace DigitalRise.ModelConverter
 
 			if (string.IsNullOrEmpty(options.InputFile))
 			{
-				throw new Exception("Input file is not specified");
+				throw new ModelConverterException("Input file is not specified");
 			}
 
 			Log(options.ToString());
@@ -111,6 +122,10 @@ namespace DigitalRise.ModelConverter
 			try
 			{
 				Process(args);
+			}
+			catch (ModelConverterException ex)
+			{
+				Log($"Argument error: {ex.Message}");
 			}
 			catch (Exception ex)
 			{

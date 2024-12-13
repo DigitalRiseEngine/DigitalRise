@@ -1,4 +1,4 @@
-﻿using DigitalRise.Mathematics;
+﻿using DigitalRise.ModelStorage.Binary;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,64 +8,87 @@ namespace DigitalRise.ModelStorage
 	public partial class ModelContent
 	{
 		private static readonly byte[] DrmSignature = { (byte)'D', (byte)'R', (byte)'M' };
-		private const int DrmVersion = 2;
 
-		public List<VertexBufferContent> VertexBuffers { get; } = new List<VertexBufferContent>();
+		public string BinaryPath { get; set; }
+		public List<VertexBufferContent> VertexBuffers { get; set; } = new List<VertexBufferContent>();
 
 		public IndexBufferContent IndexBuffer { get; set; }
 
 		public BoneContent RootBone { get; set; }
 
-		public Dictionary<string, AnimationClipContent> Animations { get; } = new Dictionary<string, AnimationClipContent>();
+		public Dictionary<string, AnimationClipContent> Animations { get; set; } = new Dictionary<string, AnimationClipContent>();
+
+		private void SaveBinaryData(WriteContext context)
+		{
+			// Write vertex buffers
+			for (var i = 0; i < VertexBuffers.Count; ++i)
+			{
+				VertexBuffers[i].SaveBinaryData(context);
+			}
+
+			// Write index buffer
+			if (IndexBuffer != null)
+			{
+				IndexBuffer.SaveBinaryData(context);
+			}
+
+			// Bones
+			if (RootBone != null)
+			{
+				RootBone.RecursiveProcess(bone =>
+				{
+					if (bone.Mesh == null)
+					{
+						return;
+					}
+
+					foreach (var submesh in bone.Mesh.Submeshes)
+					{
+						if (submesh.Skin == null)
+						{
+							continue;
+						}
+
+						submesh.Skin.SaveBinaryData(context);
+					}
+				});
+			}
+
+			// Animations
+			foreach (var pair in Animations)
+			{
+				foreach (var channel in pair.Value.Channels)
+				{
+					channel.SaveBinaryData(context);
+				}
+			}
+		}
 
 
 		/// <summary>
 		/// Saves model in the json format
 		/// </summary>
-		/// <param name="path"></param>
 		public void SaveJsonToFile(string path)
 		{
+			path = Path.ChangeExtension(path, "bin");
+
+			// Write binary data and set buffer ids
+			using (var stream = File.OpenWrite(path))
+			using (var writer = new BinaryWriter(stream))
+			{
+				SaveBinaryData(new WriteContext(writer));
+			}
+
+			BinaryPath = path;
+
 			path = Path.ChangeExtension(path, "jdrm");
 			JsonSerialization.SerializeToFile(path, this);
 		}
 
 		/// <summary>
-		/// Loads model from the json string
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static ModelContent LoadJsonFromString(string s)
-		{
-			return JsonSerialization.DeserializeFromString<ModelContent>(s);
-		}
-
-		/// <summary>
-		/// Loads model from the json format
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public static ModelContent LoadJsonFromFile(string path)
-		{
-			var s = File.ReadAllText(path);
-
-			return JsonSerialization.DeserializeFromString<ModelContent>(s);
-		}
-
-		/// <summary>
 		/// Saves model in the binary format
 		/// </summary>
-		/// <param name="bw"></param>
-		public void SaveBinary(BinaryWriter bw)
-		{
-			bw.Write(DrmSignature);
-			bw.Write(DrmVersion);
-
-			bw.WriteCollection(VertexBuffers);
-			bw.WriteIfNotNull(IndexBuffer);
-			bw.WriteIfNotNull(RootBone);
-			bw.WriteCollection(Animations.Values);
-		}
-
+		/// <param name="path"></param>
 		public void SaveBinaryToFile(string path)
 		{
 			path = Path.ChangeExtension(path, "drm");
@@ -73,35 +96,110 @@ namespace DigitalRise.ModelStorage
 			using (var stream = File.OpenWrite(path))
 			using (var writer = new BinaryWriter(stream))
 			{
-				SaveBinary(writer);
+				// Signature
+				writer.Write(DrmSignature);
+
+				// Write binary data and set buffer ids
+				var writeContext = new WriteContext(writer);
+				SaveBinaryData(writeContext);
+
+				// Json data
+				var jsonData = JsonSerialization.SerializeToString(this, false);
+				writer.Write(ChunkTypes.StringChunkType);
+				writer.Write(jsonData);
 			}
 		}
 
-		public static ModelContent LoadBinary(BinaryReader reader)
+		private void LoadBinaryData(ReadContext context)
 		{
-			var result = new ModelContent();
-
-			var signature = reader.ReadBytes(3);
-			if (signature[0] != DrmSignature[0] || signature[1] != DrmSignature[1] || signature[2] != DrmSignature[2])
+			// Vertex buffers
+			for (var i = 0; i < VertexBuffers.Count; ++i)
 			{
-				throw new Exception("Wrong signature");
+				var buffer = VertexBuffers[i];
+				buffer.LoadBinaryData(context);
 			}
 
-			var version = reader.ReadInt32();
-			if (version != DrmVersion)
+			// Index buffer
+			if (IndexBuffer != null)
 			{
-				throw new Exception($"Wrong version. Reader version={DrmVersion}, file version={version}.");
+				IndexBuffer.LoadBinaryData(context);
 			}
 
-			result.VertexBuffers.AddRange(reader.ReadCollection<VertexBufferContent>());
-			result.IndexBuffer = reader.ReadIfNotNull<IndexBufferContent>();
-			result.RootBone = reader.ReadIfNotNull<BoneContent>();
-
-			var animations = reader.ReadCollection<AnimationClipContent>();
-			foreach (var animation in animations)
+			// Bones
+			if (RootBone != null)
 			{
-				result.Animations[animation.Name] = animation;
+				RootBone.RecursiveProcess(bone =>
+				{
+					if (bone.Mesh == null)
+					{
+						return;
+					}
+
+					foreach (var submesh in bone.Mesh.Submeshes)
+					{
+						if (submesh.Skin == null)
+						{
+							continue;
+						}
+
+						submesh.Skin.LoadBinaryData(context);
+					}
+				});
 			}
+
+			// Animations
+			foreach (var pair in Animations)
+			{
+				foreach (var channel in pair.Value.Channels)
+				{
+					channel.LoadBinaryData(context);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loads model from the json format
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns></returns>
+		public static ModelContent LoadJsonFromString(string s, Func<string, Stream> binaryOpener)
+		{
+			var result = JsonSerialization.DeserializeFromString<ModelContent>(s);
+
+			using (var stream = binaryOpener(result.BinaryPath))
+			using (var reader = new BinaryReader(stream))
+			{
+				result.LoadBinaryData(new ReadContext(reader));
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Loads model from the binary format
+		/// </summary>
+		/// <param name="binaryReader"></param>
+		/// <returns></returns>
+		public static ModelContent LoadBinary(BinaryReader binaryReader)
+		{
+			var signature = binaryReader.ReadBytes(DrmSignature.Length);
+			for (var i = 0; i < signature.Length; ++i)
+			{
+				if (signature[i] != DrmSignature[i])
+				{
+					throw new Exception($"Not a drm file.");
+				}
+			}
+
+			// Create read context, which will remember binary chunks positions and skip right to the string chunk
+			var readContext = new ReadContext(binaryReader);
+
+			// Load json
+			var s = binaryReader.ReadString();
+			var result = JsonSerialization.DeserializeFromString<ModelContent>(s);
+
+			// Finally read binary data
+			result.LoadBinaryData(readContext);
 
 			return result;
 		}

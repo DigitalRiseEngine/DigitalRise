@@ -67,7 +67,7 @@ namespace DigitalRise.Data.Modelling
 			var result = new DrModelBoneDesc
 			{
 				Name = bone.Name,
-				SrtTransform = bone.DefaultPose
+				SrtTransform = new SrtTransform(bone.Scale, bone.Rotation, bone.Translation)
 			};
 
 			if (bone.Mesh != null)
@@ -89,7 +89,7 @@ namespace DigitalRise.Data.Modelling
 					if (submeshContent.Skin != null)
 					{
 						var joints = new List<SkinJoint>();
-						foreach (var skinJointContent in submeshContent.Skin.Joints)
+						foreach (var skinJointContent in submeshContent.Skin.Data)
 						{
 							joints.Add(new SkinJoint(skinJointContent.BoneIndex, skinJointContent.InverseBindTransform));
 						}
@@ -141,9 +141,9 @@ namespace DigitalRise.Data.Modelling
 					// First run: gather times and transforms
 					if (channelContent.Translations != null)
 					{
-						for (var i = 0; i < channelContent.Translations.Count; ++i)
+						for (var i = 0; i < channelContent.Translations.Data.Count; ++i)
 						{
-							var translation = channelContent.Translations[i];
+							var translation = channelContent.Translations.Data[i];
 
 							SrtTransformOptional transform;
 							animationData.TryGetValue(translation.Time, out transform);
@@ -154,9 +154,9 @@ namespace DigitalRise.Data.Modelling
 
 					if (channelContent.Scales != null)
 					{
-						for (var i = 0; i < channelContent.Scales.Count; ++i)
+						for (var i = 0; i < channelContent.Scales.Data.Count; ++i)
 						{
-							var scale = channelContent.Scales[i];
+							var scale = channelContent.Scales.Data[i];
 
 							SrtTransformOptional transform;
 							animationData.TryGetValue(scale.Time, out transform);
@@ -167,9 +167,9 @@ namespace DigitalRise.Data.Modelling
 
 					if (channelContent.Rotations != null)
 					{
-						for (var i = 0; i < channelContent.Rotations.Count; ++i)
+						for (var i = 0; i < channelContent.Rotations.Data.Count; ++i)
 						{
-							var rotation = channelContent.Rotations[i];
+							var rotation = channelContent.Rotations.Data[i];
 
 							SrtTransformOptional transform;
 							animationData.TryGetValue(rotation.Time, out transform);
@@ -234,7 +234,7 @@ namespace DigitalRise.Data.Modelling
 
 			if (assetName.EndsWith("jdrm"))
 			{
-				_modelContent = ModelContent.LoadJsonFromFile(manager.ReadAsString(assetName));
+				_modelContent = ModelContent.LoadJsonFromString(manager.ReadAsString(assetName), name => manager.Open(name));
 			}
 			else
 			{

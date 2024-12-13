@@ -1,21 +1,27 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
+﻿using DigitalRise.ModelStorage.Binary;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace DigitalRise.ModelStorage
 {
-	public class IndexBufferContent : IBinarySerializable
+	public class IndexBufferContent
 	{
-		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
+		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+		public int BufferId { get; set; }
+
+		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
 		public IndexElementSize IndexType { get; set; }
 
-		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
+		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
 		public int IndexCount { get; set; }
 
+		[Browsable(false)]
+		[JsonIgnore]
 		public byte[] Data { get; set; }
-
 
 		public IndexBufferContent()
 		{
@@ -59,10 +65,9 @@ namespace DigitalRise.ModelStorage
 			}
 		}
 
-		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		internal void LoadBinaryData(ReadContext ctx)
 		{
-			IndexType = (IndexElementSize)br.ReadInt32();
-			Data = br.ReadByteArray();
+			Data = ctx.ReadByteArray(BufferId);
 
 			if (Data.Length % IndexType.GetSize() != 0)
 			{
@@ -72,10 +77,9 @@ namespace DigitalRise.ModelStorage
 			IndexCount = Data.Length / IndexType.GetSize();
 		}
 
-		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		internal void SaveBinaryData(WriteContext ctx)
 		{
-			bw.Write((int)IndexType);
-			bw.WriteByteArray(Data);
+			BufferId = ctx.WriteData(Data);
 		}
 	}
 }

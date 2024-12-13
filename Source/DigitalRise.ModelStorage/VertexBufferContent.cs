@@ -1,19 +1,23 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
+﻿using DigitalRise.ModelStorage.Binary;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace DigitalRise.ModelStorage
 {
-	public class VertexBufferContent : IBinarySerializable
+	public class VertexBufferContent
 	{
 		private int? _vertexStride;
 		private byte[] _data;
 		private readonly MemoryStream _stream = new MemoryStream();
+
+		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+		public int BufferId { get; set; }
 
 		[Browsable(false)]
 		[JsonIgnore]
@@ -36,6 +40,8 @@ namespace DigitalRise.ModelStorage
 
 		public int VertexCount { get; set; }
 
+		[Browsable(false)]
+		[JsonIgnore]
 		public byte[] Data
 		{
 			get
@@ -54,8 +60,7 @@ namespace DigitalRise.ModelStorage
 			}
 		}
 
-
-		public ObservableCollection<VertexElementContent> Elements { get; } = new ObservableCollection<VertexElementContent>();
+		public ObservableCollection<VertexElementContent> Elements { get; set; } = new ObservableCollection<VertexElementContent>();
 
 		public VertexBufferContent()
 		{
@@ -90,26 +95,9 @@ namespace DigitalRise.ModelStorage
 
 		public byte[] GetMemoryData() => _stream.GetBuffer();
 
-		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		internal void LoadBinaryData(ReadContext ctx)
 		{
-			var elements = br.ReadCollection(br =>
-			{
-				var result = new VertexElementContent
-				{
-					Usage = (VertexElementUsage)br.ReadInt32(),
-					Format = (VertexElementFormat)br.ReadInt32(),
-					UsageIndex = br.ReadInt32()
-				};
-
-				return result;
-			});
-
-			for(var i = 0; i < elements.Count; ++i)
-			{
-				Elements.Add(elements[i]);
-			}
-
-			Data = br.ReadByteArray();
+			Data = ctx.ReadByteArray(BufferId);
 
 			if (Data.Length % VertexStride != 0)
 			{
@@ -119,16 +107,10 @@ namespace DigitalRise.ModelStorage
 			VertexCount = Data.Length / VertexStride;
 		}
 
-		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		internal void SaveBinaryData(WriteContext ctx)
 		{
-			bw.WriteCollection(Elements, (bw, element) =>
-			{
-				bw.Write((int)element.Usage);
-				bw.Write((int)element.Format);
-				bw.Write(element.UsageIndex);
-			});
-
-			bw.WriteByteArray(Data);
+			VertexCount = MemoryVertexCount;
+			BufferId = ctx.WriteData(Data);
 		}
 	}
 }

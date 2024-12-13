@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Source\DigitalRise.Mathematics\DigitalRise.Mathematics.MonoGame.csproj" />
     <ProjectReference Include="..\..\Source\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj" />
   </ItemGroup>
 

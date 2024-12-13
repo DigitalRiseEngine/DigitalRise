@@ -1,30 +1,26 @@
-﻿using DigitalRise.Mathematics;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace DigitalRise.ModelStorage
 {
-	public class BoneContent : INamedObject, IBinarySerializable
+	public class BoneContent
 	{
 		public string Name { get; set; }
-		public List<BoneContent> Children { get; } = new List<BoneContent>();
 		public MeshContent Mesh { get; set; }
-		public SrtTransform DefaultPose = SrtTransform.Identity;
+		public Vector3 Scale = Vector3.One;
+		public Quaternion Rotation = Quaternion.Identity;
+		public Vector3 Translation = Vector3.Zero;
+		public List<BoneContent> Children { get; set; } = new List<BoneContent>();
 
-		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		internal void RecursiveProcess(Action<BoneContent> processor)
 		{
-			Name = br.ReadString();
-			Mesh = br.ReadIfNotNull<MeshContent>();
-			DefaultPose = br.ReadSrtTransform();
-			Children.AddRange(br.ReadCollection<BoneContent>());
-		}
+			processor(this);
 
-		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
-		{
-			bw.WriteString(Name);
-			bw.WriteIfNotNull(Mesh);
-			bw.Write(DefaultPose);
-			bw.WriteCollection(Children);
+			foreach (var child in Children)
+			{
+				child.RecursiveProcess(processor);
+			}
 		}
 	}
 }

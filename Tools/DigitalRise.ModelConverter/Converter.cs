@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Quaternion = Microsoft.Xna.Framework.Quaternion;
 
 namespace DigitalRise.ModelConverter
 {
@@ -310,20 +311,23 @@ namespace DigitalRise.ModelConverter
 				_submeshes.Add(submesh);
 			}
 
-			foreach (var vertexBuffer in _model.VertexBuffers)
-			{
-				vertexBuffer.VertexCount = vertexBuffer.MemoryVertexCount;
-			}
-
 			_model.IndexBuffer = new IndexBufferContent(_indices);
 		}
 
 		BoneContent Convert(Node node)
 		{
+			var transform = node.Transform.ToXna();
+			Vector3 scale, translation;
+			Quaternion rotation;
+
+			transform.Decompose(out scale, out rotation, out translation);
+
 			var result = new BoneContent
 			{
 				Name = node.Name,
-				DefaultPose = new SrtTransform(node.Transform.ToXna())
+				Scale = scale,
+				Rotation = rotation,
+				Translation = translation
 			};
 
 			_bones.Add(result);
@@ -371,7 +375,7 @@ namespace DigitalRise.ModelConverter
 						InverseBindTransform = bone.OffsetMatrix.ToXna()
 					};
 
-					skinContent.Joints.Add(skinJointContent);
+					skinContent.Data.Add(skinJointContent);
 				}
 
 				_submeshes[i].Skin = skinContent;
@@ -405,7 +409,7 @@ namespace DigitalRise.ModelConverter
 						for (var i = 0; i < sourceChannel.PositionKeyCount; ++i)
 						{
 							var pos = sourceChannel.PositionKeys[i];
-							channel.Translations.Add(new VectorKeyframeContent(pos.Time, pos.Value.ToXna()));
+							channel.Translations.Data.Add(new VectorKeyframeContent(pos.Time, pos.Value.ToXna()));
 						}
 					}
 
@@ -415,7 +419,7 @@ namespace DigitalRise.ModelConverter
 						for (var i = 0; i < sourceChannel.ScalingKeyCount; ++i)
 						{
 							var scale = sourceChannel.ScalingKeys[i];
-							channel.Scales.Add(new VectorKeyframeContent(scale.Time, scale.Value.ToXna()));
+							channel.Scales.Data.Add(new VectorKeyframeContent(scale.Time, scale.Value.ToXna()));
 						}
 					}
 
@@ -425,7 +429,7 @@ namespace DigitalRise.ModelConverter
 						for (var i = 0; i < sourceChannel.RotationKeyCount; ++i)
 						{
 							var rotation = sourceChannel.RotationKeys[i];
-							channel.Rotations.Add(new QuaternionKeyframeContent(rotation.Time, rotation.Value.ToXna()));
+							channel.Rotations.Data.Add(new QuaternionKeyframeContent(rotation.Time, rotation.Value.ToXna()));
 						}
 					}
 
@@ -483,13 +487,14 @@ namespace DigitalRise.ModelConverter
 				ProcessAnimations(scene);
 			}
 
-			var output = Path.GetFileNameWithoutExtension(options.InputFile);
-			if (!string.IsNullOrEmpty(options.OutputFolder))
+			if (options.OutputFile.EndsWith(".drm", StringComparison.OrdinalIgnoreCase))
 			{
-				output = Path.Combine(options.OutputFolder, output);
+				_model.SaveBinaryToFile(options.OutputFile);
 			}
-
-			_model.SaveBinaryToFile(output);
+			else
+			{
+				_model.SaveJsonToFile(options.OutputFile);
+			}
 
 			var passed = DateTime.Now - time;
 			Log($"{passed.TotalMilliseconds} ms");

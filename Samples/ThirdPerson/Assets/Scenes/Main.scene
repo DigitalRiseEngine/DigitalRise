@@ -112,7 +112,7 @@
     },
     {
       "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise.Graphics",
-      "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.jdrm",
+      "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.drm",
       "Children": [
         {
           "Name": "_cameraMount",

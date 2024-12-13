@@ -3,6 +3,7 @@ using DigitalRise.Animation;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
+using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Rendering.Deferred;
@@ -229,7 +230,7 @@ namespace DigitalRise.SceneGraph
 
 				ResetTransforms();
 
-				Shape = Shape.Infinite;
+				Shape = CalculateBoundingBox().CreateShape();
 
 				if (setMaterialsFromModel)
 				{
@@ -310,9 +311,12 @@ namespace DigitalRise.SceneGraph
 			var boundingBox = new BoundingBox();
 			foreach (var bone in _model.MeshBones)
 			{
-				var m = /*bone.Skin != null ? Matrix.Identity :*/ _worldTransforms[bone.Index];
-				var bb = bone.Mesh.BoundingBox.Transform(ref m);
-				boundingBox = BoundingBox.CreateMerged(boundingBox, bb);
+				foreach(var submesh in bone.Mesh.Submeshes)
+				{
+					var m = submesh.Skin != null ? Matrix.Identity : _worldTransforms[bone.Index];
+					var bb = submesh.BoundingBox.Transform(ref m);
+					boundingBox = BoundingBox.CreateMerged(boundingBox, bb);
+				}
 			}
 
 			return boundingBox;

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 
 namespace DigitalRise.ModelConverter
@@ -307,6 +308,7 @@ namespace DigitalRise.ModelConverter
 					StartIndex = startIndex,
 					PrimitiveCount = indices.Length / 3,
 					MaterialIndex = mesh.MaterialIndex,
+					BoundingBox = Microsoft.Xna.Framework.BoundingBox.CreateFromPoints((from v in mesh.Vertices select v.ToXna()).ToArray())
 				};
 
 				_submeshes.Add(submesh);

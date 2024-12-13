@@ -75,15 +75,11 @@ namespace DigitalRise.Data.Modelling
 				result.Mesh = new Mesh();
 				foreach (var submeshContent in bone.Mesh.Submeshes)
 				{
-					var submesh = new Submesh
+					var submesh = new Submesh(_vertexBuffers[submeshContent.VertexBufferIndex], _indexBuffer, submeshContent.BoundingBox,
+						submeshContent.PrimitiveType, submeshContent.VertexCount, submeshContent.PrimitiveCount)
 					{
-						PrimitiveType = submeshContent.PrimitiveType,
-						VertexBuffer = _vertexBuffers[submeshContent.VertexBufferIndex],
 						StartVertex = submeshContent.StartVertex,
-						VertexCount = submeshContent.VertexCount,
-						IndexBuffer = _indexBuffer,
 						StartIndex = submeshContent.StartIndex,
-						PrimitiveCount = submeshContent.PrimitiveCount,
 					};
 
 					if (submeshContent.Skin != null)
@@ -98,6 +94,7 @@ namespace DigitalRise.Data.Modelling
 						{
 							SkinIndex = _skinIndex
 						};
+						
 						++_skinIndex;
 					}
 
@@ -114,6 +111,8 @@ namespace DigitalRise.Data.Modelling
 					{
 						material.DiffuseTexturePath = materialContent.DiffuseTexture.FilePath;
 					}
+
+					material.Load(_assetManager);
 
 					submesh.Material = material;
 

@@ -15,6 +15,7 @@ namespace DigitalRise.ModelStorage
 		public IndexBufferContent IndexBuffer { get; set; }
 
 		public BoneContent RootBone { get; set; }
+		public List<MaterialContent> Materials { get; set; } = new List<MaterialContent>();
 
 		public Dictionary<string, AnimationClipContent> Animations { get; set; } = new Dictionary<string, AnimationClipContent>();
 

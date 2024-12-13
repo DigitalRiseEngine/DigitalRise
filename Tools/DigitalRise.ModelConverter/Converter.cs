@@ -305,7 +305,8 @@ namespace DigitalRise.ModelConverter
 					StartVertex = startVertex,
 					VertexCount = mesh.Vertices.Count,
 					StartIndex = startIndex,
-					PrimitiveCount = indices.Length / 3
+					PrimitiveCount = indices.Length / 3,
+					MaterialIndex = mesh.MaterialIndex,
 				};
 
 				_submeshes.Add(submesh);
@@ -351,6 +352,151 @@ namespace DigitalRise.ModelConverter
 			}
 
 			return result;
+		}
+
+		private void ProcessMaterials(Scene scene)
+		{
+			for (var i = 0; i < scene.MaterialCount; ++i)
+			{
+				var material = scene.Materials[i];
+
+				var materialContent = new MaterialContent
+				{
+					Name = material.Name
+				};
+
+/*				if (material.HasBlendMode)
+				{
+					materialContent.Properties["BlendMode"] = material.BlendMode;
+				}*/
+
+				if (material.HasBumpScaling)
+				{
+					materialContent.BumpScaling = material.BumpScaling;
+				}
+
+				if (material.HasColorAmbient)
+				{
+					materialContent.AmbientColor = material.ColorAmbient.ToXna();
+				}
+
+				if (material.HasColorDiffuse)
+				{
+					materialContent.DiffuseColor = material.ColorDiffuse.ToXna();
+				}
+
+				if (material.HasColorEmissive)
+				{
+					materialContent.EmissiveColor = material.ColorEmissive.ToXna();
+				}
+
+				if (material.HasColorReflective)
+				{
+					materialContent.ReflectiveColor = material.ColorReflective.ToXna();
+				}
+
+				if (material.HasColorSpecular)
+				{
+					materialContent.SpecularColor = material.ColorSpecular.ToXna();
+				}
+
+				if (material.HasColorTransparent)
+				{
+					materialContent.TransparentColor = material.ColorTransparent.ToXna();
+				}
+
+				if (material.HasOpacity)
+				{
+					materialContent.Opacity = material.Opacity;
+				}
+
+				if (material.HasReflectivity)
+				{
+					materialContent.Reflectivity = material.Reflectivity;
+				}
+
+/*				if (material.HasShadingMode)
+				{
+					materialContent.Properties["ShadingMode"] = material.ShadingMode;
+				}*/
+
+				if (material.HasShininess)
+				{
+					materialContent.Shininess = material.Shininess;
+				}
+
+				if (material.HasShininessStrength)
+				{
+					materialContent.ShininessStrength = material.ShininessStrength;
+				}
+
+				if (material.HasTextureAmbient)
+				{
+					materialContent.AmbientTexture = material.TextureAmbient.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureAmbientOcclusion)
+				{
+					materialContent.AmbientOcclusionTexture = material.TextureAmbientOcclusion.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureDiffuse)
+				{
+					materialContent.DiffuseTexture = material.TextureDiffuse.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureEmissive)
+				{
+					materialContent.EmissiveTexture = material.TextureEmissive.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureHeight)
+				{
+					materialContent.HeightTexture = material.TextureHeight.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureLightMap)
+				{
+					materialContent.LightMapTexture = material.TextureLightMap.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureNormal)
+				{
+					materialContent.NormalTexture = material.TextureNormal.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureOpacity)
+				{
+					materialContent.OpacityTexture = material.TextureOpacity.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureReflection)
+				{
+					materialContent.ReflectionTexture = material.TextureReflection.ToTextureSlotContent();
+				}
+
+				if (material.HasTextureSpecular)
+				{
+					materialContent.SpecularTexture = material.TextureSpecular.ToTextureSlotContent();
+				}
+
+				if (material.HasTransparencyFactor)
+				{
+					materialContent.TransparencyFactor = material.TransparencyFactor;
+				}
+
+				if (material.HasTwoSided)
+				{
+					materialContent.IsTwoSided = material.IsTwoSided;
+				}
+
+				if (material.HasWireFrame)
+				{
+					materialContent.IsWireFrame = material.IsWireFrameEnabled;
+				}
+
+				_model.Materials.Add(materialContent);
+			}
 		}
 
 		private void ProcessSkins(Scene scene)
@@ -481,6 +627,7 @@ namespace DigitalRise.ModelConverter
 
 				_model.RootBone = Convert(scene.RootNode);
 
+				ProcessMaterials(scene);
 				ProcessSkins(scene);
 				ProcessAnimations(scene);
 			}

@@ -94,15 +94,27 @@ namespace DigitalRise.Data.Modelling
 							joints.Add(new SkinJoint(skinJointContent.BoneIndex, skinJointContent.InverseBindTransform));
 						}
 
-						submesh.Skin = new Skin(joints.ToArray());
-						submesh.Skin.SkinIndex = _skinIndex;
+						submesh.Skin = new Skin(joints.ToArray())
+						{
+							SkinIndex = _skinIndex
+						};
 						++_skinIndex;
 					}
 
+					var materialContent = _modelContent.Materials[submeshContent.MaterialIndex];
+
 					var material = new DefaultMaterial
 					{
-						Skinning = submeshContent.Skin != null
+						Skinning = submeshContent.Skin != null,
+						DiffuseColor = materialContent.DiffuseColor,
+						SpecularPower = materialContent.Shininess,
 					};
+
+					if (materialContent.DiffuseTexture != null)
+					{
+						material.DiffuseTexturePath = materialContent.DiffuseTexture.FilePath;
+					}
+
 					submesh.Material = material;
 
 					result.Mesh.Submeshes.Add(submesh);

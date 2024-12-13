@@ -25,6 +25,10 @@ namespace DigitalRise.ModelStorage
 
 		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
 		public int PrimitiveCount { get; set; }
+
+		[JsonIgnore(Condition = JsonIgnoreCondition.Never)]
+		public int MaterialIndex { get; set; }
+
 		public BoundingBox BoundingBox { get; set; }
 	}
 }

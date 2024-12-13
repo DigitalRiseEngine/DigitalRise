@@ -113,28 +113,6 @@
     {
       "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise.Graphics",
       "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.jdrm",
-      "MeshMaterials": [
-        {
-          "MeshName": "Beta_Joints",
-          "Materials": [
-            {
-              "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
-              "DiffuseColor": "255, 255, 255, 255",
-              "Skinning": true
-            }
-          ]
-        },
-        {
-          "MeshName": "Beta_Surface",
-          "Materials": [
-            {
-              "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
-              "DiffuseColor": "255, 255, 255, 255",
-              "Skinning": true
-            }
-          ]
-        }
-      ],
       "Children": [
         {
           "Name": "_cameraMount",

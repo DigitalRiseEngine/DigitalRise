@@ -442,8 +442,6 @@ namespace DigitalRise.ModelConverter
 
 		public void Convert(Options options)
 		{
-			Log($"Input file: {options.InputFile}");
-
 			var time = DateTime.Now;
 
 			_model = new ModelContent();

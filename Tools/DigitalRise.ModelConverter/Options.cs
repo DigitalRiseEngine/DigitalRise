@@ -9,6 +9,6 @@
 		public bool FlipWindingOrder { get; set; }
 
 		public override string ToString() =>
-			$"{InputFile}, OutputFolder={OutputFolder}, GenerateTangents={GenerateTangentsAndBitangents}, FlipWindingOrder={FlipWindingOrder}";
+			$"Input={InputFile}, Output={OutputFile}, GenerateTangents={GenerateTangentsAndBitangents}, FlipWindingOrder={FlipWindingOrder}";
 	}
 }

@@ -78,7 +78,7 @@ namespace DigitalRise.ModelConverter
 					default:
 						if (arg.StartsWith("-"))
 						{
-							throw new ModelConverterException($"Unknown argument '{arg}'");
+							throw new ModelConverterException($"Unknown argument '{arg}'.");
 						}
 
 						if (string.IsNullOrEmpty(options.InputFile))
@@ -96,7 +96,7 @@ namespace DigitalRise.ModelConverter
 						}
 						else
 						{
-							throw new ModelConverterException($"Unknown argument '{arg}'");
+							throw new ModelConverterException($"Unknown argument '{arg}'.");
 						}
 
 
@@ -107,7 +107,12 @@ namespace DigitalRise.ModelConverter
 
 			if (string.IsNullOrEmpty(options.InputFile))
 			{
-				throw new ModelConverterException("Input file is not specified");
+				throw new ModelConverterException("Input file is not specified.");
+			}
+
+			if (string.IsNullOrEmpty(options.OutputFile))
+			{
+				throw new ModelConverterException("Output file is not specified.");
 			}
 
 			Log(options.ToString());

@@ -200,16 +200,6 @@ namespace DigitalRise.Data.Meshes.Morphing
 		//--------------------------------------------------------------
 
 		/// <summary>
-		/// Gets or sets the name of the <see cref="MorphWeightCollection"/>.
-		/// </summary>
-		/// <value>
-		/// The name of the <see cref="MorphWeightCollection"/>. The default value is the name of the
-		/// <see cref="Mesh"/> or <see langword="null"/>.
-		/// </value>
-		public string Name { get; set; }  // Needed for IAnimatableObject
-
-
-		/// <summary>
 		/// Gets the number of morph targets.
 		/// </summary>
 		/// <value>The number of morph targets.</value>
@@ -253,10 +243,8 @@ namespace DigitalRise.Data.Meshes.Morphing
 		/// <paramref name="mesh"/> does not include any morph targets.
 		/// </exception>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		public MorphWeightCollection(Mesh mesh)
-		  : this(GetMorphTargetNames(mesh))
+		public MorphWeightCollection(Mesh mesh): this(GetMorphTargetNames(mesh))
 		{
-			Name = mesh.Name;
 		}
 
 
@@ -294,7 +282,6 @@ namespace DigitalRise.Data.Meshes.Morphing
 		/// <param name="source">The source <see cref="MorphWeightCollection"/>.</param>
 		private MorphWeightCollection(MorphWeightCollection source)
 		{
-			Name = source.Name;
 			_names = source._names;
 
 			var weights = source._weights;

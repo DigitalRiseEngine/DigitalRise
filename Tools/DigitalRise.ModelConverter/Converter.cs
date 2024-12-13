@@ -387,7 +387,10 @@ namespace DigitalRise.ModelConverter
 					throw new Exception($"Mesh animations aren't supported. Animaton name='{animation.Name}'.");
 				}
 
-				var animationClip = new AnimationClipContent();
+				var animationClip = new AnimationClipContent
+				{
+					Name = animation.Name
+				};
 				foreach (var sourceChannel in animation.NodeAnimationChannels)
 				{
 					var boneIndex = GetBoneIndex(sourceChannel.NodeName);
@@ -429,13 +432,15 @@ namespace DigitalRise.ModelConverter
 					animationClip.Channels.Add(channel);
 				}
 
-				_model.Animations[animation.Name] = animationClip;
+				_model.Animations[animationClip.Name] = animationClip;
 			}
 		}
 
 		public void Convert(Options options)
 		{
 			Log($"Input file: {options.InputFile}");
+
+			var time = DateTime.Now;
 
 			_model = new ModelContent();
 			_bones.Clear();
@@ -484,7 +489,10 @@ namespace DigitalRise.ModelConverter
 				output = Path.Combine(options.OutputFolder, output);
 			}
 
-			_model.Save(@".", Path.GetFileNameWithoutExtension(options.InputFile));
+			_model.SaveBinaryToFile(output);
+
+			var passed = DateTime.Now - time;
+			Log($"{passed.TotalMilliseconds} ms");
 		}
 	}
 }

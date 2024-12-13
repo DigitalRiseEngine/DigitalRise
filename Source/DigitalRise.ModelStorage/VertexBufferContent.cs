@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace DigitalRise.ModelStorage
 {
-	public class VertexBufferContent
+	public class VertexBufferContent : IBinarySerializable
 	{
 		private int? _vertexStride;
 		private byte[] _data;
@@ -89,5 +89,46 @@ namespace DigitalRise.ModelStorage
 		}
 
 		public byte[] GetMemoryData() => _stream.GetBuffer();
+
+		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		{
+			var elements = br.ReadCollection(br =>
+			{
+				var result = new VertexElementContent
+				{
+					Usage = (VertexElementUsage)br.ReadInt32(),
+					Format = (VertexElementFormat)br.ReadInt32(),
+					UsageIndex = br.ReadInt32()
+				};
+
+				return result;
+			});
+
+			for(var i = 0; i < elements.Count; ++i)
+			{
+				Elements.Add(elements[i]);
+			}
+
+			Data = br.ReadByteArray();
+
+			if (Data.Length % VertexStride != 0)
+			{
+				throw new Exception($"Inconsistent data size. Data.Length={Data.Length}, VertexStride={VertexStride}");
+			}
+
+			VertexCount = Data.Length / VertexStride;
+		}
+
+		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		{
+			bw.WriteCollection(Elements, (bw, element) =>
+			{
+				bw.Write((int)element.Usage);
+				bw.Write((int)element.Format);
+				bw.Write(element.UsageIndex);
+			});
+
+			bw.WriteByteArray(Data);
+		}
 	}
 }

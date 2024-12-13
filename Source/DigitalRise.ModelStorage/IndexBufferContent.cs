@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace DigitalRise.ModelStorage
 {
-	public class IndexBufferContent
+	public class IndexBufferContent : IBinarySerializable
 	{
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
 		public IndexElementSize IndexType { get; set; }
@@ -39,26 +38,44 @@ namespace DigitalRise.ModelStorage
 			}
 
 			using (var ms = new MemoryStream())
+			using (var writer = new BinaryWriter(ms))
 			{
 				if (IndexType == IndexElementSize.SixteenBits)
 				{
-					var indicesShort = new ushort[indices.Count];
-					for (var i = 0; i < indicesShort.Length; ++i)
+					for (var i = 0; i < indices.Count; ++i)
 					{
-						indicesShort[i] = (ushort)indices[i];
+						writer.Write((ushort)indices[i]);
 					}
-
-					var bytes = MemoryMarshal.AsBytes<ushort>(indicesShort);
-					ms.Write(bytes);
 				}
 				else
 				{
-					var bytes = MemoryMarshal.AsBytes<uint>(indices.ToArray());
-					ms.Write(bytes);
+					for (var i = 0; i < indices.Count; ++i)
+					{
+						writer.Write(indices[i]);
+					}
 				}
 
 				Data = ms.ToArray();
 			}
+		}
+
+		void IBinarySerializable.LoadFromBinary(BinaryReader br)
+		{
+			IndexType = (IndexElementSize)br.ReadInt32();
+			Data = br.ReadByteArray();
+
+			if (Data.Length % IndexType.GetSize() != 0)
+			{
+				throw new Exception($"Inconsistent data size. Data.Length={Data.Length}, IndexSize={IndexType.GetSize()}");
+			}
+
+			IndexCount = Data.Length / IndexType.GetSize();
+		}
+
+		void IBinarySerializable.SaveToBinary(BinaryWriter bw)
+		{
+			bw.Write((int)IndexType);
+			bw.WriteByteArray(Data);
 		}
 	}
 }

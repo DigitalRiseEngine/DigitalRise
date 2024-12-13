@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using AssetManagementBase;
 using DigitalRise.Animation;
 using DigitalRise.Data.Materials;
@@ -71,11 +72,7 @@ namespace DigitalRise.Data.Modelling
 
 			if (bone.Mesh != null)
 			{
-				result.Mesh = new Mesh
-				{
-					Name = bone.Mesh.Name
-				};
-
+				result.Mesh = new Mesh();
 				foreach (var submeshContent in bone.Mesh.Submeshes)
 				{
 					var submesh = new Submesh
@@ -235,7 +232,18 @@ namespace DigitalRise.Data.Modelling
 			_assetManager = manager;
 			_assetName = assetName;
 
-			_modelContent = JsonSerialization.DeserializeFromString<ModelContent>(manager.ReadAsString(assetName));
+			if (assetName.EndsWith("jdrm"))
+			{
+				_modelContent = ModelContent.LoadJsonFromFile(manager.ReadAsString(assetName));
+			}
+			else
+			{
+				using (var stream = manager.Open(assetName))
+				using (var reader = new BinaryReader(stream))
+				{
+					_modelContent = ModelContent.LoadBinary(reader);
+				}
+			}
 
 			LoadVertexBuffers();
 

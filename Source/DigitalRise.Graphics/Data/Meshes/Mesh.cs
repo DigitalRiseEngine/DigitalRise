@@ -66,7 +66,7 @@ namespace DigitalRise.Data.Meshes
 	/// </remarks>
 	/// <seealso cref="MeshNode"/>
 	/// <seealso cref="Submesh"/>
-	public class Mesh : INamedObject, IDisposable
+	public class Mesh : IDisposable
 	{
 		// Note: Meshes are not cloneable because meshes/submeshes from one model usually
 		// share vertex and index buffers. Therefore, it makes little sense to duplicate 
@@ -112,14 +112,6 @@ namespace DigitalRise.Data.Meshes
 		/// <value>The <see cref="Submesh"/>es that make up this mesh.</value>
 		[Category("Common")]
 		public ObservableCollection<Submesh> Submeshes { get; } = new ObservableCollection<Submesh>();
-
-
-		/// <summary>
-		/// Gets or sets the name of this mesh.
-		/// </summary>
-		/// <value>The name of this mesh.</value>
-		[Category("Common")]
-		public string Name { get; set; }
 
 
 		/// <summary>
@@ -276,7 +268,6 @@ namespace DigitalRise.Data.Meshes
 		{
 			Mesh mesh = new Mesh
 			{
-				Name = Name,
 				Occluder = Occluder,
 				UserData = UserData
 			};

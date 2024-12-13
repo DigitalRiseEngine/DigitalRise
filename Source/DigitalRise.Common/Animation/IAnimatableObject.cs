@@ -14,8 +14,7 @@ namespace DigitalRise.Animation
   /// An <see cref="IAnimatableObject"/> is an object that can be animated. It has properties that 
   /// can be controlled by animations. 
   /// </remarks>
-  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Animatable")]
-  public interface IAnimatableObject : INamedObject
+  public interface IAnimatableObject
   {
     /// <summary>
     /// Gets either the properties which are currently animated, or all properties which can be 

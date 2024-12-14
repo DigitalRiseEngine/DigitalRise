@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>DigitalRise.ModelStorage.MonoGame</PackageId>
+    <AssemblyName>DigitalRise.ModelStorage</AssemblyName>
+    <RootNamespace>DigitalRise.ModelStorage</RootNamespace>
+    <Description>DigitalRise.ModelStorage for MonoGame</Description>
+    <DefineConstants>$(DefineConstants);MONOGAME</DefineConstants>
+    <OutputPath>bin\MonoGame\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" PrivateAssets="All" Version="$(MonoGameVersion)" />
+  </ItemGroup>
+
+</Project>

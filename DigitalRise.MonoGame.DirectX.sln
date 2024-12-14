@@ -39,9 +39,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{F8D3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThirdPerson.MonoGame.DirectX", "Samples\ThirdPerson\ThirdPerson.MonoGame.DirectX.csproj", "{9F125C28-173C-496D-B6E7-64A10B15B629}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{EE10814A-3120-413D-B76B-3F825F19C0E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelStorage.MonoGame", "Source\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj", "{1FD3C011-969F-47F1-8420-44A522F822F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelStorage.MonoGame", "..\DigitalRise.ModelStorage\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj", "{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelConverter", "Tools\DigitalRise.ModelConverter\DigitalRise.ModelConverter.csproj", "{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.SceneData.MonoGame", "Source\DigitalRise.SceneData\DigitalRise.SceneData.MonoGame.csproj", "{1C7BA988-221A-4D10-9207-0C1B0D50B26F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,10 +107,18 @@ Global
 		{9F125C28-173C-496D-B6E7-64A10B15B629}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F125C28-173C-496D-B6E7-64A10B15B629}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F125C28-173C-496D-B6E7-64A10B15B629}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FD3C011-969F-47F1-8420-44A522F822F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FD3C011-969F-47F1-8420-44A522F822F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FD3C011-969F-47F1-8420-44A522F822F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FD3C011-969F-47F1-8420-44A522F822F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,7 +138,9 @@ Global
 		{3BD8E7E5-53B6-451E-8524-55DA87ACCCCD} = {9E6E150B-162E-4D9A-8782-9BAFA9DE73FB}
 		{A357EC01-AB04-425A-A692-A57FB85D8ABA} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
 		{9F125C28-173C-496D-B6E7-64A10B15B629} = {F8D3E01B-E8A7-4D04-A976-C1FB46BB51E7}
-		{DCA5E6D3-A906-41D9-87A9-E5A2A45234F4} = {EE10814A-3120-413D-B76B-3F825F19C0E3}
+		{1FD3C011-969F-47F1-8420-44A522F822F5} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
+		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
+		{1C7BA988-221A-4D10-9207-0C1B0D50B26F} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35ACDF4E-2CE2-46B1-A19F-35DC131069A1}

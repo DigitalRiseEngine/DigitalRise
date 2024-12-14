@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DigitalRise.ModelConverter": {
+      "commandName": "Project",
+      "commandLineArgs": "\"D:\\Projects\\DigitalRise.Samples\\DigitalRise.Samples.FNA.Core\\Assets\\Models\\Dude.fbx\" Dude.drm"
+    }
+  }
+}

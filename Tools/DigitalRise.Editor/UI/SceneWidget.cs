@@ -365,11 +365,6 @@ namespace DigitalRise.Editor.UI
 
 				var camera = StudioGame.MainForm.CurrentCamera;
 
-				/*				if (DigitalRiseEditorOptions.ShowGrid)
-								{
-									_renderer.AddNode(GridMesh);
-								}*/
-
 				// Render scene
 				var result = _renderer.Render(Scene,
 					camera,

@@ -1,6 +1,8 @@
 ﻿using Assimp;
 using Assimp.Configs;
+using DigitalRise.Data.Materials;
 using DigitalRise.ModelStorage;
+using DigitalRise.SceneGraph;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
@@ -27,6 +29,7 @@ namespace DigitalRise.ModelConverter
 		private readonly List<SubmeshContent> _submeshes = new List<SubmeshContent>();
 		private readonly List<BoneContent> _bones = new List<BoneContent>();
 		private readonly Dictionary<string, byte> _bonesIndices = new Dictionary<string, byte>();
+		private readonly List<IMaterial> _materials = new List<IMaterial>();
 
 		static void Log(string message) => Console.WriteLine(message);
 
@@ -355,23 +358,35 @@ namespace DigitalRise.ModelConverter
 			return result;
 		}
 
-		private void ProcessMaterials(Scene scene)
+		private static string UpdateMaterialPath(string texturePath, string modelFolder)
 		{
+			if (!string.IsNullOrEmpty(texturePath) && !Path.IsPathRooted(texturePath))
+			{
+				texturePath = Path.Combine(modelFolder, texturePath);
+			}
+
+			return texturePath;
+		}
+
+		private void ProcessMaterials(Scene scene, string inputPath)
+		{
+			var modelFolder = Path.GetDirectoryName(inputPath);
+
 			for (var i = 0; i < scene.MaterialCount; ++i)
 			{
-				var material = scene.Materials[i];
+				var sourceMaterial = scene.Materials[i];
 
-				var materialContent = new MaterialContent
+				var material = new DefaultMaterial
 				{
-					Name = material.Name
+					Name = sourceMaterial.Name
 				};
 
-/*				if (material.HasBlendMode)
-				{
-					materialContent.Properties["BlendMode"] = material.BlendMode;
-				}*/
+				/*				if (material.HasBlendMode)
+								{
+									materialContent.Properties["BlendMode"] = material.BlendMode;
+								}*/
 
-				if (material.HasBumpScaling)
+/*				if (material.HasBumpScaling)
 				{
 					materialContent.BumpScaling = material.BumpScaling;
 				}
@@ -379,14 +394,14 @@ namespace DigitalRise.ModelConverter
 				if (material.HasColorAmbient)
 				{
 					materialContent.AmbientColor = material.ColorAmbient.ToXna();
-				}
+				}*/
 
-				if (material.HasColorDiffuse)
+				if (sourceMaterial.HasColorDiffuse)
 				{
-					materialContent.DiffuseColor = material.ColorDiffuse.ToXna();
+					material.DiffuseColor = sourceMaterial.ColorDiffuse.ToXna();
 				}
 
-				if (material.HasColorEmissive)
+/*				if (material.HasColorEmissive)
 				{
 					materialContent.EmissiveColor = material.ColorEmissive.ToXna();
 				}
@@ -394,14 +409,14 @@ namespace DigitalRise.ModelConverter
 				if (material.HasColorReflective)
 				{
 					materialContent.ReflectiveColor = material.ColorReflective.ToXna();
-				}
+				}*/
 
-				if (material.HasColorSpecular)
+				if (sourceMaterial.HasColorSpecular)
 				{
-					materialContent.SpecularColor = material.ColorSpecular.ToXna();
+					material.SpecularColor = sourceMaterial.ColorSpecular.ToXna();
 				}
 
-				if (material.HasColorTransparent)
+/*				if (material.HasColorTransparent)
 				{
 					materialContent.TransparentColor = material.ColorTransparent.ToXna();
 				}
@@ -416,17 +431,17 @@ namespace DigitalRise.ModelConverter
 					materialContent.Reflectivity = material.Reflectivity;
 				}
 
-/*				if (material.HasShadingMode)
-				{
-					materialContent.Properties["ShadingMode"] = material.ShadingMode;
-				}*/
+								if (material.HasShadingMode)
+								{
+									materialContent.Properties["ShadingMode"] = material.ShadingMode;
+								}*/
 
-				if (material.HasShininess)
+				if (sourceMaterial.HasShininess)
 				{
-					materialContent.Shininess = material.Shininess;
+					material.SpecularPower = sourceMaterial.Shininess;
 				}
 
-				if (material.HasShininessStrength)
+/*				if (material.HasShininessStrength)
 				{
 					materialContent.ShininessStrength = material.ShininessStrength;
 				}
@@ -439,14 +454,14 @@ namespace DigitalRise.ModelConverter
 				if (material.HasTextureAmbientOcclusion)
 				{
 					materialContent.AmbientOcclusionTexture = material.TextureAmbientOcclusion.ToTextureSlotContent();
-				}
+				}*/
 
-				if (material.HasTextureDiffuse)
+				if (sourceMaterial.HasTextureDiffuse)
 				{
-					materialContent.DiffuseTexture = material.TextureDiffuse.ToTextureSlotContent();
+					material.DiffuseTexturePath = UpdateMaterialPath(sourceMaterial.TextureDiffuse.FilePath, modelFolder);
 				}
 
-				if (material.HasTextureEmissive)
+/*				if (material.HasTextureEmissive)
 				{
 					materialContent.EmissiveTexture = material.TextureEmissive.ToTextureSlotContent();
 				}
@@ -459,14 +474,14 @@ namespace DigitalRise.ModelConverter
 				if (material.HasTextureLightMap)
 				{
 					materialContent.LightMapTexture = material.TextureLightMap.ToTextureSlotContent();
-				}
+				}*/
 
-				if (material.HasTextureNormal)
+				if (sourceMaterial.HasTextureNormal)
 				{
-					materialContent.NormalTexture = material.TextureNormal.ToTextureSlotContent();
+					material.NormalTexturePath = UpdateMaterialPath(sourceMaterial.TextureNormal.FilePath, modelFolder);
 				}
 
-				if (material.HasTextureOpacity)
+/*				if (material.HasTextureOpacity)
 				{
 					materialContent.OpacityTexture = material.TextureOpacity.ToTextureSlotContent();
 				}
@@ -474,14 +489,14 @@ namespace DigitalRise.ModelConverter
 				if (material.HasTextureReflection)
 				{
 					materialContent.ReflectionTexture = material.TextureReflection.ToTextureSlotContent();
-				}
+				}*/
 
-				if (material.HasTextureSpecular)
+				if (sourceMaterial.HasTextureSpecular)
 				{
-					materialContent.SpecularTexture = material.TextureSpecular.ToTextureSlotContent();
+					material.SpecularTexturePath = UpdateMaterialPath(sourceMaterial.TextureSpecular.FilePath, modelFolder);
 				}
 
-				if (material.HasTransparencyFactor)
+/*				if (material.HasTransparencyFactor)
 				{
 					materialContent.TransparencyFactor = material.TransparencyFactor;
 				}
@@ -494,9 +509,9 @@ namespace DigitalRise.ModelConverter
 				if (material.HasWireFrame)
 				{
 					materialContent.IsWireFrame = material.IsWireFrameEnabled;
-				}
+				}*/
 
-				_model.Materials.Add(materialContent);
+				_materials.Add(material);
 			}
 		}
 
@@ -596,6 +611,7 @@ namespace DigitalRise.ModelConverter
 			_bonesIndices.Clear();
 			_indices.Clear();
 			_submeshes.Clear();
+			_materials.Clear();
 
 			using (AssimpContext importer = new AssimpContext())
 			{
@@ -628,19 +644,33 @@ namespace DigitalRise.ModelConverter
 
 				_model.RootBone = Convert(scene.RootNode);
 
-				ProcessMaterials(scene);
+				ProcessMaterials(scene, options.InputFile);
 				ProcessSkins(scene);
 				ProcessAnimations(scene);
 			}
 
+			string outputFile;
 			if (options.OutputFile.EndsWith(".drm", StringComparison.OrdinalIgnoreCase))
 			{
-				_model.SaveBinaryToFile(options.OutputFile);
+				outputFile = Path.ChangeExtension(options.OutputFile, "drm");
+				_model.SaveBinaryToFile(outputFile, Log);
 			}
 			else
 			{
-				_model.SaveJsonToFile(options.OutputFile);
+				outputFile = Path.ChangeExtension(options.OutputFile, "jdrm");
+				var binaryFile = Path.ChangeExtension(options.OutputFile, "bin");
+				_model.SaveJsonToFile(outputFile, binaryFile, Log);
 			}
+
+			var modelNode = new DrModelNode
+			{
+				ModelPath = outputFile,
+				Materials = _materials.ToArray()
+			};
+
+			var sceneFile = Path.ChangeExtension(options.OutputFile, "prefab");
+			Log($"Writing {sceneFile}...");
+			modelNode.SaveToFile(sceneFile);
 
 			var passed = DateTime.Now - time;
 			Log($"{passed.TotalMilliseconds} ms");

@@ -1,14 +1,11 @@
 using DigitalRise.SceneGraph;
 using Myra.Graphics2D.UI;
-using Myra.Graphics2D.UI.Properties;
 using System;
 
 namespace DigitalRise.Editor.UI
 {
 	public partial class EditMaterialsDialog
 	{
-		private readonly TreeView _treeMeshes;
-
 		public DrModelNode ModelNode { get; }
 
 		public EditMaterialsDialog(DrModelNode modelNode)
@@ -17,45 +14,24 @@ namespace DigitalRise.Editor.UI
 
 			BuildUI();
 
-			_treeMeshes = new TreeView();
-
-			foreach (var mesh in ModelNode.MeshMaterials)
+			foreach (var material in ModelNode.Materials)
 			{
-				var meshTreeNode = _treeMeshes.AddSubNode(new Label
+				var label = new Label
 				{
-					Text = mesh.MeshName
-				});
+					Text = material.Name,
+					Tag = material
+				};
 
-				if (mesh.Materials.Length == 1)
-				{
-					meshTreeNode.Tag = mesh.Materials[0];
-				}
-				else
-				{
-					for (var i = 0; i < mesh.Materials.Length; ++i)
-					{
-						var subMeshTreeNode = meshTreeNode.AddSubNode(new Label
-						{
-							Text = $"{i}"
-						});
-
-						subMeshTreeNode.Tag = mesh.Materials[i];
-					}
-
-					meshTreeNode.IsExpanded = true;
-				}
+				_listMaterials.Widgets.Add(label);
 			}
 
-			_treeMeshes.SelectionChanged += _treeMeshes_SelectionChanged;
-
-			_panelLeft.Widgets.Add(_treeMeshes);
-
-			_propertyGrid.CustomWidgetProvider = StudioGame.MainForm.CreateCustomEditor;
+			_listMaterials.SelectedIndexChanged += _listMaterials_SelectedIndexChanged;
+			_properties.CustomWidgetProvider = StudioGame.MainForm.CreateCustomEditor;
 		}
 
-		private void _treeMeshes_SelectionChanged(object sender, EventArgs e)
+		private void _listMaterials_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			_propertyGrid.Object = _treeMeshes.SelectedNode.Tag;
+			_properties.Object = _listMaterials.SelectedItem.Tag;
 		}
 	}
 }

@@ -132,6 +132,8 @@ namespace DigitalRise.Data.Meshes
 		[Category("Material")]
 		public IMaterial Material { get; set; }
 
+		public int MaterialIndex { get; set; }
+
 		public Skin Skin { get; set; }
 
 		/// <summary>
@@ -337,6 +339,7 @@ namespace DigitalRise.Data.Meshes
 				IndexBuffer = IndexBuffer,
 				StartIndex = StartIndex,
 				PrimitiveCount = PrimitiveCount,
+				MaterialIndex = MaterialIndex,
 				Material = Material.Clone(),
 				MorphTargets = MorphTargets,
 				UserData = UserData,

@@ -12,35 +12,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 
 namespace DigitalRise.SceneGraph
 {
-	public class MeshMaterials
-	{
-		public string MeshName { get; set; }
-		public IMaterial[] Materials { get; set; }
-
-		public MeshMaterials Clone()
-		{
-			var result = new MeshMaterials
-			{
-				MeshName = MeshName
-			};
-
-			if (Materials != null)
-			{
-				result.Materials = new IMaterial[Materials.Length];
-				for (var i = 0; i < Materials.Length; ++i)
-				{
-					result.Materials[i] = Materials[i].Clone();
-				}
-			}
-
-			return result;
-		}
-	}
-
 	[EditorInfo("Model")]
 	public class DrModelNode : SceneNode, ISkeleton
 	{
@@ -75,7 +49,43 @@ namespace DigitalRise.SceneGraph
 					return;
 				}
 
-				SetModel(value, true);
+				_model = value;
+
+				_localTransforms = null;
+				_worldTransforms = null;
+				_skinInfos = null;
+				if (_model != null)
+				{
+					_localTransforms = new Matrix[_model.Bones.Length];
+					_worldTransforms = new Matrix[_model.Bones.Length];
+
+					var skinInfos = new List<SkinInfo>();
+					_model.TraverseNodes(n =>
+					{
+						if (n.Mesh == null)
+						{
+							return;
+						}
+
+						foreach (var submesh in n.Mesh.Submeshes)
+						{
+							if (submesh.Skin != null)
+							{
+								skinInfos.Add(new SkinInfo(submesh.Skin));
+							}
+						}
+					});
+
+					_skinInfos = skinInfos.ToArray();
+
+					ResetTransforms();
+
+					Shape = CalculateBoundingBox().CreateShape();
+				}
+				else
+				{
+					Shape = Shape.Empty;
+				}
 			}
 		}
 
@@ -83,7 +93,7 @@ namespace DigitalRise.SceneGraph
 		public string ModelPath { get; set; }
 
 		[Browsable(false)]
-		public MeshMaterials[] MeshMaterials { get; set; }
+		public IMaterial[] Materials { get; set; }
 
 		public DrModelNode()
 		{
@@ -139,7 +149,6 @@ namespace DigitalRise.SceneGraph
 						var joint = skinInfo.Skin.Joints[j];
 
 						skinInfo.Transforms[j] = joint.InverseBindTransform * _worldTransforms[joint.BoneIndex];
-						// skinInfo.Transforms[j] = Matrix.Identity;
 					}
 				}
 
@@ -182,100 +191,7 @@ namespace DigitalRise.SceneGraph
 						bones = _skinInfos[submesh.Skin.SkinIndex].Transforms;
 					}
 
-					list.AddJob(submesh, MeshMaterials[i].Materials[j], transform, bones);
-				}
-			}
-		}
-
-		private static string UpdateMaterialPath(string texturePath, string modelFolder)
-		{
-			if (!string.IsNullOrEmpty(texturePath) && !Path.IsPathRooted(texturePath))
-			{
-				texturePath = Path.Combine(modelFolder, texturePath);
-			}
-
-			return texturePath;
-		}
-
-		private void SetModel(DrModel model, bool setMaterialsFromModel)
-		{
-			_model = model;
-
-			_localTransforms = null;
-			_worldTransforms = null;
-			_skinInfos = null;
-			if (_model != null)
-			{
-				_localTransforms = new Matrix[_model.Bones.Length];
-				_worldTransforms = new Matrix[_model.Bones.Length];
-
-				var skinInfos = new List<SkinInfo>();
-				_model.TraverseNodes(n =>
-				{
-					if (n.Mesh == null)
-					{
-						return;
-					}
-
-					foreach(var submesh in n.Mesh.Submeshes)
-					{
-						if (submesh.Skin != null)
-						{
-							skinInfos.Add(new SkinInfo(submesh.Skin));
-						}
-					}
-				});
-
-				_skinInfos = skinInfos.ToArray();
-
-				ResetTransforms();
-
-				Shape = CalculateBoundingBox().CreateShape();
-
-				if (setMaterialsFromModel)
-				{
-					var meshMaterials = new List<MeshMaterials>();
-					foreach (var meshBone in _model.MeshBones)
-					{
-						var mesh = meshBone.Mesh;
-						var materials = new List<IMaterial>();
-						foreach (var submesh in mesh.Submeshes)
-						{
-							var material = submesh.Material.Clone();
-
-							// Make texture paths relative to the node
-							if (!string.IsNullOrEmpty(ModelPath))
-							{
-								var asDefaultMaterial = material as DefaultMaterial;
-								var modelFolder = Path.GetDirectoryName(ModelPath);
-								if (asDefaultMaterial != null && !string.IsNullOrEmpty(modelFolder))
-								{
-									asDefaultMaterial.DiffuseTexturePath = UpdateMaterialPath(asDefaultMaterial.DiffuseTexturePath, modelFolder);
-									asDefaultMaterial.SpecularTexturePath = UpdateMaterialPath(asDefaultMaterial.SpecularTexturePath, modelFolder);
-									asDefaultMaterial.NormalTexturePath = UpdateMaterialPath(asDefaultMaterial.NormalTexturePath, modelFolder);
-								}
-							}
-
-							materials.Add(material);
-						}
-
-						meshMaterials.Add(new MeshMaterials
-						{
-							MeshName = meshBone.Name,
-							Materials = materials.ToArray()
-						});
-					}
-
-					MeshMaterials = meshMaterials.ToArray();
-				}
-			}
-			else
-			{
-				Shape = Shape.Empty;
-
-				if (setMaterialsFromModel)
-				{
-					MeshMaterials = null;
+					list.AddJob(submesh, Materials[submesh.MaterialIndex], transform, bones);
 				}
 			}
 		}
@@ -284,24 +200,22 @@ namespace DigitalRise.SceneGraph
 		{
 			base.Load(assetManager);
 
-			if (MeshMaterials != null)
+			if (Materials != null)
 			{
-				foreach (var meshMaterials in MeshMaterials)
+				foreach (var material in Materials)
 				{
-					foreach(var material in meshMaterials.Materials)
+					var hasExternalAssets = material as IHasExternalAssets;
+					if (hasExternalAssets != null)
 					{
-						var hasExternalAssets = material as IHasExternalAssets;
-						if (hasExternalAssets != null)
-						{
-							hasExternalAssets.Load(assetManager);
-						}
+						hasExternalAssets.Load(assetManager);
 					}
 				}
 			}
 
-			var model = assetManager.LoadJDRM(ModelPath);
+			Model = assetManager.LoadJDRM(ModelPath);
 
-			SetModel(model, MeshMaterials == null);
+			// Update skinning
+
 		}
 
 		private BoundingBox CalculateBoundingBox()
@@ -311,7 +225,7 @@ namespace DigitalRise.SceneGraph
 			var boundingBox = new BoundingBox();
 			foreach (var bone in _model.MeshBones)
 			{
-				foreach(var submesh in bone.Mesh.Submeshes)
+				foreach (var submesh in bone.Mesh.Submeshes)
 				{
 					var m = submesh.Skin != null ? Matrix.Identity : _worldTransforms[bone.Index];
 					var bb = submesh.BoundingBox.Transform(ref m);
@@ -347,19 +261,20 @@ namespace DigitalRise.SceneGraph
 
 			var src = (DrModelNode)source;
 			ModelPath = src.ModelPath;
-			SetModel(src.Model, src.MeshMaterials == null);
+			Model = src.Model;
 
-			if (src.MeshMaterials != null)
+			if (src.Materials != null)
 			{
-				MeshMaterials = new MeshMaterials[src.MeshMaterials.Length];
+				Materials = new IMaterial[src.Materials.Length];
 
-				for (var i = 0; i < MeshMaterials.Length; ++i)
+				for (var i = 0; i < Materials.Length; ++i)
 				{
-					MeshMaterials[i] = src.MeshMaterials[i].Clone();
+					Materials[i] = src.Materials[i].Clone();
 				}
-			} else
+			}
+			else
 			{
-				MeshMaterials = null;
+				Materials = null;
 			}
 		}
 

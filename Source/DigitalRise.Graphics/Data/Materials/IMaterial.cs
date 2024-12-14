@@ -1,6 +1,6 @@
 ﻿namespace DigitalRise.Data.Materials
 {
-	public interface IMaterial
+	public interface IMaterial: INamedObject
 	{
 		public BatchEffectBinding EffectGBuffer { get; }
 		public BatchEffectBinding EffectShadowMap { get; }

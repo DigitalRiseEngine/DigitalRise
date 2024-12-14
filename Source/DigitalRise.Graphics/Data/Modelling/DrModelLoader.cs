@@ -80,6 +80,7 @@ namespace DigitalRise.Data.Modelling
 					{
 						StartVertex = submeshContent.StartVertex,
 						StartIndex = submeshContent.StartIndex,
+						MaterialIndex = submeshContent.MaterialIndex,
 					};
 
 					if (submeshContent.Skin != null)
@@ -97,24 +98,6 @@ namespace DigitalRise.Data.Modelling
 						
 						++_skinIndex;
 					}
-
-					var materialContent = _modelContent.Materials[submeshContent.MaterialIndex];
-
-					var material = new DefaultMaterial
-					{
-						Skinning = submeshContent.Skin != null,
-						DiffuseColor = materialContent.DiffuseColor,
-						SpecularPower = materialContent.Shininess,
-					};
-
-					if (materialContent.DiffuseTexture != null)
-					{
-						material.DiffuseTexturePath = materialContent.DiffuseTexture.FilePath;
-					}
-
-					material.Load(_assetManager);
-
-					submesh.Material = material;
 
 					result.Mesh.Submeshes.Add(submesh);
 				}

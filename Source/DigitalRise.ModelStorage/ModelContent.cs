@@ -15,7 +15,6 @@ namespace DigitalRise.ModelStorage
 		public IndexBufferContent IndexBuffer { get; set; }
 
 		public BoneContent RootBone { get; set; }
-		public List<MaterialContent> Materials { get; set; } = new List<MaterialContent>();
 
 		public Dictionary<string, AnimationClipContent> Animations { get; set; } = new Dictionary<string, AnimationClipContent>();
 
@@ -69,31 +68,33 @@ namespace DigitalRise.ModelStorage
 		/// <summary>
 		/// Saves model in the json format
 		/// </summary>
-		public void SaveJsonToFile(string path)
+		/// <param name="jsonPath"></param>
+		/// <param name="binaryPath"></param>
+		/// <param name="logger"></param>
+		public void SaveJsonToFile(string jsonPath, string binaryPath, Action<string> logger = null)
 		{
-			path = Path.ChangeExtension(path, "bin");
-
 			// Write binary data and set buffer ids
-			using (var stream = File.OpenWrite(path))
+			logger?.Invoke($"Writing '{binaryPath}'...");
+			using (var stream = File.OpenWrite(binaryPath))
 			using (var writer = new BinaryWriter(stream))
 			{
 				SaveBinaryData(new WriteContext(writer));
 			}
 
-			BinaryPath = path;
+			BinaryPath = binaryPath;
 
-			path = Path.ChangeExtension(path, "jdrm");
-			JsonSerialization.SerializeToFile(path, this);
+			logger?.Invoke($"Writing '{jsonPath}'...");
+			JsonSerialization.SerializeToFile(jsonPath, this);
 		}
 
 		/// <summary>
 		/// Saves model in the binary format
 		/// </summary>
 		/// <param name="path"></param>
-		public void SaveBinaryToFile(string path)
+		/// <param name="logger"></param>
+		public void SaveBinaryToFile(string path, Action<string> logger = null)
 		{
-			path = Path.ChangeExtension(path, "drm");
-
+			logger?.Invoke($"Writing '{path}'...");
 			using (var stream = File.OpenWrite(path))
 			using (var writer = new BinaryWriter(stream))
 			{

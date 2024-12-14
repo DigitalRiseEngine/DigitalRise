@@ -41,7 +41,6 @@ namespace DigitalRise.ModelConverter
 		public static Vector3 ToXna(this Vector3D v) => new Vector3(v.X, v.Y, v.Z);
 		public static Color ToXna(this Color4D v) => new Color(new Vector4(v.R, v.G, v.B, v.A));
 		public static Quaternion ToXna(this Assimp.Quaternion v) => new Quaternion(v.X, v.Y, v.Z, v.W);
-		public static TextureSlotContent ToTextureSlotContent(this TextureSlot textureSlot) => new TextureSlotContent(textureSlot.FilePath);
 
 		public static void Write(this BinaryWriter writer, Vector2 v)
 		{

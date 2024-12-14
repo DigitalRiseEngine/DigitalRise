@@ -7,6 +7,8 @@
     <Version>0.3.0</Version>
     <StbImageSharpVersion>2.27.13</StbImageSharpVersion>
     <MonoGameVersion>3.8.1.303</MonoGameVersion>
+    <XNAssetsVersion>0.7.5</XNAssetsVersion>
+    <FontStashSharpVersion>1.3.9</FontStashSharpVersion>
 	<NUnitVersion>3.13.3</NUnitVersion>
 	<NUnit3TestAdapterVersion>4.2.1</NUnit3TestAdapterVersion>
 	<MNTestSdkVersion>17.2.0</MNTestSdkVersion>

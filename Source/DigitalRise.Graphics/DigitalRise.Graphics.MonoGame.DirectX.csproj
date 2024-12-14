@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\DigitalRise.ModelStorage\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj" />
     <ProjectReference Include="..\DigitalRise.Geometry\DigitalRise.Geometry.MonoGame.csproj" />
-    <ProjectReference Include="..\DigitalRise.ModelStorage\DigitalRise.ModelStorage.MonoGame.csproj" />
   </ItemGroup>
 </Project>

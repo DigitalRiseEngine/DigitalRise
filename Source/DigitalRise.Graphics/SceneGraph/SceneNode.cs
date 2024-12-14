@@ -3,6 +3,8 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -32,12 +34,12 @@ namespace DigitalRise.SceneGraph
 	/// <para>
 	/// A scene node can have a transformation (see <see cref="ScaleLocal"/>/<see cref="PoseLocal"/>,
 	/// <see cref="ScaleWorld"/>/<see cref="PoseWorld"/>), a bounding shape (see <see cref="Shape"/>), 
-	/// a parent and children (see <see cref="Parent"/>, <see cref="Children"/>). 
+	/// a parent and children (see <see cref="Parent"/>, <see cref="ActualChildren"/>). 
 	/// </para>
 	/// <para>
 	/// <strong>Scene Graph:</strong><br/>
 	/// The scene node hierarchy, defined by the properties <see cref="Parent"/> and 
-	/// <see cref="Children"/>, is a tree (a graph without cycles). A scene node can only have zero or
+	/// <see cref="ActualChildren"/>, is a tree (a graph without cycles). A scene node can only have zero or
 	/// one parent - it cannot be the child of multiple other nodes. Scene nodes are attached to their
 	/// parent: When the parent node is transformed (rotated or translated) in a scene, all descendant
 	/// nodes move together with the parent node.
@@ -283,38 +285,16 @@ namespace DigitalRise.SceneGraph
 
 
 		/// <summary>
-		/// Gets or sets the children of this scene node.
+		/// Gets the actual children of this scene node.
 		/// </summary>
 		/// <value>
-		/// The collection of children of the scene node. The default value is <see langword="null"/> -
-		/// see remarks. Null entries are not allowed in the children collection.
-		/// </value>
-		/// <remarks>
-		/// <para>
-		/// The property is <see langword="null"/> by default to minimize the memory consumption of the 
-		/// scene node. If the value is <see langword="null"/>, a new <see cref="SceneNodeCollection"/>
-		/// needs to be set before any scene nodes can be attached to the current node.
-		/// </para>
-		/// <example>
-		/// The following example shows how to attach a scene node to another node.
-		/// <code lang="csharp">
-		/// <![CDATA[
-		/// var node = new SceneNode();
-		/// var childNode = new SceneNode();
-		/// 
-		/// // First initialize the Children collection. (The property is null by default.)
-		/// node.Children = new SceneNodeCollection();
-		/// 
-		/// // Now attach the childNode to node.
-		/// node.Children.Add(childNode);
-		/// ]]>
-		/// </code>
-		/// </example>
-		/// </remarks>
 		[Browsable(false)]
+		[JsonIgnore]
 		[Category("Hierarchy")]
-		public virtual ObservableCollection<SceneNode> Children { get; } = new ObservableCollection<SceneNode>();
+		internal virtual IReadOnlyCollection<SceneNode> ActualChildren => Children;
 
+		[Browsable(false)]
+		public ObservableCollection<SceneNode> Children { get; } = new ObservableCollection<SceneNode>();
 
 		/// <summary>
 		/// Gets a value indicating whether this scene node has been disposed of.
@@ -712,11 +692,13 @@ namespace DigitalRise.SceneGraph
 			}
 			else if (args.Action == NotifyCollectionChangedAction.Reset)
 			{
-				foreach (var w in Children)
+				foreach (var w in ActualChildren)
 				{
 					w.Parent = null;
 				}
 			}
+
+			OnChildrenChanged();
 		}
 
 
@@ -799,7 +781,7 @@ namespace DigitalRise.SceneGraph
 					RenderData.SafeDispose();
 					SceneData.SafeDispose();
 					UserData.SafeDispose();
-					foreach (var child in Children)
+					foreach (var child in ActualChildren)
 						child.Dispose(disposeData);
 				}
 
@@ -817,12 +799,12 @@ namespace DigitalRise.SceneGraph
 		{
 			processor(this);
 
-			if (Children == null)
+			if (ActualChildren == null)
 			{
 				return;
 			}
 
-			foreach (var child in Children)
+			foreach (var child in ActualChildren)
 			{
 				child.RecursiveProcess(processor);
 			}
@@ -925,10 +907,14 @@ namespace DigitalRise.SceneGraph
 
 		public virtual void Load(AssetManager assetManager)
 		{
-			foreach (var child in Children)
+			foreach (var child in ActualChildren)
 			{
 				child.Load(assetManager);
 			}
+		}
+
+		protected virtual void OnChildrenChanged()
+		{
 		}
 
 		public virtual void BatchJobs(IRenderList list)
@@ -954,7 +940,6 @@ namespace DigitalRise.SceneGraph
 			var data = File.ReadAllText(path);
 			return ReadFromString(data, assetManager);
 		}
-
 
 		#endregion
 	}

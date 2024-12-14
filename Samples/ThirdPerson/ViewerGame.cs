@@ -23,10 +23,10 @@ namespace SimpleScene
 		private Scene _scene;
 		private SceneNode _cameraMount;
 		private CameraNode _mainCamera;
-		private DrModelNode _model;
+		private PrefabNode _model;
 		private AnimationController _player;
 		private readonly Renderer _renderer = new Renderer();
-//		private readonly FramesPerSecondCounter _fpsCounter = new FramesPerSecondCounter();
+		//		private readonly FramesPerSecondCounter _fpsCounter = new FramesPerSecondCounter();
 		private SpriteBatch _spriteBatch;
 		private InputService _inputService;
 
@@ -70,8 +70,8 @@ namespace SimpleScene
 			var assetManager = AssetManager.CreateFileAssetManager(Path.Combine(ExecutingAssemblyDirectory, "Assets"));
 			_scene = (Scene)assetManager.LoadSceneNode("Scenes/Main.scene");
 
-			_model = _scene.GetSubtree().OfType<DrModelNode>().First();
-			_player = new AnimationController(_model);
+			_model = _scene.GetSubtree().OfType<PrefabNode>().First();
+			_player = new AnimationController((DrModelNode)_model.Prefab);
 			_player.StartClip("idle");
 
 			_cameraMount = _scene.GetSceneNode("_cameraMount");
@@ -150,7 +150,7 @@ namespace SimpleScene
 			pose.Position += velocity;
 			_model.PoseLocal = pose;
 
-//			_fpsCounter.Update(gameTime);
+			//			_fpsCounter.Update(gameTime);
 			_player.Update(gameTime.ElapsedGameTime);
 		}
 
@@ -166,7 +166,7 @@ namespace SimpleScene
 			_spriteBatch.Draw(result, Vector2.Zero, Color.White);
 			_spriteBatch.End();
 
-//			_fpsCounter.Draw(gameTime);
+			//			_fpsCounter.Draw(gameTime);
 		}
 	}
 }

@@ -454,7 +454,7 @@ namespace DigitalRise.SceneGraph
 		/// </remarks>
 		private void InvalidateChildren()
 		{
-			foreach (SceneNode child in Children)
+			foreach (SceneNode child in ActualChildren)
 				child.Invalidate();
 		}
 

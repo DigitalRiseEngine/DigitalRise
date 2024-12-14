@@ -61,14 +61,14 @@ namespace DigitalRise.SceneGraph
 		/// <param name="node">The node.</param>
 		/// <returns>
 		/// The children of the given node or an empty <see cref="IEnumerable{T}"/> if 
-		/// <paramref name="node"/> or <see cref="SceneNode.Children"/> is <see langword="null"/>.
+		/// <paramref name="node"/> or <see cref="SceneNode.ActualChildren"/> is <see langword="null"/>.
 		/// </returns>
 		public static IEnumerable<SceneNode> GetChildren(this SceneNode node)
 		{
-			if (node == null || node.Children == null)
+			if (node == null || node.ActualChildren == null)
 				return LinqHelper.Empty<SceneNode>();
 
-			return node.Children;
+			return node.ActualChildren;
 		}
 
 
@@ -349,9 +349,9 @@ namespace DigitalRise.SceneGraph
 			if (node.Name == name)
 				return node;
 
-			if (node.Children != null)
+			if (node.ActualChildren != null)
 			{
-				foreach (var child in node.Children)
+				foreach (var child in node.ActualChildren)
 				{
 					var result = child.GetSceneNode(name);
 					if (result != null)
@@ -417,8 +417,8 @@ namespace DigitalRise.SceneGraph
 
 			sceneNode.LastPoseWorld = null;
 
-			if (recursive && sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (recursive && sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					child.ClearLastPose(true);
 		}
 
@@ -442,8 +442,8 @@ namespace DigitalRise.SceneGraph
 
 			sceneNode.LastScaleWorld = null;
 
-			if (recursive && sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (recursive && sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					child.ClearLastScale(true);
 		}
 
@@ -467,8 +467,8 @@ namespace DigitalRise.SceneGraph
 
 			sceneNode.LastPoseWorld = sceneNode.PoseWorld;
 
-			if (recursive && sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (recursive && sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					child.SetLastPose(true);
 		}
 
@@ -492,8 +492,8 @@ namespace DigitalRise.SceneGraph
 
 			sceneNode.LastScaleWorld = sceneNode.ScaleWorld;
 
-			if (recursive && sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (recursive && sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					child.SetLastScale(true);
 		}
 
@@ -555,8 +555,8 @@ namespace DigitalRise.SceneGraph
 					aabb = sceneNode.BoundingBox;
 			}
 
-			if (sceneNode.Children != null)
-				foreach (var childNode in sceneNode.Children)
+			if (sceneNode.ActualChildren != null)
+				foreach (var childNode in sceneNode.ActualChildren)
 					if (GetSubtreeBoundingBoxInternal(childNode, ref aabb))
 						return true;
 

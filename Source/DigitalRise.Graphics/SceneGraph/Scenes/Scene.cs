@@ -715,8 +715,8 @@ namespace DigitalRise.SceneGraph.Scenes
 			}
 
 			// Add descendant nodes.
-			if (sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					Register(child);
 		}
 
@@ -758,8 +758,8 @@ namespace DigitalRise.SceneGraph.Scenes
 			}
 
 			// Remove descendant nodes.
-			if (sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					Unregister(child);
 		}
 
@@ -792,8 +792,8 @@ namespace DigitalRise.SceneGraph.Scenes
 					break;
 			}
 
-			if (sceneNode.Children != null)
-				foreach (var child in sceneNode.Children)
+			if (sceneNode.ActualChildren != null)
+				foreach (var child in sceneNode.ActualChildren)
 					HandleIsEnabledChanged(child, isEnabled);
 		}
 
@@ -993,8 +993,8 @@ namespace DigitalRise.SceneGraph.Scenes
 				if (!(node.Shape is EmptyShape) && filter.Filter(new Pair<SceneNode>(node, referenceNode)))
 					list.Add(node);
 
-				if (node.Children != null)
-					foreach (var child in node.Children)
+				if (node.ActualChildren != null)
+					foreach (var child in node.ActualChildren)
 						GetSceneNodes(child, referenceNode, filter, list);
 			}
 		}

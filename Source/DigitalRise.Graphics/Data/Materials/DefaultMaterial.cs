@@ -1,4 +1,5 @@
 ﻿using AssetManagementBase;
+using DigitalRise.Graphics.Data.Materials;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -155,7 +156,7 @@ namespace DigitalRise.Data.Materials
 		}
 	}
 
-	public partial class DefaultMaterial : INamedObject, IMaterial, IHasExternalAssets
+	public partial class DefaultMaterial : INamedObject, IMaterial, ISupportsSkinning, IHasExternalAssets
 	{
 		private bool _skinning;
 		private Texture2D _diffuseTexture, _specularTexture, _normalTexture;
@@ -287,6 +288,8 @@ namespace DigitalRise.Data.Materials
 		public string NormalTexturePath { get; set; }
 
 
+		[Browsable(false)]
+		[JsonIgnore]
 		public bool Skinning
 		{
 			get => _skinning;

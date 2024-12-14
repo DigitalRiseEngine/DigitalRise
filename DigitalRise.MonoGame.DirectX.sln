@@ -43,8 +43,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelStorage.Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.ModelConverter", "Tools\DigitalRise.ModelConverter\DigitalRise.ModelConverter.csproj", "{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRise.SceneData.MonoGame", "Source\DigitalRise.SceneData\DigitalRise.SceneData.MonoGame.csproj", "{1C7BA988-221A-4D10-9207-0C1B0D50B26F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,10 +113,6 @@ Global
 		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C7BA988-221A-4D10-9207-0C1B0D50B26F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,7 +134,6 @@ Global
 		{9F125C28-173C-496D-B6E7-64A10B15B629} = {F8D3E01B-E8A7-4D04-A976-C1FB46BB51E7}
 		{1FD3C011-969F-47F1-8420-44A522F822F5} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 		{0A48F6FE-9157-4836-AFC6-2F8A5BEBB3B3} = {9CB0DAA8-0CF9-4618-A20C-9DDAE411FB09}
-		{1C7BA988-221A-4D10-9207-0C1B0D50B26F} = {43377E56-9E7A-4ECD-BD27-44B9F85E01AE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {35ACDF4E-2CE2-46B1-A19F-35DC131069A1}

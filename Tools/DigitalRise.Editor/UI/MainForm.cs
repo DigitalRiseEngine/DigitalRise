@@ -829,7 +829,7 @@ namespace DigitalRise.Editor.UI
 
 			UpdateTreeNodeId(newNode);
 
-			if (!(sceneNode is PrefabNode) && sceneNode.Children != null)
+			if (sceneNode.Children != null)
 			{
 				foreach (var child in sceneNode.Children)
 				{

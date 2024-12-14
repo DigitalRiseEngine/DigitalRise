@@ -273,8 +273,8 @@ namespace DigitalRise.SceneGraph.LOD
 			Debug.Assert(referencedNode != null, "node must not be null.");
 
 			referencedNode.Proxy = proxyNode;
-			if (referencedNode.Children != null)
-				foreach (var childNode in referencedNode.Children)
+			if (referencedNode.ActualChildren != null)
+				foreach (var childNode in referencedNode.ActualChildren)
 					SetProxy(childNode, proxyNode);
 		}
 

@@ -148,8 +148,8 @@ namespace DigitalRise.SceneGraph.Queries
 			{
 				AddNodeEx(node, context);
 
-				if (node.Children != null)
-					foreach (var childNode in node.Children)
+				if (node.ActualChildren != null)
+					foreach (var childNode in node.ActualChildren)
 						AddSubtree(childNode, context);
 			}
 		}

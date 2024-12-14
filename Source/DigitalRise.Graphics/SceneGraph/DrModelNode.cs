@@ -5,6 +5,7 @@ using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
+using DigitalRise.Graphics.Data.Materials;
 using DigitalRise.Mathematics;
 using DigitalRise.Rendering.Deferred;
 using Microsoft.Xna.Framework;
@@ -215,7 +216,27 @@ namespace DigitalRise.SceneGraph
 			Model = assetManager.LoadJDRM(ModelPath);
 
 			// Update skinning
+			if (Model != null)
+			{
+				Model.TraverseNodes(n =>
+				{
+					if (n.Mesh == null)
+					{
+						return;
+					}
 
+					foreach (var submesh in n.Mesh.Submeshes)
+					{
+						var material = Materials[submesh.MaterialIndex];
+						var supportsSkinning = material as ISupportsSkinning;
+						if (supportsSkinning != null)
+						{
+							supportsSkinning.Skinning = submesh.Skin != null;
+						}
+
+					}
+				});
+			}
 		}
 
 		private BoundingBox CalculateBoundingBox()

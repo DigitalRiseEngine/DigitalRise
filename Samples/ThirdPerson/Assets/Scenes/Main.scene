@@ -12,8 +12,8 @@
     "Children": [],
     "IsEnabled": true,
     "ScaleLocal": "1, 1, 1",
-    "RotationLocal": "-33.1371, -65.65766, 0",
-    "PositionLocal": "-2.6722298, 4.695229, 3.0637937"
+    "RotationLocal": "-21.310131, -45.878765, 0",
+    "PositionLocal": "-6.7376275, 7.038943, 6.101172"
   },
   "Name": "Root",
   "Children": [
@@ -111,8 +111,8 @@
       "PositionLocal": "0, 25, 0"
     },
     {
-      "$type": "DigitalRise.SceneGraph.DrModelNode, DigitalRise.Graphics",
-      "ModelPath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets/Models\\mixamo_base.drm",
+      "$type": "DigitalRise.SceneGraph.PrefabNode, DigitalRise.Graphics",
+      "PrefabPath": "../Models/mixamo_base.prefab",
       "Children": [
         {
           "Name": "_cameraMount",

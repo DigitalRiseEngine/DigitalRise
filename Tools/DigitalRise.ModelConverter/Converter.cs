@@ -649,28 +649,37 @@ namespace DigitalRise.ModelConverter
 				ProcessAnimations(scene);
 			}
 
+			var outputFolder = Path.GetDirectoryName(options.OutputFile);
+			if (!string.IsNullOrEmpty(outputFolder) && !Directory.Exists(outputFolder))
+			{
+				Log($"Creating folder '{outputFolder}' doesn't exist.");
+				Directory.CreateDirectory(outputFolder);
+			}
+
 			string outputFile;
 			if (options.OutputFile.EndsWith(".drm", StringComparison.OrdinalIgnoreCase))
 			{
 				outputFile = Path.ChangeExtension(options.OutputFile, "drm");
-				_model.SaveBinaryToFile(outputFile, Log);
+				_model.SaveBinaryToFile(outputFile, options.OverwriteModelFile, Log);
 			}
 			else
 			{
 				outputFile = Path.ChangeExtension(options.OutputFile, "jdrm");
 				var binaryFile = Path.ChangeExtension(options.OutputFile, "bin");
-				_model.SaveJsonToFile(outputFile, binaryFile, Log);
+				_model.SaveJsonToFile(outputFile, binaryFile, options.OverwriteModelFile, Log);
 			}
 
-			var modelNode = new DrModelNode
-			{
-				ModelPath = outputFile,
-				Materials = _materials.ToArray()
-			};
-
 			var sceneFile = Path.ChangeExtension(options.OutputFile, "prefab");
-			Log($"Writing {sceneFile}...");
-			modelNode.SaveToFile(sceneFile);
+			if (ModelContent.CheckOverwrite(sceneFile, options.OverwritePrefabFile, Log))
+			{
+				var modelNode = new DrModelNode
+				{
+					ModelPath = Path.GetFileName(outputFile),
+					Materials = _materials.ToArray()
+				};
+
+				modelNode.SaveToFile(sceneFile);
+			}
 
 			var passed = DateTime.Now - time;
 			Log($"{passed.TotalMilliseconds} ms");

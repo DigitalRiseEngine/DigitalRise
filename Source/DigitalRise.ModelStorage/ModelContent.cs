@@ -64,37 +64,58 @@ namespace DigitalRise.ModelStorage
 			}
 		}
 
+		public static bool CheckOverwrite(string path, bool overwrite, Action<string> logger)
+		{
+			if (File.Exists(path) && !overwrite)
+			{
+				logger?.Invoke($"File '{path}' exists already. Can't overwrite.");
+				return false;
+			}
+
+			logger?.Invoke($"Writing '{path}'...");
+
+			return true;
+		}
 
 		/// <summary>
 		/// Saves model in the json format
 		/// </summary>
 		/// <param name="jsonPath"></param>
 		/// <param name="binaryPath"></param>
+		/// <param name="overwrite"></param>
 		/// <param name="logger"></param>
-		public void SaveJsonToFile(string jsonPath, string binaryPath, Action<string> logger = null)
+		public void SaveJsonToFile(string jsonPath, string binaryPath, bool overwrite, Action<string> logger = null)
 		{
-			// Write binary data and set buffer ids
-			logger?.Invoke($"Writing '{binaryPath}'...");
-			using (var stream = File.OpenWrite(binaryPath))
-			using (var writer = new BinaryWriter(stream))
+			if (CheckOverwrite(binaryPath, overwrite, logger))
 			{
-				SaveBinaryData(new WriteContext(writer));
+				// Write binary data and set buffer ids
+				using (var stream = File.OpenWrite(binaryPath))
+				using (var writer = new BinaryWriter(stream))
+				{
+					SaveBinaryData(new WriteContext(writer));
+				}
 			}
 
-			BinaryPath = binaryPath;
-
-			logger?.Invoke($"Writing '{jsonPath}'...");
-			JsonSerialization.SerializeToFile(jsonPath, this);
+			if (CheckOverwrite(jsonPath, overwrite, logger))
+			{
+				BinaryPath = Path.GetFileName(binaryPath);
+				JsonSerialization.SerializeToFile(jsonPath, this);
+			}
 		}
 
 		/// <summary>
 		/// Saves model in the binary format
 		/// </summary>
 		/// <param name="path"></param>
+		/// <param name="overwrite"></param>
 		/// <param name="logger"></param>
-		public void SaveBinaryToFile(string path, Action<string> logger = null)
+		public void SaveBinaryToFile(string path, bool overwrite, Action<string> logger = null)
 		{
-			logger?.Invoke($"Writing '{path}'...");
+			if (!CheckOverwrite(path, overwrite, logger))
+			{
+				return;
+			}
+
 			using (var stream = File.OpenWrite(path))
 			using (var writer = new BinaryWriter(stream))
 			{

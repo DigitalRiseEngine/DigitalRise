@@ -29,6 +29,20 @@ namespace DigitalRise.ModelConverter
 
 			return args[i];
 		}
+		
+		static bool ParseBool(string name, string[] args, ref int i)
+		{
+			var value = ParseString(name, args, ref i);
+
+			bool result;
+			if (!bool.TryParse(value, out result))
+			{
+				throw new Exception($"Unable to parse bool value '{args[i]}' for the argument '{name}'.");
+			}
+
+			return result;
+		}
+
 
 		static void ShowUsage()
 		{
@@ -41,10 +55,14 @@ namespace DigitalRise.ModelConverter
 
 			grid.SetMaximumWidth(0, 30);
 
-			grid.SetValue(0, 1, "-t, --generateTangents");
-			grid.SetValue(1, 1, "If enabled, then the tangents and bitangents are generated.");
-			grid.SetValue(0, 2, "-f, --flipWindingOrder");
-			grid.SetValue(1, 2, "If enabled, then the winding order is flipped.");
+			grid.SetValue(0, 0, "-t, --generateTangents");
+			grid.SetValue(1, 0, "If enabled, then the tangents and bitangents are generated.");
+			grid.SetValue(0, 1, "-f, --flipWindingOrder");
+			grid.SetValue(1, 1, "If enabled, then the winding order is flipped.");
+			grid.SetValue(0, 2, "-om, --overwriteModel true|false");
+			grid.SetValue(1, 2, "If enabled, then the model file(s) are overwritten if exists. The default value is 'true'.");
+			grid.SetValue(0, 2, "-op, --overwritePrefab true|false");
+			grid.SetValue(1, 2, "If enabled, then the prefab file is overwritten if exists. The default value is 'false'.");
 
 			Console.WriteLine(grid.ToString());
 		}
@@ -73,6 +91,16 @@ namespace DigitalRise.ModelConverter
 					case "-f":
 					case "--flipWindingOrder":
 						options.FlipWindingOrder = true;
+						break;
+
+					case "-om":
+					case "--overwriteModel":
+						options.OverwriteModelFile = ParseBool("overwriteModel", args, ref i);
+						break;
+
+					case "-op":
+					case "--overwritePrefab":
+						options.OverwritePrefabFile = ParseBool("overwritePrefab", args, ref i);
 						break;
 
 					default:
@@ -122,7 +150,7 @@ namespace DigitalRise.ModelConverter
 		}
 
 
-		static void Main(string[] args)
+		static int Main(string[] args)
 		{
 			try
 			{
@@ -131,11 +159,15 @@ namespace DigitalRise.ModelConverter
 			catch (ModelConverterException ex)
 			{
 				Log($"Argument error: {ex.Message}");
+				return 2;
 			}
 			catch (Exception ex)
 			{
 				Log(ex.ToString());
+				return 1;
 			}
+
+			return 0;
 		}
 	}
 }

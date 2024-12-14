@@ -174,6 +174,8 @@ namespace DigitalRise.TextureConverter
 				throw new Exception($"Unable to find file '{options.InputFile}'");
 			}
 
+			var time = DateTime.Now;
+
 			var importerContext = new ImporterContext();
 
 			var importer = new DRTextureImporter();
@@ -206,9 +208,12 @@ namespace DigitalRise.TextureConverter
 			{
 				DdsHelper.Save(texture, output, DdsFlags.None);
 			}
+
+			var passed = DateTime.Now - time;
+			Log($"{passed.TotalMilliseconds} ms");
 		}
 
-		static void Main(string[] args)
+		static int Main(string[] args)
 		{
 			try
 			{
@@ -217,7 +222,10 @@ namespace DigitalRise.TextureConverter
 			catch (Exception ex)
 			{
 				Log(ex.ToString());
+				return 1;
 			}
+
+			return 0;
 		}
 	}
 }

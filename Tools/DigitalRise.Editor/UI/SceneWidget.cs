@@ -17,7 +17,6 @@ using DigitalRise.Data.Billboards;
 using DigitalRise.Misc.TextureAtlas;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Geometry;
-using DigitalRise.Vertices;
 using DigitalRise.Data.Meshes;
 using DigitalRise.Data.Meshes.Primitives;
 

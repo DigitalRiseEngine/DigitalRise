@@ -115,7 +115,7 @@ namespace DigitalRise.Rendering.Deferred
 
 				var light = lightNode.Light as PointLight;
 				if (light == null)
-					return;
+					continue;
 
 				var shadow = light.Shadow;
 				if (shadow.ShadowMap == null || shadow.ShadowMask == null)

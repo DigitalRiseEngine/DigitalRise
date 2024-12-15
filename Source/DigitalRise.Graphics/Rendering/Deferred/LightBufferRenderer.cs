@@ -159,6 +159,8 @@ namespace DigitalRise.Rendering.Deferred
 			// Render all lights into the light buffers.
 			AmbientLightRenderer.Render(context, lights);
 			DirectionalLightRenderer.Render(context, lights);
+			PointLightRenderer.Render(context, lights);
+			ProjectorLightRenderer.Render(context, lights);
 
 			/*			if (aoRenderTarget != null)
 						{

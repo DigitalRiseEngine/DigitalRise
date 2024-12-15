@@ -264,6 +264,16 @@ namespace DigitalRise.Editor.UI
 
 				_debugRenderer.DrawShape(viewVolume, asCamera.PoseWorld, Vector3.One, Color.Brown, true, false);
 			}
+
+			var asLightNode = node as LightNode;
+			if (asLightNode != null)
+			{
+				var asProjectorLight = asLightNode.Light as ProjectorLight;
+				if (asProjectorLight != null)
+				{
+					_debugRenderer.DrawShape(asProjectorLight.Projection, asLightNode.PoseWorld, asLightNode.ScaleWorld, Color.LightYellow, true, false);
+				}
+			}
 		}
 
 		private void PostRender(RenderContext drContext, Myra.Graphics2D.RenderContext myraContext, CameraNode camera)

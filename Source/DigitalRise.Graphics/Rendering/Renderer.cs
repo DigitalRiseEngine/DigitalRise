@@ -72,6 +72,8 @@ namespace DigitalRise.Rendering
 				// ----- Shadow Pass
 				// The ShadowMapRenderer renders the shadow maps which are stored in the light nodes.
 				CascadedShadowMapRenderer.Render(_context, sceneQuery.Lights);
+				CubeMapShadowMapRenderer.Render(_context, sceneQuery.Lights);
+				StandardShadowMapRenderer.Render(_context, sceneQuery.Lights);
 
 				// The ShadowMaskRenderer renders the shadows and stores them in one or more render
 				// targets ("shadows masks").

@@ -3,11 +3,14 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
+using AssetManagementBase;
 using DigitalRise.Data.Shadows;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Misc;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
@@ -81,7 +84,7 @@ namespace DigitalRise.Data.Lights
 	/// <see cref="Texture"/> is not duplicated. The <see cref="Texture"/> is copied by reference.
 	/// </para>
 	/// </remarks>
-	public class PointLight : Light
+	public class PointLight : Light, IHasExternalAssets
 	{
 		//--------------------------------------------------------------
 		#region Properties & Events
@@ -171,7 +174,11 @@ namespace DigitalRise.Data.Lights
 		/// Gets or sets the cube map texture which is projected by this point light.
 		/// </summary>
 		/// <value>The cube map texture. The default value is <see langword="null"/>.</value>
+		[JsonIgnore]
 		public TextureCube Texture { get; set; }
+
+		[Browsable(false)]
+		public string TexturePath { get; set; }
 
 		public CubeMapShadow Shadow { get; private set; } = new CubeMapShadow();
 
@@ -242,6 +249,14 @@ namespace DigitalRise.Data.Lights
 			var cv = Color.ToVector3();
 			return MathHelper.Max(cv * (DiffuseIntensity * HdrScale * attenuation),
 								cv * (SpecularIntensity * HdrScale * attenuation));
+		}
+
+		public void Load(AssetManager assetManager)
+		{
+			if (!string.IsNullOrEmpty(TexturePath))
+			{
+				Texture = assetManager.LoadTextureCube(DR.GraphicsDevice, TexturePath);
+			}
 		}
 		#endregion
 	}

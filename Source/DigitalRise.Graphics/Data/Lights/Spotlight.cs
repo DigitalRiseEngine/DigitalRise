@@ -3,13 +3,17 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
+using AssetManagementBase;
 using DigitalRise.Data.Shadows;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
 using DigitalRise.Mathematics;
 using DigitalRise.Misc;
+using DigitalRise.Rendering.Debugging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 namespace DigitalRise.Data.Lights
@@ -97,7 +101,7 @@ namespace DigitalRise.Data.Lights
 	/// is not duplicated. The <see cref="Texture"/> is copied by reference.
 	/// </para>
 	/// </remarks>
-	public class Spotlight : Light
+	public class Spotlight : Light, IHasExternalAssets
 	{
 		//--------------------------------------------------------------
 		#region Properties & Events
@@ -154,7 +158,6 @@ namespace DigitalRise.Data.Lights
 		/// <see cref="Color"/> and <see cref="DiffuseIntensity"/>/<see cref="SpecularIntensity"/> when 
 		/// high dynamic range lighting (HDR lighting) is enabled.
 		/// </remarks>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
 		public float HdrScale { get; set; }
 
 
@@ -273,7 +276,11 @@ namespace DigitalRise.Data.Lights
 		/// Gets or sets the texture which is projected by this spotlight.
 		/// </summary>
 		/// <value>The texture. The default value is <see langword="null"/>.</value>
+		[JsonIgnore]
 		public Texture2D Texture { get; set; }
+
+		[Browsable(false)]
+		public string TexturePath { get; set; }
 
 		public StandardShadow Shadow { get; private set; } = new StandardShadow();
 
@@ -348,16 +355,14 @@ namespace DigitalRise.Data.Lights
 								Color * (SpecularIntensity * HdrScale * attenuation));
 		}
 
+		public void Load(AssetManager assetManager)
+		{
+			if (!string.IsNullOrEmpty(TexturePath))
+			{
+				Texture = assetManager.LoadTexture2D(DR.GraphicsDevice, TexturePath);
+			}
+		}
 
-		//public override Vector3 GetIntensity(Vector3 position)
-		//{
-		//  float distance = position.Length;
-		//  float angle = !position.IsNumericallyZero() ? MathHelper.GetAngle(Vector3.Forward, position) : 0;
-		//  float attenuation = GraphicsHelper.GetDistanceAttenuation(distance, Range, AttenuationExponent);
-		//  float spotlightFalloff = GraphicsHelper.GetAngularAttenuation(angle, FalloffAngle, CutoffAngle);
-		//  return MathHelper.Max(Color * (DiffuseIntensity * HdrScale * spotlightFalloff * attenuation),
-		//                      Color * (SpecularIntensity * HdrScale * spotlightFalloff * attenuation));
-		//}
 		#endregion
 	}
 }

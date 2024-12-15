@@ -294,7 +294,7 @@ namespace DigitalRise.Editor.UI
 
 							pathProperty.SetValue(obj, path);
 							record.SetValue(obj, value);
-}
+						}
 						catch (Exception ex)
 						{
 							var dialog = Dialog.CreateMessageBox("Error", ex.ToString());
@@ -316,7 +316,7 @@ namespace DigitalRise.Editor.UI
 
 		public Widget CreateCustomEditor(Record record, object obj)
 		{
-			if (obj is DefaultMaterial && record.Name.EndsWith("Texture"))
+			if (record.Type == typeof(Texture2D))
 			{
 				return InternalCreateCustomEditor(record, obj,
 					new[] { "dds", "png", "jpg", "gif", "bmp", "tga" },
@@ -614,14 +614,6 @@ namespace DigitalRise.Editor.UI
 
 		}
 
-		private void OnAddModel(SceneNode parent)
-		{
-			OnAddExternalResource(parent, new[] { "jdrm" }, path => new DrModelNode
-			{
-				ModelPath = path
-			});
-		}
-
 		private void OnAddPrefab(SceneNode parent)
 		{
 			OnAddExternalResource(parent, new[] { "prefab" }, path =>
@@ -655,18 +647,8 @@ namespace DigitalRise.Editor.UI
 			var contextMenuOptions = new List<Tuple<string, Action>>();
 			foreach (var pair in NodesRegistry.NodesByCategories)
 			{
-				Action action = null;
-
-				if (pair.Value.Count == 1 && pair.Value[0].Type == typeof(DrModelNode))
-				{
-					// Special case
-					action = () => OnAddModel(sceneNode);
-				}
-				else
-				{
-					// Ordinary case
-					action = () => OnAddGenericNode(sceneNode, pair.Key, pair.Value);
-				}
+				// Ordinary case
+				var action = () => OnAddGenericNode(sceneNode, pair.Key, pair.Value);
 
 				contextMenuOptions.Add(new Tuple<string, Action>($"Insert {pair.Key}...", action));
 			}

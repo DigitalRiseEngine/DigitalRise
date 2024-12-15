@@ -16,7 +16,6 @@ using System.ComponentModel;
 
 namespace DigitalRise.SceneGraph
 {
-	[EditorInfo("Model")]
 	public class DrModelNode : SceneNode, ISkeleton
 	{
 		private class SkinInfo

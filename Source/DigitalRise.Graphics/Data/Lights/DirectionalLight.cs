@@ -2,10 +2,13 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.TXT', which is part of this source code package.
 
+using AssetManagementBase;
 using DigitalRise.Data.Shadows;
 using DigitalRise.Geometry.Shapes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
+using System.ComponentModel;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
@@ -85,7 +88,7 @@ namespace DigitalRise.Data.Lights
 	/// <see cref="Texture"/> is not duplicated. The <see cref="Texture"/> is copied by reference.
 	/// </para>
 	/// </remarks>
-	public class DirectionalLight : Light
+	public class DirectionalLight : Light, IHasExternalAssets
 	{
 		//--------------------------------------------------------------
 		#region Properties & Events
@@ -139,7 +142,12 @@ namespace DigitalRise.Data.Lights
 		/// Gets or sets the texture which is projected by this directional light.
 		/// </summary>
 		/// <value>The texture. The default value is <see langword="null"/>.</value>
+		[JsonIgnore]
 		public Texture2D Texture { get; set; }
+
+		[Browsable(false)]
+		public string TexturePath { get; set; }
+
 
 
 		/// <summary>
@@ -220,6 +228,15 @@ namespace DigitalRise.Data.Lights
 			return MathHelper.Max(cv * (DiffuseIntensity * HdrScale),
 								cv * (SpecularIntensity * HdrScale));
 		}
+
+		public void Load(AssetManager assetManager)
+		{
+			if (!string.IsNullOrEmpty(TexturePath))
+			{
+				Texture = assetManager.LoadTexture2D(DR.GraphicsDevice, TexturePath);
+			}
+		}
+
 		#endregion
 	}
 }

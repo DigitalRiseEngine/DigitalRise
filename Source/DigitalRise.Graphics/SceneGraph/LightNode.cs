@@ -46,6 +46,7 @@ namespace DigitalRise.SceneGraph
 	[EditorInfo("Light", typeof(AmbientLight))]
 	[EditorInfo("Light", typeof(DirectionalLight))]
 	[EditorInfo("Light", typeof(PointLight))]
+	[EditorInfo("Light", typeof(ProjectorLight))]
 	public class LightNode : SceneNode
 	{
 		//--------------------------------------------------------------

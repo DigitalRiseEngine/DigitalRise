@@ -236,7 +236,19 @@ namespace DigitalRise.Editor.UI
 					wd.Normalize();
 					var p2 = p + wd * 10;
 
-					_debugRenderer.DrawArrow(p, p2, Color.Yellow, false);
+					_debugRenderer.DrawArrow(p, p2, asDirectionalLight.Color, false);
+				}
+
+				var asPointLight = lightNode.Light as PointLight;
+				if (asPointLight != null)
+				{
+					_debugRenderer.DrawSphere(asPointLight.Range, lightNode.PoseWorld, asPointLight.Color, true, false);
+				}
+
+				var asProjectorLight = lightNode.Light as ProjectorLight;
+				if (asProjectorLight != null)
+				{
+					_debugRenderer.DrawShape(asProjectorLight.Projection, lightNode.PoseWorld, lightNode.ScaleWorld, asProjectorLight.Color, true, false);
 				}
 			}
 
@@ -263,16 +275,6 @@ namespace DigitalRise.Editor.UI
 				}
 
 				_debugRenderer.DrawShape(viewVolume, asCamera.PoseWorld, Vector3.One, Color.Brown, true, false);
-			}
-
-			var asLightNode = node as LightNode;
-			if (asLightNode != null)
-			{
-				var asProjectorLight = asLightNode.Light as ProjectorLight;
-				if (asProjectorLight != null)
-				{
-					_debugRenderer.DrawShape(asProjectorLight.Projection, asLightNode.PoseWorld, asLightNode.ScaleWorld, Color.LightYellow, true, false);
-				}
 			}
 		}
 

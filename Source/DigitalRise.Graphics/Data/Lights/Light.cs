@@ -36,18 +36,11 @@ namespace DigitalRise.Data.Lights
 	/// the <see cref="Shape"/> are duplicated.
 	/// </para>
 	/// </remarks>
-	public abstract class Light : INamedObject
+	public abstract class Light
 	{
 		//--------------------------------------------------------------
 		#region Properties & Events
 		//--------------------------------------------------------------
-
-		/// <summary>
-		/// Gets or sets the name of the light.
-		/// </summary>
-		/// <value>The name of the light.</value>
-		public string Name { get; set; }
-
 
 		/// <summary>
 		/// Gets (or sets) the shape of the light volume.
@@ -199,11 +192,8 @@ namespace DigitalRise.Data.Lights
 		/// property. The derived class needs to take care of the <see cref="Shape"/> property.
 		/// </para>
 		/// </remarks>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected virtual void CloneCore(Light source)
 		{
-			Name = source.Name;
-
 			// Shape does not need to be cloned. It is managed automatically in derived classes.
 		}
 		#endregion

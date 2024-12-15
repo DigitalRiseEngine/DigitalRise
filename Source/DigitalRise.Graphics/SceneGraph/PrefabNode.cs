@@ -37,7 +37,15 @@ namespace DigitalRise.SceneGraph
 				if (value != null)
 				{
 					value.Parent = this;
-					Shape = new TransformedShape(value.Shape, value.PoseLocal, value.ScaleLocal);
+
+					if (value.Shape is InfiniteShape || value.Shape is EmptyShape)
+					{
+						Shape = value.Shape;
+					}
+					else
+					{
+						Shape = new TransformedShape(value.Shape, value.PoseLocal, value.ScaleLocal);
+					}
 				} else
 				{
 					Shape = Shape.Empty;

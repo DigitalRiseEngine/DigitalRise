@@ -557,14 +557,6 @@ namespace DigitalRise.Editor.UI
 				var ot = orderedTypes[dialog.SelectedIndex.Value];
 
 				var newNode = ot.CreateInstance();
-				newNode.Name = dialog.ItemName;
-
-				/*				var asMeshNodeBase = newNode as MeshNodeBase;
-								if (asMeshNodeBase != null)
-								{
-									asMeshNodeBase.Material = new DefaultMaterial();
-								}*/
-
 				AddNewNode(parent, newNode);
 			};
 

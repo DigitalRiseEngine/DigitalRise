@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using AssetManagementBase;
 using DigitalRise.Attributes;
 using DigitalRise.Data.Lights;
 using DigitalRise.Data.Shadows;
@@ -248,6 +249,18 @@ namespace DigitalRise.SceneGraph
 		{
 			RenderData.SafeDispose();
 		}
+
+		public override void Load(AssetManager assetManager)
+		{
+			base.Load(assetManager);
+
+			var hasExternalAssets = Light as IHasExternalAssets;
+			if (hasExternalAssets != null)
+			{
+				hasExternalAssets.Load(assetManager);
+			}
+		}
+
 		#endregion
 	}
 }

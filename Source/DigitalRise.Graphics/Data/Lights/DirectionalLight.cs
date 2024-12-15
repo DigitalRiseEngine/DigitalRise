@@ -215,6 +215,7 @@ namespace DigitalRise.Data.Lights
 			Texture = sourceTyped.Texture;
 			TextureOffset = sourceTyped.TextureOffset;
 			TextureScale = sourceTyped.TextureScale;
+			TexturePath = sourceTyped.TexturePath;
 			Shape = source.Shape.Clone();
 			Shadow = (CascadedShadow)sourceTyped.Shadow.Clone();
 		}

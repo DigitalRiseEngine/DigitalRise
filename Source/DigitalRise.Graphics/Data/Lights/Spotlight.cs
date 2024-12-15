@@ -339,6 +339,7 @@ namespace DigitalRise.Data.Lights
 			CutoffAngle = sourceTyped.CutoffAngle; // Setting the CutoffAngle will automatically adjust the Shape.
 			Attenuation = sourceTyped.Attenuation;
 			Texture = sourceTyped.Texture;
+			TexturePath = sourceTyped.TexturePath;
 			Shadow = (StandardShadow)sourceTyped.Shadow.Clone();
 
 			// Shape does not need to be cloned. It is automatically set in the constructor and 

@@ -233,6 +233,7 @@ namespace DigitalRise.Data.Lights
 			Range = sourceTyped.Range;
 			Attenuation = sourceTyped.Attenuation;
 			Texture = sourceTyped.Texture;
+			TexturePath = sourceTyped.TexturePath;
 			Shadow = (CubeMapShadow)sourceTyped.Shadow.Clone();
 
 			// Shape does not need to be cloned. It is automatically set in the constructor and 

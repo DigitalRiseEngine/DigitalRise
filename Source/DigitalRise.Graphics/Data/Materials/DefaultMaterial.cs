@@ -109,9 +109,11 @@ namespace DigitalRise.Data.Materials
 	internal class DefaultMaterialBinding : BatchEffectBinding
 	{
 		private static DefaultMaterialBinding _material, _materialSkinning;
+		private static DefaultMaterialBinding _materialEmissive, _materialEmissiveSkinning;
 
 		public EffectParameter DiffuseColor { get; private set; }
 		public EffectParameter SpecularColor { get; private set; }
+		public EffectParameter EmissiveColor { get; private set; }
 		public EffectParameter DiffuseTexture { get; private set; }
 		public EffectParameter SpecularTexture { get; private set; }
 
@@ -141,6 +143,32 @@ namespace DigitalRise.Data.Materials
 			}
 		}
 
+		public static DefaultMaterialBinding MaterialEmissive
+		{
+			get
+			{
+				if (_materialEmissive == null)
+				{
+					_materialEmissive = new DefaultMaterialBinding("Materials/MaterialEmissive");
+				}
+
+				return _materialEmissive;
+			}
+		}
+
+		public static DefaultMaterialBinding MaterialEmissiveSkinning
+		{
+			get
+			{
+				if (_materialEmissiveSkinning == null)
+				{
+					_materialEmissiveSkinning = new DefaultMaterialBinding("Materials/MaterialEmissiveSkinned");
+				}
+
+				return _materialEmissiveSkinning;
+			}
+		}
+
 		private DefaultMaterialBinding(string path) : base(path)
 		{
 		}
@@ -151,6 +179,7 @@ namespace DigitalRise.Data.Materials
 
 			DiffuseColor = effect.Parameters["DiffuseColor"];
 			SpecularColor = effect.Parameters["SpecularColor"];
+			EmissiveColor = effect.Parameters["EmissiveColor"];
 			DiffuseTexture = effect.Parameters["DiffuseTexture"];
 			SpecularTexture = effect.Parameters["SpecularTexture"];
 		}
@@ -160,6 +189,7 @@ namespace DigitalRise.Data.Materials
 	{
 		private bool _skinning;
 		private Texture2D _diffuseTexture, _specularTexture, _normalTexture;
+		private Color _emissiveColor;
 
 		private DefaultGBufferBinding _gBufferBinding;
 		private DefaultShadowMapBinding _shadowMapBinding;
@@ -214,7 +244,13 @@ namespace DigitalRise.Data.Materials
 			{
 				if (_materialBinding == null)
 				{
-					_materialBinding = Skinning ? DefaultMaterialBinding.MaterialSkinning : DefaultMaterialBinding.Material;
+					if (EmissiveColor == Color.Transparent)
+					{
+						_materialBinding = Skinning ? DefaultMaterialBinding.MaterialSkinning : DefaultMaterialBinding.Material;
+					} else
+					{
+						_materialBinding = Skinning ? DefaultMaterialBinding.MaterialEmissiveSkinning : DefaultMaterialBinding.MaterialEmissive;
+					}
 				}
 
 				return _materialBinding;
@@ -223,6 +259,21 @@ namespace DigitalRise.Data.Materials
 
 		public Color DiffuseColor { get; set; } = Color.White;
 		public Color SpecularColor { get; set; }
+		public Color EmissiveColor
+		{
+			get => _emissiveColor;
+
+			set
+			{
+				if (value == _emissiveColor)
+				{
+					return;
+				}
+
+				_emissiveColor = value;
+				Invalidate();
+			}
+		}
 
 		[JsonIgnore]
 		public Texture2D DiffuseTexture
@@ -346,6 +397,7 @@ namespace DigitalRise.Data.Materials
 		{
 			_materialBinding.DiffuseColor.SetValue(DiffuseColor.ToVector3());
 			_materialBinding.SpecularColor.SetValue(SpecularColor.ToVector3());
+			_materialBinding.EmissiveColor?.SetValue(EmissiveColor.ToVector3());
 
 			if (DiffuseTexture != null)
 			{
@@ -381,6 +433,7 @@ namespace DigitalRise.Data.Materials
 				SpecularPower = SpecularPower,
 				DiffuseColor = DiffuseColor,
 				SpecularColor = SpecularColor,
+				EmissiveColor = EmissiveColor,
 				DiffuseTexture = DiffuseTexture,
 				DiffuseTexturePath = DiffuseTexturePath,
 				SpecularTexture = SpecularTexture,

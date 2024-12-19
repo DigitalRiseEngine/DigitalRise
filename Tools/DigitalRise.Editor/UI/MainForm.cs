@@ -372,6 +372,8 @@ namespace DigitalRise.Editor.UI
 		{
 			var dialog = new EditMaterialsDialog(modelNode);
 
+			dialog.Changed += (s, a) => InvalidateCurrentItem();
+
 			dialog.Closed += (s, a) =>
 			 {
 				 if (!dialog.Result)

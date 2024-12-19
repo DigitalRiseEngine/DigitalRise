@@ -8,6 +8,8 @@ namespace DigitalRise.Editor.UI
 	{
 		public DrModelNode ModelNode { get; }
 
+		public event EventHandler Changed;
+
 		public EditMaterialsDialog(DrModelNode modelNode)
 		{
 			ModelNode = modelNode ?? throw new ArgumentNullException(nameof(modelNode));
@@ -27,6 +29,7 @@ namespace DigitalRise.Editor.UI
 
 			_listMaterials.SelectedIndexChanged += _listMaterials_SelectedIndexChanged;
 			_properties.CustomWidgetProvider = StudioGame.MainForm.CreateCustomEditor;
+			_properties.PropertyChanged += (s, a) => Changed?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void _listMaterials_SelectedIndexChanged(object sender, EventArgs e)

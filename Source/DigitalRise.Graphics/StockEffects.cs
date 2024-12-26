@@ -1,6 +1,5 @@
 ﻿using AssetManagementBase;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.Utilities;
 using System.IO;
 
 namespace DigitalRise
@@ -24,8 +23,6 @@ namespace DigitalRise
 		{
 			path = Path.ChangeExtension(path, "efb");
 
-			var p = PlatformInfo.MonoGamePlatform;
-			var b = PlatformInfo.GraphicsBackend;
 			return _effects.LoadEffect(DR.GraphicsDevice, path);
 		}
 	}

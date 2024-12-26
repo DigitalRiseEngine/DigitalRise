@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using NUnit.Framework;
 
-namespace DigitalRise.Graphics.Tests
+namespace DigitalRise.Tests
 {
 	[SetUpFixture]
 	public class TestsEnvironment

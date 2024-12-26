@@ -12,8 +12,8 @@
     "Children": [],
     "IsEnabled": true,
     "ScaleLocal": "1, 1, 1",
-    "RotationLocal": "-21.310131, -45.878765, 0",
-    "PositionLocal": "-6.7376275, 7.038943, 6.101172"
+    "RotationLocal": "-32.666595, -19.231295, 0",
+    "PositionLocal": "-6.2942142, 6.3728023, 5.778959"
   },
   "Name": "Root",
   "Children": [
@@ -30,43 +30,6 @@
       "Children": [],
       "IsEnabled": true,
       "ScaleLocal": "1, 1, 1"
-    },
-    {
-      "$type": "DigitalRise.SceneGraph.Primitives.Plane, DigitalRise.Graphics",
-      "Size": "100, 100",
-      "Tessellation": "1, 1",
-      "GenerateBackface": true,
-      "NormalDirection": "UpY",
-      "Material": {
-        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
-        "DiffuseColor": "255, 255, 255, 255",
-        "DiffuseTexturePath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets\\Textures\\checker.dds"
-      },
-      "UScale": 50.0,
-      "VScale": 50.0,
-      "Name": "_plane",
-      "Children": [],
-      "IsEnabled": true,
-      "CastsShadows": true,
-      "ScaleLocal": "1, 1, 1"
-    },
-    {
-      "$type": "DigitalRise.SceneGraph.Primitives.Capsule, DigitalRise.Graphics",
-      "Length": 1.0,
-      "Radius": 0.5,
-      "Tessellation": 8,
-      "Material": {
-        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
-        "DiffuseColor": "255, 255, 255, 255"
-      },
-      "UScale": 2.0,
-      "VScale": 2.0,
-      "Name": "_capsule",
-      "Children": [],
-      "IsEnabled": true,
-      "CastsShadows": true,
-      "ScaleLocal": "1, 1, 1",
-      "PositionLocal": "8, 2, 10"
     },
     {
       "$type": "DigitalRise.SceneGraph.LightNode, DigitalRise.Graphics",
@@ -139,6 +102,27 @@
           "PositionLocal": "0, 2, 0"
         }
       ],
+      "IsEnabled": true,
+      "CastsShadows": true,
+      "ScaleLocal": "1, 1, 1"
+    },
+    {
+      "$type": "DigitalRise.Graphics.SceneGraph.PrimitiveMeshNode, DigitalRise.Graphics",
+      "Primitive": {
+        "$type": "DigitalRise.Data.Meshes.Primitives.Objects.Plane, DigitalRise.Graphics",
+        "Size": "100, 100",
+        "Tessellation": "1, 1",
+        "GenerateBackface": true,
+        "NormalDirection": "UpY",
+        "UScale": 50.0,
+        "VScale": 50.0
+      },
+      "Material": {
+        "$type": "DigitalRise.Data.Materials.DefaultMaterial, DigitalRise.Graphics",
+        "DiffuseColor": "255, 255, 255, 255",
+        "DiffuseTexturePath": "D:\\Projects\\DigitalRise\\Samples\\ThirdPerson\\Assets\\Textures\\checker.dds"
+      },
+      "Children": [],
       "IsEnabled": true,
       "CastsShadows": true,
       "ScaleLocal": "1, 1, 1"

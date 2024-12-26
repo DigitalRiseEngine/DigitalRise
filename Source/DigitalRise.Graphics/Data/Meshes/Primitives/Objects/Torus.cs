@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Mathematics;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Torus : PrimitiveMeshNode
+	public class Torus : BasePrimitive
 	{
 		private float _majorRadius = 0.5f;
 		private float _minorRadius = 0.16666f;
@@ -64,9 +60,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Torus Clone() => (Torus)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Torus();
+		protected override BasePrimitive CreateInstanceCore() => new Torus();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

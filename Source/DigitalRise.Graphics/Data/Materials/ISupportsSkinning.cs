@@ -1,4 +1,4 @@
-﻿namespace DigitalRise.Graphics.Data.Materials
+﻿namespace DigitalRise.Data.Materials
 {
 	public interface ISupportsSkinning
 	{

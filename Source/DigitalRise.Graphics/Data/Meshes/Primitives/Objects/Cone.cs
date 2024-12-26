@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Mathematics;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Data.Meshes;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Cone : PrimitiveMeshNode
+	public class Cone : BasePrimitive
 	{
 		private float _radius = 0.5f;
 		private float _height = 1.0f;
@@ -64,9 +60,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Cone Clone() => (Cone)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Cone();
+		protected override BasePrimitive CreateInstanceCore() => new Cone();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

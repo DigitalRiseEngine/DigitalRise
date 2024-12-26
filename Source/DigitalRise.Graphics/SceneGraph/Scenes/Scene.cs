@@ -12,6 +12,7 @@ using DigitalRise.Geometry;
 using DigitalRise.Geometry.Collisions;
 using DigitalRise.Geometry.Partitioning;
 using DigitalRise.Geometry.Shapes;
+using DigitalRise.Graphics.SceneGraph;
 using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Rendering;
@@ -582,7 +583,7 @@ namespace DigitalRise.SceneGraph.Scenes
 		protected virtual int GetDefaultGroup(SceneNode sceneNode)
 		{
 			// Checks roughly sorted by frequency.
-			if (sceneNode is MeshNode)
+			if (sceneNode is DrModelNode || sceneNode is PrimitiveMeshNode)
 				return 4;
 
 			if (sceneNode is LightNode)

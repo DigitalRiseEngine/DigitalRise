@@ -1,5 +1,4 @@
 ﻿using AssetManagementBase;
-using DigitalRise.Graphics.Data.Materials;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;

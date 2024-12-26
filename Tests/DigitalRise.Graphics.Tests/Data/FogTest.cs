@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using NUnit.Utils;
 
-namespace DigitalRise.Graphics.Tests.Data
+namespace DigitalRise.Tests.Data
 {
 	[TestFixture]
 	public class FogTest

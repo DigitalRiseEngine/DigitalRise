@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using NUnit.Utils;
 
-namespace DigitalRise.Graphics.Tests
+namespace DigitalRise.Tests
 {
 	[TestFixture]
 	public class MiscTest

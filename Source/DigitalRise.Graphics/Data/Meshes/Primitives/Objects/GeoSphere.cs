@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Mathematics;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class GeoSphere : PrimitiveMeshNode
+	public class GeoSphere : BasePrimitive
 	{
 		private float _radius = 0.5f;
 		private int _tessellation = 3;
@@ -47,9 +43,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new GeoSphere Clone() => (GeoSphere)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new GeoSphere();
+		protected override BasePrimitive CreateInstanceCore() => new GeoSphere();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

@@ -16,6 +16,7 @@ using DigitalRise.Data.Modelling;
 using DigitalRise.Utility;
 using Myra.Events;
 using info.lundin.math;
+using DigitalRise.Attributes;
 
 namespace DigitalRise.Editor.UI
 {
@@ -239,6 +240,7 @@ namespace DigitalRise.Editor.UI
 			_propertyGrid.ObjectChanged += OnObjectChanged;
 			_propertyGrid.PropertyChanged += OnPropertyChanged;
 			_propertyGrid.CustomWidgetProvider = CreateCustomEditor;
+			_propertyGrid.CustomValuesProvider = InternalCreateCustomValues;
 
 			_tabControlScenes.Items.Clear();
 			_tabControlScenes.SelectedIndexChanged += (s, a) => RefreshExplorer(null);
@@ -251,6 +253,36 @@ namespace DigitalRise.Editor.UI
 			_buttonVisualizeBuffers.IsToggledChanged += (s, a) => UpdateDebugOptions();
 
 			UpdateStackPanelEditor();
+		}
+
+		private CustomValues InternalCreateCustomValues(object obj, Record record)
+		{
+			var attrs = record.FindAttributes<EditorOptionAttribute>();
+			if (attrs == null || attrs.Length == 0)
+			{
+				return null;
+			}
+
+			var items = new List<CustomValue>();
+
+			var val = record.GetValue(obj);
+			int? selectedIndex = null;
+
+			for(var i = 0; i < attrs.Length; ++i)
+			{
+				var attr = attrs[i];
+				items.Add(new CustomValue(attr.Type.Name, Activator.CreateInstance(attr.Type)));
+
+				if (val != null && val.GetType() == attr.Type)
+				{
+					selectedIndex = i;
+				}
+			}
+
+			var result = new CustomValues(items);
+			result.SelectedIndex = selectedIndex;
+
+			return result;
 		}
 
 		private Widget InternalCreateCustomEditor(Record record, object obj, string[] extensions, Func<string, object> loader)
@@ -515,7 +547,7 @@ namespace DigitalRise.Editor.UI
 					UpdateTreeNodeId(_treeFileExplorer.SelectedNode);
 					break;
 
-				case "PrimitiveMeshType":
+				case "Primitive":
 					_propertyGrid.Rebuild();
 					break;
 			}

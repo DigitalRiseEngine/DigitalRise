@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Mathematics;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Teapot : PrimitiveMeshNode
+	public class Teapot : BasePrimitive
 	{
 		private float _size = 1.0f;
 		private int _tessellation = 8;
@@ -47,9 +43,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Teapot Clone() => (Teapot)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Teapot();
+		protected override BasePrimitive CreateInstanceCore() => new Teapot();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

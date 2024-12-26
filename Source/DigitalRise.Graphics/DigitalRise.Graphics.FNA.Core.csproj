@@ -17,7 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\FontStashSharp\src\XNA\FontStashSharp.FNA.Core.csproj" />
     <ProjectReference Include="..\..\..\XNAssets\src\XNAssets.FNA.Core.csproj" />
-    <ProjectReference Include="..\DigitalRise.Animation\DigitalRise.Animation.FNA.Core.csproj" />
     <ProjectReference Include="..\DigitalRise.Geometry\DigitalRise.Geometry.FNA.Core.csproj" />
     <ProjectReference Include="..\DigitalRise.ModelStorage\DigitalRise.ModelStorage.FNA.Core.csproj" />
   </ItemGroup>

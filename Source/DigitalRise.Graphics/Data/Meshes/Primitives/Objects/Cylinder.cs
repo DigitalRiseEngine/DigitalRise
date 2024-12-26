@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Mathematics;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Cylinder : PrimitiveMeshNode
+	public class Cylinder : BasePrimitive
 	{
 		private float _height = 1.0f;
 		private float _radius = 0.5f;
@@ -64,9 +60,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Cylinder Clone() => (Cylinder)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Cylinder();
+		protected override BasePrimitive CreateInstanceCore() => new Cylinder();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

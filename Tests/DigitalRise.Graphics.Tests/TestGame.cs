@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace DigitalRise.Graphics.Tests
+namespace DigitalRise.Tests
 {
 	class TestGame: Game
 	{

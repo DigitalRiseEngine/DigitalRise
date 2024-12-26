@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 using NUnit.Framework;
 
 
-namespace DigitalRise.Graphics.SceneGraph.Tests
+namespace DigitalRise.SceneGraph.Tests
 {
 	[TestFixture]
 	public class SceneTest

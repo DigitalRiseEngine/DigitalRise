@@ -1,11 +1,9 @@
 ﻿using AssetManagementBase;
 using DigitalRise.Animation;
-using DigitalRise.Attributes;
 using DigitalRise.Data.Materials;
 using DigitalRise.Data.Modelling;
 using DigitalRise.Geometry;
 using DigitalRise.Geometry.Shapes;
-using DigitalRise.Graphics.Data.Materials;
 using DigitalRise.Mathematics;
 using DigitalRise.Rendering.Deferred;
 using Microsoft.Xna.Framework;

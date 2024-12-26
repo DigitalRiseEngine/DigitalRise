@@ -51,10 +51,6 @@ namespace DigitalRise.SceneGraph
 		private static readonly Func<SceneNode, SceneNode> GetParentCallback = node => node.Parent;
 		private static readonly Func<SceneNode, IEnumerable<SceneNode>> GetChildrenCallback = GetChildren;
 
-		public static MeshNode FindFirstMeshNode(this SceneNode node) => node.MeshNodes().First();
-
-		public static IEnumerable<MeshNode> MeshNodes(this SceneNode node) => node.GetSubtree().OfType<MeshNode>();
-
 		/// <summary>
 		/// Gets the children of the given scene node.
 		/// </summary>

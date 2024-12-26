@@ -12,7 +12,7 @@ using NUnit.Utils;
 using MathHelper = DigitalRise.Mathematics.MathHelper;
 
 
-namespace DigitalRise.Graphics.Tests
+namespace DigitalRise.Tests
 {
 	[TestFixture]
 	public class GraphicsHelperTest

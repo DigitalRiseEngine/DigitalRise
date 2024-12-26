@@ -2234,9 +2234,16 @@ namespace DigitalRise.Rendering.Debugging
 			else
 				batch = TransparentPrimitiveBatch;
 
-			foreach (var meshNode in sceneNode.GetSubtree().OfType<MeshNode>())
-				foreach (var submesh in meshNode.Mesh.Submeshes)
-					batch.AddSubmesh(submesh, meshNode.PoseWorld, meshNode.ScaleWorld, color);
+			foreach (var meshNode in sceneNode.GetSubtree().OfType<DrModelNode>())
+			{
+				foreach (var meshBone in meshNode.Model.MeshBones)
+				{
+					foreach (var submesh in meshBone.Mesh.Submeshes)
+					{
+						batch.AddSubmesh(submesh, meshNode.PoseWorld, meshNode.ScaleWorld, color);
+					}
+				}
+			}
 		}
 
 		/// <summary>

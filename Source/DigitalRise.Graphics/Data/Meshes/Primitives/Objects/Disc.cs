@@ -1,15 +1,11 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Mathematics;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Data.Meshes;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
 	/// <summary>
 	/// A disc - a circular base, or a circular sector.
 	/// </summary>
-	[EditorInfo("Primitive")]
-	public class Disc : PrimitiveMeshNode
+	public class Disc : BasePrimitive
 	{
 		private float _radius = 0.5f;
 		private float _sectorAngle = 360;
@@ -63,15 +59,15 @@ namespace DigitalRise.SceneGraph.Primitives
 			}
 		}
 
-		protected override Mesh CreateMesh() => MeshPrimitives.CreateDiscMesh(Radius, 
+		protected override Mesh CreateMesh() => MeshPrimitives.CreateDiscMesh(Radius,
 			MathHelper.ToRadians(SectorAngle),
 			Tessellation, UScale, VScale, IsLeftHanded);
 
 		public new Disc Clone() => (Disc)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Disc();
+		protected override BasePrimitive CreateInstanceCore() => new Disc();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

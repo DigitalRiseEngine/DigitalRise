@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Data.Meshes;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Box : PrimitiveMeshNode
+	public class Box : BasePrimitive
 	{
 		private Vector3 _size = Vector3.One;
 
@@ -30,9 +26,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Box Clone() => (Box)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Box();
+		protected override BasePrimitive CreateInstanceCore() => new Box();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

@@ -1,12 +1,8 @@
-﻿using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Mathematics;
+﻿using DigitalRise.Mathematics;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Sphere : PrimitiveMeshNode
+	public class Sphere : BasePrimitive
 	{
 		private float _radius = 0.5f;
 		private int _tessellation = 16;
@@ -47,9 +43,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Sphere Clone() => (Sphere)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Sphere();
+		protected override BasePrimitive CreateInstanceCore() => new Sphere();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

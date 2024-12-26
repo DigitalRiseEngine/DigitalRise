@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using DigitalRise.Attributes;
-using DigitalRise.Data.Meshes.Primitives;
-using DigitalRise.Data.Meshes;
 
-namespace DigitalRise.SceneGraph.Primitives
+namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
-	[EditorInfo("Primitive")]
-	public class Plane : PrimitiveMeshNode
+	public class Plane : BasePrimitive
 	{
 		private Vector2 _size = Vector2.One;
 		private Point _tessellation = new Point(1, 1);
@@ -81,9 +77,9 @@ namespace DigitalRise.SceneGraph.Primitives
 
 		public new Plane Clone() => (Plane)base.Clone();
 
-		protected override SceneNode CreateInstanceCore() => new Plane();
+		protected override BasePrimitive CreateInstanceCore() => new Plane();
 
-		protected override void CloneCore(SceneNode source)
+		protected override void CloneCore(BasePrimitive source)
 		{
 			base.CloneCore(source);
 

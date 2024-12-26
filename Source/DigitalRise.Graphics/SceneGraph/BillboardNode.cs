@@ -136,6 +136,9 @@ namespace DigitalRise.SceneGraph
 				return PoseWorld.Orientation.GetColumn(1);
 			}
 		}
+
+		public override bool IsRenderable => true;
+
 		#endregion
 
 
@@ -155,7 +158,6 @@ namespace DigitalRise.SceneGraph
 			if (billboard == null)
 				throw new ArgumentNullException("billboard");
 
-			IsRenderable = true;
 			_billboard = billboard;
 			Shape = billboard.Shape;
 			Color = new Vector3(1, 1, 1);

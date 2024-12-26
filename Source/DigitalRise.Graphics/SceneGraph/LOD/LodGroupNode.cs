@@ -100,6 +100,9 @@ namespace DigitalRise.SceneGraph.LOD
 		/// </summary>
 		/// <value>The levels of detail (LODs).</value>
 		public LodCollection Levels { get; private set; }
+
+		public override bool IsRenderable => true;
+
 		#endregion
 
 
@@ -131,7 +134,6 @@ namespace DigitalRise.SceneGraph.LOD
 		{
 			// The actual value of the following flags does not matter. The LodGroupNodes 
 			// need be handled explicitly in scene queries!
-			IsRenderable = true;
 			CastsShadows = true;
 
 			Levels = new LodCollection(this, capacity);

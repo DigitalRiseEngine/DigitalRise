@@ -51,6 +51,8 @@ namespace DigitalRise.SceneGraph.Sky
 		}
 		private int _drawOrder;
 
+		public override bool IsRenderable => true;
+
 		#endregion
 
 
@@ -63,7 +65,6 @@ namespace DigitalRise.SceneGraph.Sky
 		/// </summary>
 		protected SkyNode()
 		{
-			IsRenderable = true;
 			Shape = Shape.Infinite;
 		}
 		#endregion

@@ -80,6 +80,7 @@ namespace DigitalRise.SceneGraph
 		}
 		private MorphWeightCollection _morphWeights;
 
+		public override bool IsRenderable => true;
 
 		#endregion
 
@@ -95,7 +96,6 @@ namespace DigitalRise.SceneGraph
 			// defined in MeshNodeReader.
 			// When all fix-ups are executed, OnAssetLoaded (see below) is called.
 
-			IsRenderable = true;
 			CastsShadows = true;
 		}
 

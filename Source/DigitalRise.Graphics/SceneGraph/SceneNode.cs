@@ -430,12 +430,7 @@ namespace DigitalRise.SceneGraph
 		/// </remarks>
 		[Browsable(false)]
 		[JsonIgnore]
-		[Category("Graphics")]
-		public bool IsRenderable
-		{
-			get { return GetFlag(SceneNodeFlags.IsRenderable); }
-			set { SetFlag(SceneNodeFlags.IsRenderable, value); }
-		}
+		public virtual bool IsRenderable => false;
 
 
 		/// <summary>

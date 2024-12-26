@@ -95,9 +95,11 @@ namespace DigitalRise.SceneGraph
 		[Browsable(false)]
 		public IMaterial[] Materials { get; set; }
 
+		public override bool IsRenderable => true;
+
+
 		public DrModelNode()
 		{
-			IsRenderable = true;
 			CastsShadows = true;
 		}
 

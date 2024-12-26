@@ -23,16 +23,15 @@ namespace DigitalRise.SceneGraph
 		IsDirty = 1 << 6,       // General purpose flag. Usage depends on scene node type.
 		IsEnabled = 1 << 7,
 		IsStatic = 1 << 8,
-		IsRenderable = 1 << 9,
-		CastsShadows = 1 << 10,
-		IsShadowCasterCulled = 1 << 11,
-		HasAlpha = 1 << 12,     // Does the node have an Alpha value that can be changed?
+		CastsShadows = 1 << 9,
+		IsShadowCasterCulled = 1 << 10,
+		HasAlpha = 1 << 11,     // Does the node have an Alpha value that can be changed?
 
 		// Following flags share the same bit. Only one can be used per SceneNode type.
-		IsAlphaSet = 1 << 13,   // Is the current Alpha value != 1?
-		InvertClip = 1 << 13,   // LightNode.InvertClip
+		IsAlphaSet = 1 << 12,   // Is the current Alpha value != 1?
+		InvertClip = 1 << 12,   // LightNode.InvertClip
 
-		IsDirtyScene = 1 << 14, // Like is IsDirty, but resetting is controlled by Scene.
+		IsDirtyScene = 1 << 13, // Like is IsDirty, but resetting is controlled by Scene.
 
 		// Upper 16 bit are reserved for SceneNode.UserFlag.
 		// Possible extensions: IsReflected, IsSelected, etc.

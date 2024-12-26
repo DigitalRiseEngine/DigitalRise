@@ -265,7 +265,7 @@ namespace DigitalRise.Editor.UI
 
 			var items = new List<CustomValue>();
 			var val = record.GetValue(obj);
-			var selectedIndex = 0;
+			int? selectedIndex = null;
 			for(var i = 0; i < attrs.Length; ++i)
 			{
 				var attr = attrs[i];
@@ -277,8 +277,16 @@ namespace DigitalRise.Editor.UI
 				}
 			}
 
-			var result = new CustomValues(items);
-			result.SelectedIndex = selectedIndex;
+			if (selectedIndex == null)
+			{
+				record.SetValue(obj, items[0].Value);
+				selectedIndex = 0;
+			}
+
+			var result = new CustomValues(items)
+			{
+				SelectedIndex = selectedIndex
+			};
 
 			return result;
 		}

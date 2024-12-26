@@ -1,4 +1,6 @@
 ﻿using DigitalRise.Mathematics;
+using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
@@ -56,6 +58,10 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				InvalidateMesh();
 			}
 		}
+
+		[Browsable(false)]
+		[JsonIgnore]
+		public bool IsDirty => Mesh == null;
 
 
 		internal Mesh Mesh

@@ -264,10 +264,8 @@ namespace DigitalRise.Editor.UI
 			}
 
 			var items = new List<CustomValue>();
-
 			var val = record.GetValue(obj);
-			int? selectedIndex = null;
-
+			var selectedIndex = 0;
 			for(var i = 0; i < attrs.Length; ++i)
 			{
 				var attr = attrs[i];

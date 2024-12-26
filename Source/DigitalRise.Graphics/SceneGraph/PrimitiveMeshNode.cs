@@ -9,12 +9,16 @@ using Plane = DigitalRise.Data.Meshes.Primitives.Objects.Plane;
 using DigitalRise.SceneGraph.Occlusion;
 using System.Diagnostics;
 using DigitalRise.Rendering.Deferred;
+using Microsoft.Xna.Framework;
+using DigitalRise.Geometry;
 
 namespace DigitalRise.Graphics.SceneGraph
 {
 	[EditorInfo("Primitive")]
-	public class PrimitiveMeshNode : SceneNode, IOcclusionProxy
+	public class PrimitiveMeshNode : SceneNode, IOcclusionProxy, IUpdateableNode
 	{
+		private BasePrimitive _primitive;
+
 		[EditorOption(typeof(Box))]
 		[EditorOption(typeof(Capsule))]
 		[EditorOption(typeof(Cone))]
@@ -25,7 +29,28 @@ namespace DigitalRise.Graphics.SceneGraph
 		[EditorOption(typeof(Sphere))]
 		[EditorOption(typeof(Teapot))]
 		[EditorOption(typeof(Torus))]
-		public BasePrimitive Primitive { get; set; }
+		public BasePrimitive Primitive
+		{
+			get => _primitive;
+
+			set
+			{
+				if (value == _primitive)
+				{
+					return;
+				}
+
+				_primitive = value;
+
+				if (_primitive == null)
+				{
+					Shape = Shape.Empty;
+				} else
+				{
+					Shape = _primitive.Mesh.BoundingBox.CreateShape();
+				}
+			}
+		}
 
 		public IMaterial Material { get; set; } = new DefaultMaterial();
 
@@ -35,7 +60,7 @@ namespace DigitalRise.Graphics.SceneGraph
 
 		public PrimitiveMeshNode()
 		{
-			Shape = Shape.Infinite;
+			Shape = Shape.Empty;
 			CastsShadows = true;
 		}
 
@@ -126,6 +151,16 @@ namespace DigitalRise.Graphics.SceneGraph
 			{
 				list.AddJob(submesh, Material, CalculateGlobalTransform());
 			}
+		}
+
+		public void Update(GameTime gameTime)
+		{
+			if (Primitive == null || !Primitive.IsDirty)
+			{
+				return;
+			}
+
+			Shape = _primitive.Mesh.BoundingBox.CreateShape();
 		}
 
 		#endregion

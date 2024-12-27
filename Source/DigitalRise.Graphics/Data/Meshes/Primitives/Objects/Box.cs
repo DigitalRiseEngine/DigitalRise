@@ -18,7 +18,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_size = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 

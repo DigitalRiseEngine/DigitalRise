@@ -23,7 +23,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_isLeftHanded = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -39,7 +39,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_uScale = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_vScale = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -75,7 +75,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 		}
 
 
-		protected void InvalidateMesh()
+		protected void Invalidate()
 		{
 			_mesh = null;
 		}

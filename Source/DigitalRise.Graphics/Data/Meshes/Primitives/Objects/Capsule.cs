@@ -20,7 +20,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_length = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_radius = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_tessellation = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 

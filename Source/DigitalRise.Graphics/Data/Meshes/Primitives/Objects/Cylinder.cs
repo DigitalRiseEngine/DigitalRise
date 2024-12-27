@@ -1,4 +1,5 @@
 ﻿using DigitalRise.Mathematics;
+using System.ComponentModel;
 
 namespace DigitalRise.Data.Meshes.Primitives.Objects
 {
@@ -7,6 +8,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 		private float _height = 1.0f;
 		private float _radius = 0.5f;
 		private int _tessellation = 32;
+		private bool _isCapped = true;
 
 		public float Height
 		{
@@ -20,7 +22,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_height = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -36,7 +38,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_radius = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -52,11 +54,28 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_tessellation = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
-		protected override Mesh CreateMesh() => MeshPrimitives.CreateCylinderMesh(Height, Radius, Tessellation, UScale, VScale, IsLeftHanded);
+		[DefaultValue(true)]
+		public bool IsCapped
+		{
+			get => _isCapped;
+
+			set
+			{
+				if (value == _isCapped)
+				{
+					return;
+				}
+
+				_isCapped = value;
+				Invalidate();
+			}	
+		}
+
+		protected override Mesh CreateMesh() => MeshPrimitives.CreateCylinderMesh(Height, Radius, Tessellation, UScale, VScale, IsCapped, IsLeftHanded);
 
 		public new Cylinder Clone() => (Cylinder)base.Clone();
 

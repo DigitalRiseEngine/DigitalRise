@@ -21,7 +21,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_size = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_tessellation = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -53,7 +53,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_generateBackFace = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_normalDirection = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 

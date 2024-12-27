@@ -23,7 +23,6 @@ namespace DigitalRise.Graphics.SceneGraph
 		[EditorOption(typeof(Capsule))]
 		[EditorOption(typeof(Cone))]
 		[EditorOption(typeof(Cylinder))]
-		[EditorOption(typeof(Disc))]
 		[EditorOption(typeof(GeoSphere))]
 		[EditorOption(typeof(Plane))]
 		[EditorOption(typeof(Sphere))]

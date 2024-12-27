@@ -20,7 +20,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_majorRadius = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_minorRadius = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace DigitalRise.Data.Meshes.Primitives.Objects
 				}
 
 				_tessellation = value;
-				InvalidateMesh();
+				Invalidate();
 			}
 		}
 

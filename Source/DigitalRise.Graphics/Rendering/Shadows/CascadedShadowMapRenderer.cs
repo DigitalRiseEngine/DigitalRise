@@ -46,10 +46,10 @@ namespace DigitalRise.Rendering.Shadows
 
 		public static void Render(RenderContext context, IList<SceneNode> nodes)
 		{
-			if (nodes == null)
-				throw new ArgumentNullException("nodes");
 			if (context == null)
 				throw new ArgumentNullException("context");
+			if (nodes == null)
+				throw new ArgumentNullException("nodes");
 
 			int numberOfNodes = nodes.Count;
 			if (numberOfNodes == 0)
@@ -58,7 +58,8 @@ namespace DigitalRise.Rendering.Shadows
 			context.ThrowIfCameraMissing();
 			context.ThrowIfSceneMissing();
 
-			var graphicsDevice = DR.GraphicsDevice;
+			var originalRenderTarget = context.RenderTarget;
+			var originalViewport = context.Viewport;
 			var originalReferenceNode = context.ReferenceNode;
 
 			// Camera properties
@@ -80,6 +81,7 @@ namespace DigitalRise.Rendering.Shadows
 			context.CameraNode = _orthographicCameraNode;
 			context.Technique = "Directional";
 
+			var graphicsDevice = DR.GraphicsDevice;
 			var savedRenderState = new RenderStateSnapshot();
 			for (int i = 0; i < numberOfNodes; i++)
 			{
@@ -140,13 +142,11 @@ namespace DigitalRise.Rendering.Shadows
 					var oldShadowMap = shadow.ShadowMap;
 					shadow.ShadowMap = context.RenderTargetPool.Obtain2D(new RenderTargetFormat(oldShadowMap));
 
-					graphicsDevice.SetRenderTarget(shadow.ShadowMap);
-					graphicsDevice.Clear(Color.White);
+					context.RenderTarget = shadow.ShadowMap;
+					context.Clear(Color.White);
 
 					var spriteBatch = Resources.SpriteBatch;
-
 					spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-
 					for (int cascade = 0; cascade < shadow.NumberOfCascades; cascade++)
 					{
 						if (shadow.IsCascadeLocked[cascade])
@@ -156,15 +156,14 @@ namespace DigitalRise.Rendering.Shadows
 							spriteBatch.Draw(oldShadowMap, rectangle, rectangle, Color.White);
 						}
 					}
-
 					spriteBatch.End();
 
 					context.RenderTargetPool.Recycle(oldShadowMap);
 				}
 				else
 				{
-					graphicsDevice.SetRenderTarget(shadow.ShadowMap);
-					graphicsDevice.Clear(Color.White);
+					context.RenderTarget = shadow.ShadowMap;
+					context.Clear(Color.White);
 				}
 
 				graphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -255,12 +254,13 @@ namespace DigitalRise.Rendering.Shadows
 				}
 			}
 
-			graphicsDevice.SetRenderTarget(null);
 			savedRenderState.Restore();
 
 			context.CameraNode = cameraNode;
 			context.ShadowNear = float.NaN;
 			context.Technique = null;
+			context.RenderTarget = originalRenderTarget;
+			context.Viewport = originalViewport;
 			context.ReferenceNode = originalReferenceNode;
 			context.Object = null;
 		}

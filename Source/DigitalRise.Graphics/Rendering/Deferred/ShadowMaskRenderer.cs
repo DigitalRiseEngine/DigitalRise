@@ -224,6 +224,7 @@ namespace DigitalRise.Rendering.Deferred
 
 			var graphicsDevice = DR.GraphicsDevice;
 			var savedRenderState = new RenderStateSnapshot();
+			var oldRenderTarget = context.RenderTarget;
 			var viewport = graphicsDevice.Viewport;
 
 			RenderTarget2D lowResTarget = null;
@@ -257,8 +258,8 @@ namespace DigitalRise.Rendering.Deferred
 
 			// Set device render target and clear it to white (= no shadow).
 			var shadowMask = _shadowMasks[0];
-			graphicsDevice.SetRenderTarget(shadowMask);
-			graphicsDevice.Clear(Color.White);
+			context.RenderTarget = shadowMask;
+			context.Clear(Color.White);
 
 			// Render shadow masks
 			CascadedShadowMaskRenderer.Render(context, nodes);
@@ -278,8 +279,9 @@ namespace DigitalRise.Rendering.Deferred
 
 			savedRenderState.Restore();
 			graphicsDevice.ResetTextures();
-			graphicsDevice.SetRenderTarget(null);
-			graphicsDevice.Viewport = viewport;
+			
+			context.RenderTarget = oldRenderTarget;
+			context.Viewport = viewport;
 
 			context.RenderTargetPool.Recycle(lowResTarget);
 		}
@@ -291,7 +293,7 @@ namespace DigitalRise.Rendering.Deferred
 
 			var graphicsDevice = DR.GraphicsDevice;
 			var originalSourceTexture = context.SourceTexture;
-			var source = (RenderTarget2D)graphicsDevice.GetCurrentRenderTarget();
+			var source = context.RenderTarget;
 			var originalViewport = graphicsDevice.Viewport;
 
 			if (Filter != null && Filter.Enabled)
@@ -312,7 +314,7 @@ namespace DigitalRise.Rendering.Deferred
 				// The previous scene render target is bound as texture.
 				// --> Switch scene render targets!
 				context.SourceTexture = source;
-				graphicsDevice.SetRenderTarget(target);
+				context.RenderTarget = target;
 				_upsampleFilter.DepthSensitivity = UpsampleDepthSensitivity;
 				_upsampleFilter.Mode = UpsamplingMode.Bilateral;
 				_upsampleFilter.RebuildZBuffer = false;
@@ -324,8 +326,8 @@ namespace DigitalRise.Rendering.Deferred
 
 			context.SourceTexture = originalSourceTexture;
 
-			graphicsDevice.SetRenderTarget(source);
-			graphicsDevice.Viewport = originalViewport;
+			context.RenderTarget = source;
+			context.Viewport = originalViewport;
 		}
 
 

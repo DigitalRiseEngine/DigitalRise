@@ -383,7 +383,7 @@ namespace DigitalRune.Rendering.Sky
 			if (node.Encoding is RgbEncoding)
 			{
 				effect.TextureSize.SetValue(node.Texture.Size);
-				if (graphicsDevice.IsCurrentRenderTargetHdr())
+				if (context.IsHdr)
 				{
 					pass = effect.PassRgbToRgb;
 				}
@@ -396,7 +396,7 @@ namespace DigitalRune.Rendering.Sky
 			{
 				if (!sourceIsFloatingPoint)
 				{
-					if (graphicsDevice.IsCurrentRenderTargetHdr())
+					if (context.IsHdr)
 					{
 						pass = effect.PassSRgbToRgb;
 					}
@@ -415,7 +415,7 @@ namespace DigitalRune.Rendering.Sky
 				float max = GraphicsHelper.ToGamma(((RgbmEncoding)node.Encoding).Max);
 				effect.RgbmMaxValue.SetValue(max);
 
-				if (graphicsDevice.IsCurrentRenderTargetHdr())
+				if (context.IsHdr)
 				{
 					pass = effect.PassRgbmToRgb;
 				}

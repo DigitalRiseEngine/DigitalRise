@@ -55,10 +55,12 @@
                 <Label Text="Draw Calls:" Grid.Row="1" />
                 <Label Text="Vertices Drawn:" Grid.Row="2" />
                 <Label Text="Primitives Drawn:" Grid.Row="3" />
+                <Label Text="Render Target Switches:" Grid.Row="4" />
                 <Label Text="10" Id="_labelEffectsSwitches" Grid.Column="1" />
                 <Label Text="10" Id="_labelDrawCalls" Grid.Column="1" Grid.Row="1" />
                 <Label Text="10" Id="_labelVerticesDrawn" Grid.Column="1" Grid.Row="2" />
                 <Label Text="10" Id="_labelPrimitivesDrawn" Grid.Column="1" Grid.Row="3" />
+                <Label Text="10" Id="_labelRenderTargetSwitches" Grid.Column="1" Grid.Row="4" />
               </Grid>
             </Panel>
           </VerticalStackPanel>

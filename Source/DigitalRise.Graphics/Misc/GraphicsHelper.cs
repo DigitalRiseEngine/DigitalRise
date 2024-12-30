@@ -47,9 +47,6 @@ namespace DigitalRise.Misc
 																				0, 0, 1, 0,
 																				0, 0, 0, 1);
 
-		private static readonly RenderTargetBinding[] _renderTargetBindings = new RenderTargetBinding[4];
-		private static readonly RenderTargetBinding[] _getRenderTargetBindings = new RenderTargetBinding[16];
-
 		/// <summary>
 		/// Gets the max number of primitives per draw call.
 		/// </summary>
@@ -417,66 +414,5 @@ namespace DigitalRise.Misc
 		public static BoundingBox BuildBoundingBox(this VertexPositionNormal[] vertices) => BoundingBox.CreateFromPoints(vertices.GetPositions());
 		public static BoundingBox BuildBoundingBox(this VertexPosition[] vertices) => BoundingBox.CreateFromPoints(vertices.GetPositions());
 		public static BoundingBox BuildBoundingBox(this Vector3[] vertices) => BoundingBox.CreateFromPoints(vertices);
-
-		public static void SetRenderTargets(this GraphicsDevice device, RenderTarget2D target1,  RenderTarget2D target2)
-		{
-			_renderTargetBindings[0] = new RenderTargetBinding(target1);
-			_renderTargetBindings[1] = new RenderTargetBinding(target2);
-			
-			device.SetRenderTargets(_renderTargetBindings);
-		}
-
-		public static void ResetRenderTargets(this GraphicsDevice device)
-		{
-			_renderTargetBindings[0] = new RenderTargetBinding();
-			_renderTargetBindings[1] = new RenderTargetBinding();
-		}
-
-		public static Texture GetCurrentRenderTarget(this GraphicsDevice device)
-		{
-#if FNA
-			var count = device.GetRenderTargetsNoAllocEXT(null);
-			if (count == 0)
-			{
-				return null;
-			}
-			
-			device.GetRenderTargetsNoAllocEXT(_getRenderTargetBindings);
-
-			var result = _getRenderTargetBindings[0].RenderTarget;
-
-			// Reset temporary array
-			for(var i = 0; i < count; ++i)
-			{
-				_getRenderTargetBindings[i] = new RenderTargetBinding();
-			}
-#else
-			device.GetRenderTargets(_getRenderTargetBindings);
-
-			var result = _getRenderTargetBindings[0].RenderTarget;
-
-			// Reset temporary array
-			for (var i = 0; i < device.RenderTargetCount; ++i)
-			{
-				_getRenderTargetBindings[i] = new RenderTargetBinding();
-			}
-#endif
-
-			return result;
-		}
-
-		public static bool IsCurrentRenderTargetHdr(this GraphicsDevice device)
-		{
-			var target = device.GetCurrentRenderTarget();
-
-			return target != null && target.Format == SurfaceFormat.HdrBlendable;
-		}
-
-		public static Vector2 GetViewportSize(this GraphicsDevice device)
-		{
-			var viewport = device.Viewport;
-
-			return new Vector2(viewport.Width, viewport.Height);
-		}
 	}
 }

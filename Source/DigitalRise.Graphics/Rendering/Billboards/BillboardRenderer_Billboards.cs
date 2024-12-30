@@ -185,9 +185,9 @@ namespace DigitalRise.Rendering.Billboards
 
 				// Select effect technique.
 				if (EnableOffscreenRendering || EnableSoftParticles)
-					effect.CurrentTechnique = graphicsDevice.IsCurrentRenderTargetHdr() ? effect.TechniqueSoftLinear : effect.TechniqueSoftGamma;
+					effect.CurrentTechnique = context.IsHdr ? effect.TechniqueSoftLinear : effect.TechniqueSoftGamma;
 				else
-					effect.CurrentTechnique = graphicsDevice.IsCurrentRenderTargetHdr() ? effect.TechniqueHardLinear : effect.TechniqueHardGamma;
+					effect.CurrentTechnique = context.IsHdr ? effect.TechniqueHardLinear : effect.TechniqueHardGamma;
 
 				if (!EnableOffscreenRendering && !EnableSoftParticles)
 				{
@@ -250,14 +250,12 @@ namespace DigitalRise.Rendering.Billboards
 					graphicsDevice.BlendState = BlendStateOffscreen;
 					graphicsDevice.DepthStencilState = DepthStencilState.None;
 
-					var sceneRenderTarget = graphicsDevice.GetCurrentRenderTarget();
-
+					var sceneRenderTarget = context.RenderTarget;
 					var depthBufferHalf = context.DepthBufferHalf;
 					_offscreenBuffer = context.RenderTargetPool.Obtain2D(
 					  new RenderTargetFormat(depthBufferHalf.Width, depthBufferHalf.Height, false, sceneRenderTarget.Format, DepthFormat.None));
-					graphicsDevice.SetRenderTarget(_offscreenBuffer);
-
-					graphicsDevice.Clear(Color.Black);
+					context.RenderTarget = _offscreenBuffer;
+					context.Clear(Color.Black);
 				}
 			}
 			else
@@ -286,13 +284,13 @@ namespace DigitalRise.Rendering.Billboards
 
 				// The previous scene render target is bound as texture.
 				// --> Switch scene render targets!
-				var sceneTexture = (RenderTarget2D)graphicsDevice.GetCurrentRenderTarget();
+				var sceneTexture = context.RenderTarget;
 				var renderTargetPool = context.RenderTargetPool;
 				var renderTarget = renderTargetPool.Obtain2D(new RenderTargetFormat(sceneTexture));
 				context.SourceTexture = _offscreenBuffer;
 				context.SceneTexture = sceneTexture;
 
-				graphicsDevice.SetRenderTarget(renderTarget);
+				context.RenderTarget = renderTarget;
 
 				_upsampleFilter.Mode = UpsamplingMode;
 				_upsampleFilter.DepthThreshold = DepthThreshold;

@@ -115,7 +115,7 @@ namespace DigitalRise.Rendering.Deferred
 			int frame = context.Frame;
 			cameraNode.LastFrame = frame;
 
-			var isHdrEnabled = graphicsDevice.IsCurrentRenderTargetHdr();
+			var isHdrEnabled = context.IsHdr;
 			for (int i = 0; i < numberOfNodes; i++)
 			{
 				var lightNode = nodes[i] as LightNode;

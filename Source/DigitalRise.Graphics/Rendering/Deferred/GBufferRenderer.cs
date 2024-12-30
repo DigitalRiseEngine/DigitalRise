@@ -30,7 +30,7 @@ namespace DigitalRise.Rendering.Deferred
 			var height = viewport.Height;
 
 			// Set the device render target to the G-buffer.
-			graphicsDevice.SetRenderTargets(context.GBuffer0, context.GBuffer1);
+			context.SetRenderTargets(context.GBuffer0, context.GBuffer1);
 
 			graphicsDevice.DepthStencilState = DepthStencilState.None;
 			graphicsDevice.RasterizerState = RasterizerState.CullNone;
@@ -74,12 +74,12 @@ namespace DigitalRise.Rendering.Deferred
 			// The depth buffer is downsampled into a buffer of half width and half height.
 			var depthBufferHalf = context.DepthBufferHalf;
 			context.SourceTexture = context.GBuffer0;
+			context.RenderTarget = depthBufferHalf;
 
-			graphicsDevice.SetRenderTarget(depthBufferHalf);
 			_downsampleFilter.Process(context);
 			context.SourceTexture = null;
 
-			graphicsDevice.ResetRenderTargets();
+			context.ResetRenderTargets();
 		}
 	}
 }

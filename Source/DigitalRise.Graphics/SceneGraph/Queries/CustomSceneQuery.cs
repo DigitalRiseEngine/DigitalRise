@@ -25,6 +25,7 @@ namespace DigitalRise.SceneGraph.Queries
 
 		// All other scene nodes where IsRenderable is true (e.g. MeshNodes).
 		public List<SceneNode> RenderableNodes { get; private set; }
+		public List<PostProcessorNode> PostProcessorNodes { get; private set; }
 
 
 		public CustomSceneQuery()
@@ -35,6 +36,7 @@ namespace DigitalRise.SceneGraph.Queries
 			SkyNodes = new List<SceneNode>();
 			FogNodes = new List<SceneNode>();
 			RenderableNodes = new List<SceneNode>();
+			PostProcessorNodes = new List<PostProcessorNode>();
 		}
 
 
@@ -86,15 +88,25 @@ namespace DigitalRise.SceneGraph.Queries
 							DecalNodes.Add(node);
 						else*/
 			if (node is LightNode)
+			{
 				Lights.Add(node);
+			}
 			/*			else if (node is LensFlareNode)
 							LensFlareNodes.Add(node);
 						else if (node is SkyNode)
 							SkyNodes.Add(node);*/
 			else if (node is FogNode)
+			{
 				FogNodes.Add(node);
+			}
 			else if (node.IsRenderable)
+			{
 				RenderableNodes.Add(node);
+			}
+			else if (node is PostProcessorNode)
+			{
+				PostProcessorNodes.Add((PostProcessorNode)node);
+			}
 
 			// Unsupported types are simply ignored.
 		}

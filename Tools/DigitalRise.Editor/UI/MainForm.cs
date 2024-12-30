@@ -944,6 +944,7 @@ namespace DigitalRise.Editor.UI
 				_labelDrawCalls.Text = stats.DrawCalls.ToString();
 				_labelVerticesDrawn.Text = stats.VerticesDrawn.ToString();
 				_labelPrimitivesDrawn.Text = stats.PrimitivesDrawn.ToString();
+				_labelRenderTargetSwitches.Text = stats.RenderTargetSwitches.ToString();
 			}
 
 			base.InternalRender(context);

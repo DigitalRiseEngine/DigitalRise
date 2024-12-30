@@ -6,6 +6,7 @@
 		public int DrawCalls;
 		public int VerticesDrawn;
 		public int PrimitivesDrawn;
+		public int RenderTargetSwitches;
 
 		public void Reset()
 		{
@@ -13,6 +14,7 @@
 			DrawCalls = 0;
 			VerticesDrawn = 0;
 			PrimitivesDrawn = 0;
+			RenderTargetSwitches = 0;
 		}
 	}
 }

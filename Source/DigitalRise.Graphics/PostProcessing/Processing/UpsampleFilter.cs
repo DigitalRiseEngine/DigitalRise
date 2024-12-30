@@ -220,8 +220,6 @@ namespace DigitalRise.PostProcessing.Processing
 		/// <inheritdoc/>
 		protected override void OnProcess(RenderContext context)
 		{
-			var graphicsDevice = DR.GraphicsDevice;
-
 			ViewVolume volume = null;
 			if (RebuildZBuffer || Mode == UpsamplingMode.NearestDepth)
 			{
@@ -230,11 +228,10 @@ namespace DigitalRise.PostProcessing.Processing
 			}
 
 			var sourceTexture = context.SourceTexture;
-
 			_effect.SourceTexture.SetValue(sourceTexture);
 			_effect.SourceSize.SetValue(new Vector2(sourceTexture.Width, sourceTexture.Height));
 
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			_effect.TargetSize.SetValue(new Vector2(viewport.Width, viewport.Height));
 
 			if (Mode == UpsamplingMode.Bilateral)
@@ -271,7 +268,7 @@ namespace DigitalRise.PostProcessing.Processing
 
 				// PostProcessor.ProcessInternal sets the DepthStencilState to None.
 				// --> Enable depth writes.
-				graphicsDevice.DepthStencilState = GraphicsHelper.DepthStencilStateAlways;
+				DR.GraphicsDevice.DepthStencilState = GraphicsHelper.DepthStencilStateAlways;
 			}
 
 			if (RebuildZBuffer || Mode >= UpsamplingMode.Bilateral)
@@ -284,7 +281,6 @@ namespace DigitalRise.PostProcessing.Processing
 			{
 				// Render at half resolution into off-screen buffer.
 				object dummy = null;
-				//				context.Data.TryGetValue(RenderContextKeys.DepthBufferHalf, out dummy);
 				var depthBufferHalf = dummy as Texture2D;
 				if (depthBufferHalf == null)
 				{

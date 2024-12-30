@@ -147,10 +147,10 @@ namespace DigitalRise.Rendering.Deferred
 							context.SourceTexture = null;
 						}*/
 
-			graphicsDevice.SetRenderTargets(context.LightBuffer0, context.LightBuffer1);
+			context.SetRenderTargets(context.LightBuffer0, context.LightBuffer1);
 
 			// Clear the light buffer. (The alpha channel is not used. We can set it to anything.)
-			graphicsDevice.Clear(new Color(0, 0, 0, 255));
+			context.Clear(new Color(0, 0, 0, 255));
 
 			// Restore the depth buffer (which XNA destroys in SetRenderTarget).
 			// (This is only needed if lights can use a clip geometry (LightNode.Clip).)
@@ -183,7 +183,7 @@ namespace DigitalRise.Rendering.Deferred
 						_renderTargetBindings[0] = new RenderTargetBinding();
 						_renderTargetBindings[1] = new RenderTargetBinding();*/
 
-			graphicsDevice.ResetRenderTargets();
+			context.ResetRenderTargets();
 		}
 		#endregion
 	}

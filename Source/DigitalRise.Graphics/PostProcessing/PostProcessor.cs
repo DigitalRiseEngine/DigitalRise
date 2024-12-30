@@ -3,10 +3,12 @@
 // file 'LICENSE.TXT', which is part of this source code package.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using DigitalRise.Misc;
 using DigitalRise.Rendering;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 
 
 namespace DigitalRise.PostProcessing
@@ -43,7 +45,7 @@ namespace DigitalRise.PostProcessing
 	/// information.
 	/// </para>
 	/// </remarks>
-	public abstract class PostProcessor : IDisposable, INamedObject
+	public abstract class PostProcessor : IDisposable
 	{
 		//--------------------------------------------------------------
 		#region Properties & Events
@@ -56,6 +58,8 @@ namespace DigitalRise.PostProcessing
 		/// <see langword="true"/> if this instance has been disposed of; otherwise, 
 		/// <see langword="false"/>.
 		/// </value>
+		[Browsable(false)]
+		[JsonIgnore]
 		public bool IsDisposed { get; private set; }
 
 
@@ -92,13 +96,6 @@ namespace DigitalRise.PostProcessing
 
 
 		/// <summary>
-		/// Gets or sets the name of the post-processor.
-		/// </summary>
-		/// <value>The name of the post-processor.</value>
-		public string Name { get; set; }
-
-
-		/// <summary>
 		/// Gets or sets the default target format.
 		/// (This property is used by the <see cref="PostProcessorChain"/>).
 		/// </summary>
@@ -115,6 +112,8 @@ namespace DigitalRise.PostProcessing
 		/// to convert a <strong>HdrBlendable</strong> input texture to an LDR <strong>Color</strong>
 		/// (R8G8B8A8) texture.
 		/// </remarks>
+		[Browsable(false)]
+		[JsonIgnore]
 		public RenderTargetFormat DefaultTargetFormat { get; set; }
 		#endregion
 

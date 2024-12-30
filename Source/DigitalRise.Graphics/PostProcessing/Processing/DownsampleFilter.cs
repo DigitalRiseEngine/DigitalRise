@@ -79,18 +79,17 @@ namespace DigitalRise.PostProcessing.Processing
 		/// <inheritdoc/>
 		protected override void OnProcess(RenderContext context)
 		{
-			var graphicsDevice = DR.GraphicsDevice;
-
 			// The width/height of the current input.
 			int sourceWidth = context.SourceTexture.Width;
 			int sourceHeight = context.SourceTexture.Height;
 
 			// The target width/height.
-			var viewport = graphicsDevice.Viewport;
-			int targetWidth = viewport.Width;
-			int targetHeight = viewport.Height;
+			int targetWidth = context.Viewport.Width;
+			int targetHeight = context.Viewport.Height;
 
-			var lastRenderTarget = (RenderTarget2D)DR.GraphicsDevice.GetCurrentRenderTarget();
+			// Save original target/viewport
+			var originalTarget = context.RenderTarget;
+			var originalViewport = context.Viewport;
 
 			// Surface format of input.
 			bool isFloatingPointFormat = TextureHelper.IsFloatingPointFormat(context.SourceTexture.Format);
@@ -122,15 +121,15 @@ namespace DigitalRise.PostProcessing.Processing
 					RenderTarget2D temp = null;
 					if (isFinalPass)
 					{
-						graphicsDevice.SetRenderTarget(lastRenderTarget);
-						graphicsDevice.Viewport = viewport;
+						context.RenderTarget = originalTarget;
+						context.Viewport = originalViewport;
 					}
 					else
 					{
 						// Get temporary render target for intermediate steps.
 						var tempFormat = new RenderTargetFormat(tempTargetWidth, tempTargetHeight, false, context.SourceTexture.Format, DepthFormat.None);
 						temp = context.RenderTargetPool.Obtain2D(tempFormat);
-						graphicsDevice.SetRenderTarget(temp);
+						context.RenderTarget = temp;
 					}
 
 					_effect._sourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
@@ -139,13 +138,21 @@ namespace DigitalRise.PostProcessing.Processing
 
 					EffectPass pass = null;
 					if (factor == 2)
+					{
 						pass = _effect._linear2Pass;
+					}
 					else if (factor == 4)
+					{
 						pass = _effect._linear4Pass;
+					}
 					else if (factor == 6)
+					{
 						pass = _effect._linear6Pass;
+					}
 					else if (factor == 8)
+					{
 						pass = _effect._linear8Pass;
+					}
 
 					context.DrawFullScreenQuad(pass);
 
@@ -178,15 +185,15 @@ namespace DigitalRise.PostProcessing.Processing
 					RenderTarget2D temp = null;
 					if (isFinalPass)
 					{
-						graphicsDevice.SetRenderTarget(lastRenderTarget);
-						graphicsDevice.Viewport = viewport;
+						context.RenderTarget = originalTarget;
+						context.Viewport = originalViewport;
 					}
 					else
 					{
 						// Get temporary render target for intermediate steps.
 						var tempFormat = new RenderTargetFormat(tempTargetWidth, tempTargetHeight, false, context.SourceTexture.Format, DepthFormat.None);
 						temp = context.RenderTargetPool.Obtain2D(tempFormat);
-						graphicsDevice.SetRenderTarget(temp);
+						context.RenderTarget = temp;
 					}
 
 					_effect._sourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
@@ -198,24 +205,37 @@ namespace DigitalRise.PostProcessing.Processing
 					if (source != context.GBuffer0)
 					{
 						if (factor == 2)
+						{
 							pass = _effect._point2Pass;
+						}
 						else if (factor == 3)
+						{
 							pass = _effect._point3Pass;
+						}
 						else
+						{
 							pass = _effect._point4Pass;
+						}
 					}
 					else
 					{
 						// This is the depth buffer and it needs special handling.
 						if (factor == 2)
+						{
 							pass = _effect._point2DepthPass;
+						}
 						else if (factor == 3)
+						{
 							pass = _effect._point3DepthPass;
+						}
 						else
+						{
 							pass = _effect._point4DepthPass;
+						}
 					}
 
 					context.DrawFullScreenQuad(pass);
+
 					context.RenderTargetPool.Recycle(last);
 					last = temp;
 					sourceWidth = tempTargetWidth;

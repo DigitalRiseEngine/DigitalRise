@@ -1,4 +1,8 @@
-﻿using DigitalRise.Geometry.Shapes;
+﻿// DigitalRune Engine - Copyright (C) DigitalRune GmbH
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.TXT', which is part of this source code package.
+
+using DigitalRise.Geometry.Shapes;
 using DigitalRise.Misc;
 using DigitalRise.Rendering.Billboards;
 using DigitalRise.Rendering.Deferred;
@@ -10,6 +14,8 @@ using DigitalRune.Rendering.Sky;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DigitalRise.Rendering
@@ -27,6 +33,137 @@ namespace DigitalRise.Rendering
 		public RenderTarget2D LightBuffer1 => _context.LightBuffer1;
 
 		public RenderStatistics Statistics => _context.Statistics;
+
+		/// <summary>
+		/// Returns <see langword="true"/> if the given processor is the last processor that renders 
+		/// into the back buffer. 
+		/// </summary>
+		private static bool IsLastOutputProcessor(IList<PostProcessorNode> processors, int processorIndex)
+		{
+			// Return false if there is a post-processor after the given index which is enabled.
+			int numberOfProcessors = processors.Count;
+			for (int i = processorIndex + 1; i < numberOfProcessors; i++)
+			{
+				var processor = processors[i];
+				if (processor.Processor.Enabled)
+					return false;
+			}
+
+			return true;
+		}
+
+
+		private void PostProcess(List<PostProcessorNode> processorNodes)
+		{
+			if (processorNodes == null || processorNodes.Count == 0)
+			{
+				return;
+			}
+
+			Debug.Assert(_context != null);
+			Debug.Assert(_context.SourceTexture != null);
+
+			if (_context == null)
+				throw new ArgumentNullException("context");
+
+			var renderTargetPool = _context.RenderTargetPool;
+			var graphicsDevice = DR.GraphicsDevice;
+
+			var originalSourceTexture = _context.SourceTexture;
+			var originalRenderTarget = _context.RenderTarget;
+			var originalViewport = _context.Viewport;
+
+			// Some normal post-processors can be used with any blend state. In a chain
+			// alpha blending does not make sense.
+			graphicsDevice.BlendState = BlendState.Opaque;
+
+			// Intermediate render targets for ping-ponging.
+			// TODO: Use the originalRenderTarget in the ping-ponging.
+			// (Currently, we create up to 2 temp targets. If the originalRenderTarget is not null,
+			// and if the viewport is the whole target, then we could use the originalRenderTarget
+			// in the ping-ponging. But care must be taken that the originalRenderTarget is never
+			// used as the output for the post-processor before the last post-processor...)
+			RenderTarget2D tempSource = null;
+			RenderTarget2D tempTarget = null;
+
+			// The size and format for intermediate render target is determined by the source image.
+			var tempFormat = new RenderTargetFormat(originalSourceTexture)
+			{
+				Mipmap = false,
+				DepthStencilFormat = DepthFormat.None,
+			};
+
+			// Remember if any processor has written into target.
+			bool targetWritten = false;
+
+			// Execute all processors.
+			var numberOfProcessors = processorNodes.Count;
+			for (int i = 0; i < numberOfProcessors; i++)
+			{
+				var processor = processorNodes[i].Processor;
+				if (!processor.Enabled)
+					continue;
+
+				// Find effective output target:
+				// If this processor is the last, then we render into the user-defined target. 
+				// If this is not the last processor, then we use an intermediate buffer.
+				if (IsLastOutputProcessor(processorNodes, i))
+				{
+					_context.RenderTarget = originalRenderTarget;
+					_context.Viewport = originalViewport;
+					targetWritten = true;
+				}
+				else
+				{
+					// This is an intermediate post-processor, so we need an intermediate target.
+					// If we have one, does it still have the correct format? If not, recycle it.
+					if (tempTarget != null && !processor.DefaultTargetFormat.IsCompatibleWith(tempFormat))
+					{
+						renderTargetPool.Recycle(tempTarget);
+						tempTarget = null;
+					}
+
+					if (tempTarget == null)
+					{
+						// Get a new render target. 
+						// The format that the processor wants has priority. The current format 
+						// is the fallback.
+						tempFormat = new RenderTargetFormat(
+						  processor.DefaultTargetFormat.Width ?? tempFormat.Width,
+						  processor.DefaultTargetFormat.Height ?? tempFormat.Height,
+						  processor.DefaultTargetFormat.Mipmap ?? tempFormat.Mipmap,
+						  processor.DefaultTargetFormat.SurfaceFormat ?? tempFormat.SurfaceFormat,
+						  processor.DefaultTargetFormat.DepthStencilFormat ?? tempFormat.DepthStencilFormat);
+						tempTarget = renderTargetPool.Obtain2D(tempFormat);
+					}
+
+					_context.RenderTarget = tempTarget;
+					_context.Viewport = new Viewport(0, 0, tempFormat.Width.Value, tempFormat.Height.Value);
+				}
+
+				processor.ProcessInternal(_context);
+
+				_context.SourceTexture = _context.RenderTarget;
+
+				// If we have rendered into tempTarget, then we remember it in tempSource 
+				// and reuse the render target in tempSource if any is set.
+				if (_context.RenderTarget == tempTarget)
+					Mathematics.MathHelper.Swap(ref tempSource, ref tempTarget);
+			}
+
+			// If there are no processors, or no processor is enabled, then we have to 
+			// copy the source to the target manually.
+/*			if (!targetWritten)
+				graphicsService.GetCopyFilter().ProcessInternal(_context);*/
+
+			_context.SourceTexture = originalSourceTexture;
+
+			// The last processor should have written into the original target.
+			Debug.Assert(_context.RenderTarget == originalRenderTarget);
+
+			renderTargetPool.Recycle(tempSource);
+			renderTargetPool.Recycle(tempTarget);
+		}
 
 		public RenderTarget2D Render(Scene scene, CameraNode camera, GameTime gameTime, Action<RenderContext> postRender = null)
 		{
@@ -87,8 +224,8 @@ namespace DigitalRise.Rendering
 
 				// Material pass
 				var graphicsDevice = DR.GraphicsDevice;
-				graphicsDevice.SetRenderTarget(_context.Output);
-				graphicsDevice.Clear(new Color(3, 3, 3, 255));
+				_context.RenderTarget = _context.Output;
+				_context.Clear(new Color(3, 3, 3, 255));
 				graphicsDevice.DepthStencilState = DepthStencilState.Default;
 				graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 				graphicsDevice.BlendState = BlendState.Opaque;

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using DigitalRise.Data.Lights;
 using DigitalRise.Data.Shadows;
 using DigitalRise.Geometry.Shapes;
-using DigitalRise.Mathematics;
 using DigitalRise.Mathematics.Algebra;
 using DigitalRise.Misc;
 using DigitalRise.Rendering.Deferred;
@@ -80,9 +79,8 @@ namespace DigitalRise.Rendering.Shadows
 			context.ThrowIfCameraMissing();
 			context.ThrowIfSceneMissing();
 
-			var graphicsDevice = DR.GraphicsDevice;
-			var originalRenderTarget = graphicsDevice.GetCurrentRenderTarget();
-			var originalViewport = graphicsDevice.Viewport;
+			var originalRenderTarget = context.RenderTarget;
+			var originalViewport = context.Viewport;
 			var originalReferenceNode = context.ReferenceNode;
 
 			var cameraNode = context.CameraNode;
@@ -95,6 +93,7 @@ namespace DigitalRise.Rendering.Shadows
 			context.CameraNode = _perspectiveCameraNode;
 			context.Technique = "Omnidirectional";
 
+			var graphicsDevice = DR.GraphicsDevice;
 			var renderTargetPool = context.RenderTargetPool;
 			var savedRenderState = new RenderStateSnapshot();
 
@@ -126,7 +125,7 @@ namespace DigitalRise.Rendering.Shadows
 						DepthFormat.Depth24));
 				}
 
-			  ((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(ConstantsF.PiOver2, 1, shadow.Near, light.Range);
+			  ((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(90, 1, shadow.Near, light.Range);
 
 				// World units per texel at a planar distance of 1 world unit.
 				float unitsPerTexel = _perspectiveCameraNode.ViewVolume.Rectangle.Width / (shadow.ShadowMap.Size * shadow.Near);
@@ -148,6 +147,7 @@ namespace DigitalRise.Rendering.Shadows
 				{
 					graphicsDevice.SetRenderTarget(shadow.ShadowMap, CubeMapFaces[side]);
 					// context.RenderTarget = shadow.ShadowMap;   // TODO: Support cube maps targets in the render context.
+					context.Viewport = graphicsDevice.Viewport;
 
 					graphicsDevice.Clear(Color.White);
 
@@ -180,11 +180,12 @@ namespace DigitalRise.Rendering.Shadows
 				}
 			}
 
-			graphicsDevice.SetRenderTarget(null);
 			savedRenderState.Restore();
 
 			context.CameraNode = cameraNode;
 			context.Technique = null;
+			context.RenderTarget = originalRenderTarget;
+			context.Viewport = originalViewport;
 			context.ReferenceNode = originalReferenceNode;
 			context.Object = null;
 		}

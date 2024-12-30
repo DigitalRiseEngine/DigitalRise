@@ -19,7 +19,7 @@ namespace DigitalRise.Rendering.Shadows
 		//--------------------------------------------------------------
 
 		private static readonly CameraNode _perspectiveCameraNode = new CameraNode(new PerspectiveViewVolume());
-		private static  readonly CameraNode _orthographicCameraNode = new CameraNode(new OrthographicViewVolume());
+		private static readonly CameraNode _orthographicCameraNode = new CameraNode(new OrthographicViewVolume());
 		#endregion
 
 		//--------------------------------------------------------------
@@ -43,6 +43,8 @@ namespace DigitalRise.Rendering.Shadows
 			context.ThrowIfCameraMissing();
 			context.ThrowIfSceneMissing();
 
+			var originalRenderTarget = context.RenderTarget;
+			var originalViewport = context.Viewport;
 			var originalReferenceNode = context.ReferenceNode;
 
 			var cameraNode = context.CameraNode;
@@ -90,7 +92,6 @@ namespace DigitalRise.Rendering.Shadows
 					{
 						var lp = (PerspectiveViewVolume)light.Projection;
 						var cp = (PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume;
-
 						cp.SetFieldOfView(lp.FieldOfViewY, lp.AspectRatio, lp.Near, lp.Far);
 
 						lightCameraNode = _perspectiveCameraNode;
@@ -135,8 +136,8 @@ namespace DigitalRise.Rendering.Shadows
 				// Convert normal offset from "texel" to world space.
 				shadow.EffectiveNormalOffset = shadow.NormalOffset * unitsPerTexel;
 
-				graphicsDevice.SetRenderTarget(shadow.ShadowMap);
-				graphicsDevice.Clear(Color.White);
+				context.RenderTarget = shadow.ShadowMap;
+				context.Clear(Color.White);
 
 				// The scene node renderer should use the light camera instead of the player camera.
 				context.CameraNode = lightCameraNode;
@@ -164,11 +165,11 @@ namespace DigitalRise.Rendering.Shadows
 				}
 			}
 
-			graphicsDevice.SetRenderTarget(null);
 			savedRenderState.Restore();
 
-			context.CameraNode = cameraNode;
 			context.Technique = null;
+			context.RenderTarget = originalRenderTarget;
+			context.Viewport = originalViewport;
 			context.ReferenceNode = originalReferenceNode;
 			context.Object = null;
 		}

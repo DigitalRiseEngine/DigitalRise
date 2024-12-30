@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace DigitalRise.Rendering
@@ -42,6 +43,10 @@ namespace DigitalRise.Rendering
 		private readonly RenderTarget2DViewportSized _lightBuffer1Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _outputBufferWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _depthBufferHalfWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.Single, DepthFormat.None, type: RenderTarget2DViewportSizedType.Half);
+		private readonly RenderTargetBinding[] _multipleRenderTargets = new RenderTargetBinding[2];
+		private RenderTarget2D _singleRenderTarget;
+		private int _renderTargetCount = 0;
+		private bool _renderTargetDirty = true;
 
 
 		//--------------------------------------------------------------
@@ -116,8 +121,37 @@ namespace DigitalRise.Rendering
 		/// <see cref="SceneTexture"/> will specify the last scene texture. 
 		/// </remarks>
 		public Texture2D SceneTexture { get; set; }
-		#endregion
 
+		public RenderTarget2D RenderTarget
+		{
+			get => _singleRenderTarget;
+
+			set
+			{
+				if (value == _singleRenderTarget)
+				{
+					return;
+				}
+
+				_singleRenderTarget = value;
+				_renderTargetCount = 1;
+				_renderTargetDirty = true;
+			}
+		}
+
+		public Viewport Viewport
+		{
+			get => DR.GraphicsDevice.Viewport;
+
+			set
+			{
+				DR.GraphicsDevice.Viewport = value;
+			}
+		}
+
+		public bool IsHdr => RenderTarget != null && RenderTarget.Format == SurfaceFormat.HdrBlendable;
+
+		#endregion
 
 		#region ----- Deferred Rendering Buffers -----
 
@@ -197,7 +231,6 @@ namespace DigitalRise.Rendering
 		/// </remarks>
 		public SceneNode ReferenceNode { get; set; }
 		#endregion
-
 
 		#region ----- Level of Detail (LOD) -----
 
@@ -524,8 +557,60 @@ namespace DigitalRise.Rendering
 			Statistics.VerticesDrawn += 4;
 		}
 
+		private void PreDraw()
+		{
+			var graphicsDevice = DR.GraphicsDevice;
+			if (_renderTargetDirty)
+			{
+				if (_renderTargetCount == 1)
+				{
+					// Single render target
+					graphicsDevice.SetRenderTarget(_singleRenderTarget);
+				} else
+				{
+					graphicsDevice.SetRenderTargets(_multipleRenderTargets);
+				}
+
+				_renderTargetDirty = false;
+
+				++Statistics.RenderTargetSwitches;
+			}
+		}
+
+		public void SetRenderTargets(RenderTarget2D target1, RenderTarget2D target2)
+		{
+			if (target1 == null)
+			{
+				throw new ArgumentNullException(nameof(target1));
+			}
+
+			if (target2 == null)
+			{
+				throw new ArgumentNullException(nameof(target2));
+			}
+
+			if (_renderTargetCount == 1)
+			{
+				_singleRenderTarget = null;
+			}
+
+			_multipleRenderTargets[0] = new RenderTargetBinding(target1);
+			_multipleRenderTargets[1] = new RenderTargetBinding(target2);
+			_renderTargetDirty = true;
+			_renderTargetCount = 2;
+		}
+
+		public void ResetRenderTargets()
+		{
+			for (var i = 0; i < _multipleRenderTargets.Length; ++i)
+			{
+				_multipleRenderTargets[i] = new RenderTargetBinding();
+			}
+		}
+
 		public void DrawQuad(EffectPass pass, VertexPositionTexture topLeft, VertexPositionTexture bottomRight)
 		{
+			PreDraw();
 			pass.Apply();
 			DR.GraphicsDevice.DrawQuad(topLeft, bottomRight);
 			StatisticsTwoStrips();
@@ -533,6 +618,7 @@ namespace DigitalRise.Rendering
 
 		public void DrawQuad(EffectPass pass, Rectangle rectangle, Vector2 texCoordTopLeft, Vector2 texCoordBottomRight)
 		{
+			PreDraw();
 			pass.Apply();
 			DR.GraphicsDevice.DrawQuad(rectangle, texCoordTopLeft, texCoordBottomRight);
 			StatisticsTwoStrips();
@@ -552,6 +638,7 @@ namespace DigitalRise.Rendering
 
 		public void DrawQuadFrustumRay(EffectPass pass, Rectangle rectangle, Vector2 texCoordTopLeft, Vector2 texCoordBottomRight, Vector3[] frustumFarCorners)
 		{
+			PreDraw();
 			pass.Apply();
 			DR.GraphicsDevice.DrawQuadFrustumRay(rectangle, texCoordTopLeft, texCoordBottomRight, frustumFarCorners);
 			StatisticsTwoStrips();
@@ -593,12 +680,27 @@ namespace DigitalRise.Rendering
 				throw new ArgumentNullException(nameof(submesh));
 			}
 
+			PreDraw();
 			pass.Apply();
 			submesh.Draw();
 
 			++Statistics.DrawCalls;
 			Statistics.PrimitivesDrawn += submesh.PrimitiveCount;
 			Statistics.VerticesDrawn += submesh.VertexCount;
+		}
+
+		public void Clear(ClearOptions options, Color color, float depth, int stencil)
+		{
+			PreDraw();
+
+			DR.GraphicsDevice.Clear(options, color, depth, stencil);
+		}
+
+		public void Clear(Color color)
+		{
+			PreDraw();
+
+			DR.GraphicsDevice.Clear(color);
 		}
 
 		#endregion

@@ -48,6 +48,7 @@ namespace DigitalRise.SceneGraph.Queries
 			SkyNodes.Clear();
 			FogNodes.Clear();
 			RenderableNodes.Clear();
+			PostProcessorNodes.Clear();
 		}
 
 

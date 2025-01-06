@@ -192,14 +192,14 @@ namespace DigitalRise.Rendering.Billboards
 				if (!EnableOffscreenRendering && !EnableSoftParticles)
 				{
 					// Render at full resolution.
-					effect.ViewportSize.SetValue(new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height));
+					effect.ViewportSize.SetValue(new Vector2(context.Viewport.Width, context.Viewport.Height));
 				}
 				else if (!EnableOffscreenRendering && EnableSoftParticles)
 				{
 					// Render at full resolution with depth test in pixel shader.
 					context.ThrowIfGBuffer0Missing();
 					effect.DepthBuffer.SetValue(context.GBuffer0);
-					effect.ViewportSize.SetValue(new Vector2(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height));
+					effect.ViewportSize.SetValue(new Vector2(context.Viewport.Width, context.Viewport.Height));
 				}
 				else if (EnableOffscreenRendering)
 				{

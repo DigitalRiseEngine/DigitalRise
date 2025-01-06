@@ -9,7 +9,6 @@ namespace DigitalRise.Misc
 		Half
 	}
 
-
 	internal class RenderTarget2DViewportSized
 	{
 		private RenderTarget2D _renderTarget;
@@ -36,8 +35,7 @@ namespace DigitalRise.Misc
 
 		public void Update(RenderContext context)
 		{
-			var viewport = DR.GraphicsDevice.Viewport;
-
+			var viewport = context.Viewport;
 			var width = viewport.Width;
 			var height = viewport.Height;
 

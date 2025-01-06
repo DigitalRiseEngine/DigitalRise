@@ -153,8 +153,8 @@ namespace DigitalRise.Rendering
 
 			// If there are no processors, or no processor is enabled, then we have to 
 			// copy the source to the target manually.
-/*			if (!targetWritten)
-				graphicsService.GetCopyFilter().ProcessInternal(_context);*/
+			/*			if (!targetWritten)
+							graphicsService.GetCopyFilter().ProcessInternal(_context);*/
 
 			_context.SourceTexture = originalSourceTexture;
 
@@ -165,9 +165,11 @@ namespace DigitalRise.Rendering
 			renderTargetPool.Recycle(tempTarget);
 		}
 
-		public RenderTarget2D Render(Scene scene, CameraNode camera, GameTime gameTime, Action<RenderContext> postRender = null)
+		public RenderTarget2D Render(Scene scene, CameraNode camera, GameTime gameTime, Point? size = null, Action<RenderContext> postRender = null)
 		{
-			var oldViewport = DR.GraphicsDevice.Viewport;
+			var graphicsDevice = DR.GraphicsDevice;
+
+			var oldViewport = graphicsDevice.Viewport;
 
 			try
 			{
@@ -178,7 +180,11 @@ namespace DigitalRise.Rendering
 					updateable.Update(gameTime);
 				}
 
-				_context.Prepare();
+				var viewSize = size ?? new Point(oldViewport.Width, oldViewport.Height);
+				_context.Prepare(viewSize);
+
+				var originalRenderTarget = _context.RenderTarget;
+				var originalViewport = _context.Viewport;
 
 				// Our scene and the camera must be set in the render context. This info is
 				// required by many renderers.
@@ -189,7 +195,7 @@ namespace DigitalRise.Rendering
 				var asPerspective = _context.CameraNode.ViewVolume as PerspectiveViewVolume;
 				if (asPerspective != null)
 				{
-					asPerspective.AspectRatio = oldViewport.AspectRatio;
+					asPerspective.AspectRatio = _context.AspectRatio;
 				}
 
 				// LOD (level of detail) settings are also specified in the context.
@@ -214,7 +220,6 @@ namespace DigitalRise.Rendering
 
 				// The ShadowMaskRenderer renders the shadows and stores them in one or more render
 				// targets ("shadows masks").
-				DR.GraphicsDevice.Viewport = oldViewport;
 				ShadowMaskRenderer.Render(_context, sceneQuery.Lights);
 
 				// ----- Light Buffer Pass
@@ -223,7 +228,6 @@ namespace DigitalRise.Rendering
 				LightBufferRenderer.Render(_context, sceneQuery.Lights);
 
 				// Material pass
-				var graphicsDevice = DR.GraphicsDevice;
 				_context.RenderTarget = _context.Output;
 				_context.Clear(new Color(3, 3, 3, 255));
 				graphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -248,6 +252,15 @@ namespace DigitalRise.Rendering
 
 				// ----- Sky
 				SkyboxRendererInternal.Render(_context, sceneQuery.RenderableNodes);
+
+				// ----- Post Processors
+				if (sceneQuery.PostProcessorNodes.Count > 0)
+				{
+					_context.SourceTexture = _context.RenderTarget;
+					_context.RenderTarget = originalRenderTarget;
+					_context.Viewport = originalViewport;
+					PostProcess(sceneQuery.PostProcessorNodes);
+				}
 
 				if (DRDebugOptions.VisualizeBuffers)
 				{
@@ -285,7 +298,8 @@ namespace DigitalRise.Rendering
 			finally
 			{
 				// ----- Clean-up
-				DR.GraphicsDevice.SetRenderTarget(null);
+				graphicsDevice.SetRenderTarget(null);
+				graphicsDevice.Viewport = oldViewport;
 				_context.Scene = null;
 				_context.CameraNode = null;
 				_context.LodCameraNode = null;

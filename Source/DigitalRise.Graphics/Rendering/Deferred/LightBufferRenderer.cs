@@ -122,7 +122,7 @@ namespace DigitalRise.Rendering.Deferred
 		public static void Render(RenderContext context, IList<SceneNode> lights)
 		{
 			var graphicsDevice = DR.GraphicsDevice;
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			var width = viewport.Width;
 			var height = viewport.Height;
 
@@ -183,7 +183,7 @@ namespace DigitalRise.Rendering.Deferred
 						_renderTargetBindings[0] = new RenderTargetBinding();
 						_renderTargetBindings[1] = new RenderTargetBinding();*/
 
-			context.ResetRenderTargets();
+			context.ResetMultipleRenderTargets();
 		}
 		#endregion
 	}

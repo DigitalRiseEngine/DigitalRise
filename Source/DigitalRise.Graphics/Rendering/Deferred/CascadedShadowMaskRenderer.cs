@@ -113,7 +113,7 @@ namespace DigitalRise.Rendering.Deferred
 			effect.ViewInverse.SetValue(viewInverse);
 			effect.GBuffer0.SetValue(context.GBuffer0);
 
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			effect.Parameters0.SetValue(new Vector2(viewport.Width, viewport.Height));
 
 			// Set jitter map.

@@ -150,7 +150,7 @@ namespace DigitalRise.Rendering.Deferred
 				if (lastBinding == null || effectBinding.BatchId != lastBinding.BatchId)
 				{
 					// Effect level params
-					var viewportSize = new Vector2(device.Viewport.Width, device.Viewport.Height);
+					var viewportSize = new Vector2(context.Viewport.Width, context.Viewport.Height);
 					effectBinding.View?.SetValue((Matrix)context.CameraNode.View);
 					effectBinding.Projection?.SetValue((Matrix)context.CameraNode.ViewVolume.Projection);
 					effectBinding.CameraNear?.SetValue(context.CameraNode.ViewVolume.Near);
@@ -195,23 +195,9 @@ namespace DigitalRise.Rendering.Deferred
 						break;
 				}
 
-				var mesh = job.Mesh;
-				device.SetVertexBuffer(mesh.VertexBuffer);
-				device.Indices = mesh.IndexBuffer;
-
 				foreach (var pass in effectBinding.CurrentTechnique.Passes)
 				{
-					pass.Apply();
-					device.DrawIndexedPrimitives(mesh.PrimitiveType, 
-						mesh.StartVertex,
-						0,
-						mesh.VertexCount,
-						mesh.StartIndex,
-						mesh.PrimitiveCount);
-
-					context.Statistics.VerticesDrawn += mesh.VertexCount;
-					context.Statistics.PrimitivesDrawn += mesh.PrimitiveCount;
-					++context.Statistics.DrawCalls;
+					context.Draw(pass, job.Mesh);
 				}
 			}
 

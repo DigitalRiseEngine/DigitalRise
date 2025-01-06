@@ -159,8 +159,7 @@ namespace DigitalRise.Rendering.Deferred
 
 			var scene = context.Scene;
 
-			var graphicsDevice = DR.GraphicsDevice;
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			int maskWidth = viewport.Width;
 			int maskHeight = viewport.Height;
 			if (UseHalfResolution && Numeric.IsLessOrEqual(UpsampleDepthSensitivity, 0))
@@ -225,7 +224,7 @@ namespace DigitalRise.Rendering.Deferred
 			var graphicsDevice = DR.GraphicsDevice;
 			var savedRenderState = new RenderStateSnapshot();
 			var oldRenderTarget = context.RenderTarget;
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 
 			RenderTarget2D lowResTarget = null;
 			if (UseHalfResolution && Numeric.IsGreater(UpsampleDepthSensitivity, 0))
@@ -294,7 +293,7 @@ namespace DigitalRise.Rendering.Deferred
 			var graphicsDevice = DR.GraphicsDevice;
 			var originalSourceTexture = context.SourceTexture;
 			var source = context.RenderTarget;
-			var originalViewport = graphicsDevice.Viewport;
+			var originalViewport = context.Viewport;
 
 			if (Filter != null && Filter.Enabled)
 			{

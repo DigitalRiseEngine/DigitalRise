@@ -198,7 +198,7 @@ namespace DigitalRise.Rendering.Deferred
 									   rect.Bottom, rect.Top,
 									   near, far);
 
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			effect.ViewportSize.SetValue(new Vector2(viewport.Width, viewport.Height));
 			effect.Projection.SetValue((Matrix)biasedProjection);
 			effect.CameraFar.SetValue(volume.Far);

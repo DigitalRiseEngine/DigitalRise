@@ -102,7 +102,7 @@ namespace DigitalRise.Rendering.Deferred
 			graphicsDevice.RasterizerState = RasterizerState.CullNone;
 			graphicsDevice.BlendState = GraphicsHelper.BlendStateAdd;
 
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 			effect.ViewportSize.SetValue(new Vector2(viewport.Width, viewport.Height));
 			effect.GBuffer0.SetValue(context.GBuffer0);
 			effect.GBuffer1.SetValue(context.GBuffer1);

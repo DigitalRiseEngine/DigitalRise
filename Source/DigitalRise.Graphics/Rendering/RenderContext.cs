@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 
 namespace DigitalRise.Rendering
@@ -37,16 +36,26 @@ namespace DigitalRise.Rendering
 	/// </remarks>
 	public class RenderContext
 	{
+		private enum RenderTargetType
+		{
+			Single,
+			Multiple,
+			Cube
+		}
+
 		private readonly RenderTarget2DViewportSized _gBuffer0Wrapper = new RenderTarget2DViewportSized(true, SurfaceFormat.Single, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _gBuffer1Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.Color, DepthFormat.None);
 		private readonly RenderTarget2DViewportSized _lightBuffer0Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _lightBuffer1Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _outputBufferWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _depthBufferHalfWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.Single, DepthFormat.None, type: RenderTarget2DViewportSizedType.Half);
-		private readonly RenderTargetBinding[] _multipleRenderTargets = new RenderTargetBinding[2];
+		private RenderTargetType? _renderTargetType;
 		private RenderTarget2D _singleRenderTarget;
-		private int _renderTargetCount = 0;
-		private bool _renderTargetDirty = true;
+		private readonly RenderTargetBinding[] _multipleRenderTargets = new RenderTargetBinding[2];
+		private RenderTargetCube _renderTargetCube;
+		private CubeMapFace _renderTargetCubeMapFace;
+		private Viewport _viewport;
+		private bool _viewportDirty = true;
 
 
 		//--------------------------------------------------------------
@@ -128,28 +137,44 @@ namespace DigitalRise.Rendering
 
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException(nameof(value));
+				}
+
 				if (value == _singleRenderTarget)
 				{
 					return;
 				}
 
 				_singleRenderTarget = value;
-				_renderTargetCount = 1;
-				_renderTargetDirty = true;
-			}
-		}
-
-		public Viewport Viewport
-		{
-			get => DR.GraphicsDevice.Viewport;
-
-			set
-			{
-				DR.GraphicsDevice.Viewport = value;
+				ResetMultipleRenderTargets();
+				_renderTargetCube = null;
+				
+				_renderTargetType = RenderTargetType.Single;
+				Viewport = new Viewport(0, 0, value.Width, value.Height);
 			}
 		}
 
 		public bool IsHdr => RenderTarget != null && RenderTarget.Format == SurfaceFormat.HdrBlendable;
+
+		public Viewport Viewport
+		{
+			get => _viewport;
+
+			set
+			{
+				if (value.ViewportEquals(_viewport))
+				{
+					return;
+				}
+
+				_viewport = value;
+				_viewportDirty = true;
+			}
+		}
+
+		public float AspectRatio => _viewport.AspectRatio;
 
 		#endregion
 
@@ -503,8 +528,10 @@ namespace DigitalRise.Rendering
 		#region Methods
 		//--------------------------------------------------------------
 
-		public void Prepare()
+		public void Prepare(Point size)
 		{
+			Viewport = new Viewport(0, 0, size.X, size.Y);
+
 			_gBuffer0Wrapper.Update(this);
 			_gBuffer1Wrapper.Update(this);
 			_lightBuffer0Wrapper.Update(this);
@@ -560,20 +587,30 @@ namespace DigitalRise.Rendering
 		private void PreDraw()
 		{
 			var graphicsDevice = DR.GraphicsDevice;
-			if (_renderTargetDirty)
+			if (_renderTargetType != null)
 			{
-				if (_renderTargetCount == 1)
+				switch (_renderTargetType)
 				{
-					// Single render target
-					graphicsDevice.SetRenderTarget(_singleRenderTarget);
-				} else
-				{
-					graphicsDevice.SetRenderTargets(_multipleRenderTargets);
+					case RenderTargetType.Single:
+						graphicsDevice.SetRenderTarget(_singleRenderTarget);
+						break;
+					case RenderTargetType.Multiple:
+						graphicsDevice.SetRenderTargets(_multipleRenderTargets);
+						break;
+					case RenderTargetType.Cube:
+						graphicsDevice.SetRenderTarget(_renderTargetCube, _renderTargetCubeMapFace);
+						break;
 				}
 
-				_renderTargetDirty = false;
+				_renderTargetType = null;
 
 				++Statistics.RenderTargetSwitches;
+			}
+
+			if (_viewportDirty)
+			{
+				graphicsDevice.Viewport = Viewport;
+				_viewportDirty = false;
 			}
 		}
 
@@ -589,18 +626,32 @@ namespace DigitalRise.Rendering
 				throw new ArgumentNullException(nameof(target2));
 			}
 
-			if (_renderTargetCount == 1)
-			{
-				_singleRenderTarget = null;
-			}
-
 			_multipleRenderTargets[0] = new RenderTargetBinding(target1);
 			_multipleRenderTargets[1] = new RenderTargetBinding(target2);
-			_renderTargetDirty = true;
-			_renderTargetCount = 2;
+			_singleRenderTarget = null;
+			_renderTargetCube = null;
+			_renderTargetType = RenderTargetType.Multiple;
+
+			Viewport = new Viewport(0, 0, target1.Width, target1.Height);
 		}
 
-		public void ResetRenderTargets()
+		public void SetRenderTargetCube(RenderTargetCube target, CubeMapFace face)
+		{
+			if (target == null)
+			{
+				throw new ArgumentNullException(nameof(target));
+			}
+
+			_renderTargetCube = target;
+			_renderTargetCubeMapFace = face;
+			_singleRenderTarget = null;
+			ResetMultipleRenderTargets();
+			_renderTargetType = RenderTargetType.Cube;
+
+			Viewport = new Viewport(0, 0, target.Size, target.Size);
+		}
+
+		public void ResetMultipleRenderTargets()
 		{
 			for (var i = 0; i < _multipleRenderTargets.Length; ++i)
 			{
@@ -632,8 +683,7 @@ namespace DigitalRise.Rendering
 
 		public void DrawFullScreenQuad(EffectPass pass)
 		{
-			var viewport = DR.GraphicsDevice.Viewport;
-			DrawQuad(pass, new Rectangle(0, 0, viewport.Width, viewport.Height));
+			DrawQuad(pass, Viewport.ToRectangle());
 		}
 
 		public void DrawQuadFrustumRay(EffectPass pass, Rectangle rectangle, Vector2 texCoordTopLeft, Vector2 texCoordBottomRight, Vector3[] frustumFarCorners)
@@ -651,8 +701,7 @@ namespace DigitalRise.Rendering
 
 		public void DrawFullScreenQuadFrustumRay(EffectPass pass, Vector3[] frustumFarCorners)
 		{
-			var viewport = DR.GraphicsDevice.Viewport;
-			DrawQuadFrustumRay(pass, new Rectangle(0, 0, viewport.Width, viewport.Height), frustumFarCorners);
+			DrawQuadFrustumRay(pass, Viewport.ToRectangle(), frustumFarCorners);
 		}
 
 		/// <summary>

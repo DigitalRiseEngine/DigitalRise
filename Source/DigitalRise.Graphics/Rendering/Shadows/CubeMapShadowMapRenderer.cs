@@ -125,7 +125,7 @@ namespace DigitalRise.Rendering.Shadows
 						DepthFormat.Depth24));
 				}
 
-			  ((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(90, 1, shadow.Near, light.Range);
+				((PerspectiveViewVolume)_perspectiveCameraNode.ViewVolume).SetFieldOfView(90, 1, shadow.Near, light.Range);
 
 				// World units per texel at a planar distance of 1 world unit.
 				float unitsPerTexel = _perspectiveCameraNode.ViewVolume.Rectangle.Width / (shadow.ShadowMap.Size * shadow.Near);
@@ -145,11 +145,11 @@ namespace DigitalRise.Rendering.Shadows
 				bool shadowMapContainsSomething = false;
 				for (int side = 0; side < 6; side++)
 				{
-					graphicsDevice.SetRenderTarget(shadow.ShadowMap, CubeMapFaces[side]);
+					context.SetRenderTargetCube(shadow.ShadowMap, CubeMapFaces[side]);
 					// context.RenderTarget = shadow.ShadowMap;   // TODO: Support cube maps targets in the render context.
 					context.Viewport = graphicsDevice.Viewport;
 
-					graphicsDevice.Clear(Color.White);
+					context.Clear(Color.White);
 
 					_perspectiveCameraNode.View = Matrix44F.CreateLookAt(
 					  pose.Position,

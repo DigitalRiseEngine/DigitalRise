@@ -361,7 +361,6 @@ namespace DigitalRise.Editor.UI
 
 			// Save scissor as it would be destroyed on exception
 			var device = DR.GraphicsDevice;
-			var oldViewport = device.Viewport;
 
 			var p = ToGlobal(bounds.Location);
 			bounds.X = p.X;
@@ -372,18 +371,16 @@ namespace DigitalRise.Editor.UI
 
 			try
 			{
-				device.Viewport = new Viewport(bounds.X, bounds.Y, bounds.Width, bounds.Height);
-
 				var camera = StudioGame.MainForm.CurrentCamera;
 
 				// Render scene
 				var result = _renderer.Render(Scene,
 					camera,
 					StudioGame.Instance.LastRenderGameTime,
+					bounds.Size,
 					(ctx) => PostRender(ctx, context, camera));
 
 				RenderStatistics = _renderer.Statistics;
-				device.Viewport = oldViewport;
 
 				context.Draw(result, ActualBounds, Color.White);
 				context.Flush();
@@ -419,7 +416,6 @@ namespace DigitalRise.Editor.UI
 			}
 			catch (Exception ex)
 			{
-				device.Viewport = oldViewport;
 				DR.GraphicsDevice.ScissorRectangle = scissor;
 				var font = Editor.Resources.ErrorFont;
 				var message = ex.ToString();
@@ -432,10 +428,6 @@ namespace DigitalRise.Editor.UI
 				pos.X = (int)pos.X;
 				pos.Y = (int)pos.Y;
 				context.DrawString(font, message, pos, Color.Red);
-			}
-			finally
-			{
-				device.Viewport = oldViewport;
 			}
 		}
 

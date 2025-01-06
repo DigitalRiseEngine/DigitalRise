@@ -236,7 +236,7 @@ namespace DigitalRise.Rendering.Shadows
 					_orthographicCameraNode.PoseWorld = frustumPose;
 
 					// Set a viewport to render a tile in the texture atlas.
-					graphicsDevice.Viewport = GetViewport(shadow, split);
+					context.Viewport = GetViewport(shadow, split);
 
 					var shadowQuery = context.Scene.Query<ShadowCasterQuery>(context.CameraNode, context);
 					if (shadowQuery.ShadowCasters.Count > 0)

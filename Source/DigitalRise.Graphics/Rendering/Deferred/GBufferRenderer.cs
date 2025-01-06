@@ -22,7 +22,7 @@ namespace DigitalRise.Rendering.Deferred
 		public static void Render(RenderContext context, IList<SceneNode> sceneNodes, IList<SceneNode> decalNodes)
 		{
 			var graphicsDevice = DR.GraphicsDevice;
-			var viewport = graphicsDevice.Viewport;
+			var viewport = context.Viewport;
 
 			// The G-buffer consists of two full-screen render targets into which we render 
 			// depth values, normal vectors and other information.
@@ -37,7 +37,7 @@ namespace DigitalRise.Rendering.Deferred
 			graphicsDevice.BlendState = BlendState.Opaque;
 
 			// Clear the z-buffer.
-			graphicsDevice.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1, 0);
+			context.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1, 0);
 
 			// Initialize the G-buffer with default values. 
 			ClearGBufferRenderer.Render(context);
@@ -79,7 +79,7 @@ namespace DigitalRise.Rendering.Deferred
 			_downsampleFilter.Process(context);
 			context.SourceTexture = null;
 
-			context.ResetRenderTargets();
+			context.ResetMultipleRenderTargets();
 		}
 	}
 }

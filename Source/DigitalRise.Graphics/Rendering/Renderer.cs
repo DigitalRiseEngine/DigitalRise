@@ -171,6 +171,7 @@ namespace DigitalRise.Rendering
 
 			var oldViewport = graphicsDevice.Viewport;
 
+			RenderTarget2D result = null;
 			try
 			{
 				scene.Update(gameTime.ElapsedGameTime);
@@ -182,9 +183,6 @@ namespace DigitalRise.Rendering
 
 				var viewSize = size ?? new Point(oldViewport.Width, oldViewport.Height);
 				_context.Prepare(viewSize);
-
-				var originalRenderTarget = _context.RenderTarget;
-				var originalViewport = _context.Viewport;
 
 				// Our scene and the camera must be set in the render context. This info is
 				// required by many renderers.
@@ -256,12 +254,13 @@ namespace DigitalRise.Rendering
 				// ----- Post Processors
 				if (sceneQuery.PostProcessorNodes.Count > 0)
 				{
-					_context.SourceTexture = _context.RenderTarget;
-					_context.RenderTarget = originalRenderTarget;
-					_context.Viewport = originalViewport;
+					_context.SourceTexture = _context.Output;
+					_context.RenderTarget = _context.Output2;
 					PostProcess(sceneQuery.PostProcessorNodes);
 				}
 
+				result = _context.RenderTarget;
+				
 				if (DRDebugOptions.VisualizeBuffers)
 				{
 					var spriteBatch = Resources.SpriteBatch;
@@ -308,7 +307,7 @@ namespace DigitalRise.Rendering
 				ShadowMaskRenderer.RecycleShadowMasks(_context);
 			}
 
-			return _context.Output;
+			return result;
 		}
 	}
 }

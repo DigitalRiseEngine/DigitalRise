@@ -48,6 +48,7 @@ namespace DigitalRise.Rendering
 		private readonly RenderTarget2DViewportSized _lightBuffer0Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _lightBuffer1Wrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _outputBufferWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
+		private readonly RenderTarget2DViewportSized _outputBufferWrapper2 = new RenderTarget2DViewportSized(false, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
 		private readonly RenderTarget2DViewportSized _depthBufferHalfWrapper = new RenderTarget2DViewportSized(false, SurfaceFormat.Single, DepthFormat.None, type: RenderTarget2DViewportSizedType.Half);
 		private RenderTargetType? _renderTargetType;
 		private RenderTarget2D _singleRenderTarget;
@@ -195,6 +196,7 @@ namespace DigitalRise.Rendering
 		public RenderTarget2D LightBuffer1 => _lightBuffer1Wrapper.Target;
 
 		public RenderTarget2D Output => _outputBufferWrapper.Target;
+		public RenderTarget2D Output2 => _outputBufferWrapper2.Target;
 
 		#endregion
 
@@ -537,6 +539,7 @@ namespace DigitalRise.Rendering
 			_lightBuffer0Wrapper.Update(this);
 			_lightBuffer1Wrapper.Update(this);
 			_outputBufferWrapper.Update(this);
+			_outputBufferWrapper2.Update(this);
 			_depthBufferHalfWrapper.Update(this);
 
 			Technique = string.Empty;
@@ -560,6 +563,7 @@ namespace DigitalRise.Rendering
 			_lightBuffer0Wrapper.Reset(this);
 			_lightBuffer1Wrapper.Reset(this);
 			_outputBufferWrapper.Reset(this);
+			_outputBufferWrapper2.Reset(this);
 			Technique = null;
 			Scene = null;
 			CameraNode = null;

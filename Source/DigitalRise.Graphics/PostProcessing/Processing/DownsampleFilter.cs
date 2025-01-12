@@ -15,19 +15,19 @@ namespace DigitalRise.PostProcessing.Processing
 {
 	internal class DownsampleFilterEffectBinding : EffectWrapper
 	{
-		public EffectParameter _sourceSizeParameter { get; private set; }
-		public EffectParameter _targetSizeParameter { get; private set; }
-		public EffectParameter _sourceTextureParameter { get; private set; }
-		public EffectPass _linear2Pass { get; private set; }
-		public EffectPass _linear4Pass { get; private set; }
-		public EffectPass _linear6Pass { get; private set; }
-		public EffectPass _linear8Pass { get; private set; }
-		public EffectPass _point2Pass { get; private set; }
-		public EffectPass _point3Pass { get; private set; }
-		public EffectPass _point4Pass { get; private set; }
-		public EffectPass _point2DepthPass { get; private set; }
-		public EffectPass _point3DepthPass { get; private set; }
-		public EffectPass _point4DepthPass { get; private set; }
+		public EffectParameter SourceSizeParameter { get; private set; }
+		public EffectParameter TargetSizeParameter { get; private set; }
+		public EffectParameter SourceTextureParameter { get; private set; }
+		public EffectPass Linear2Pass { get; private set; }
+		public EffectPass Linear4Pass { get; private set; }
+		public EffectPass Linear6Pass { get; private set; }
+		public EffectPass Linear8Pass { get; private set; }
+		public EffectPass Point2Pass { get; private set; }
+		public EffectPass Point3Pass { get; private set; }
+		public EffectPass Point4Pass { get; private set; }
+		public EffectPass Point2DepthPass { get; private set; }
+		public EffectPass Point3DepthPass { get; private set; }
+		public EffectPass Point4DepthPass { get; private set; }
 
 		public DownsampleFilterEffectBinding() : base("PostProcessing/DownsampleFilter")
 		{
@@ -37,19 +37,19 @@ namespace DigitalRise.PostProcessing.Processing
 		{
 			base.BindParameters(effect);
 
-			_sourceSizeParameter = effect.Parameters["SourceSize"];
-			_targetSizeParameter = effect.Parameters["TargetSize"];
-			_sourceTextureParameter = effect.Parameters["SourceTexture"];
-			_linear2Pass = effect.CurrentTechnique.Passes["Linear2"];
-			_linear4Pass = effect.CurrentTechnique.Passes["Linear4"];
-			_linear6Pass = effect.CurrentTechnique.Passes["Linear6"];
-			_linear8Pass = effect.CurrentTechnique.Passes["Linear8"];
-			_point2Pass = effect.CurrentTechnique.Passes["Point2"];
-			_point3Pass = effect.CurrentTechnique.Passes["Point3"];
-			_point4Pass = effect.CurrentTechnique.Passes["Point4"];
-			_point2DepthPass = effect.CurrentTechnique.Passes["Point2Depth"];
-			_point3DepthPass = effect.CurrentTechnique.Passes["Point3Depth"];
-			_point4DepthPass = effect.CurrentTechnique.Passes["Point4Depth"];
+			SourceSizeParameter = effect.Parameters["SourceSize"];
+			TargetSizeParameter = effect.Parameters["TargetSize"];
+			SourceTextureParameter = effect.Parameters["SourceTexture"];
+			Linear2Pass = effect.CurrentTechnique.Passes["Linear2"];
+			Linear4Pass = effect.CurrentTechnique.Passes["Linear4"];
+			Linear6Pass = effect.CurrentTechnique.Passes["Linear6"];
+			Linear8Pass = effect.CurrentTechnique.Passes["Linear8"];
+			Point2Pass = effect.CurrentTechnique.Passes["Point2"];
+			Point3Pass = effect.CurrentTechnique.Passes["Point3"];
+			Point4Pass = effect.CurrentTechnique.Passes["Point4"];
+			Point2DepthPass = effect.CurrentTechnique.Passes["Point2Depth"];
+			Point3DepthPass = effect.CurrentTechnique.Passes["Point3Depth"];
+			Point4DepthPass = effect.CurrentTechnique.Passes["Point4Depth"];
 		}
 	}
 
@@ -132,26 +132,26 @@ namespace DigitalRise.PostProcessing.Processing
 						context.RenderTarget = temp;
 					}
 
-					_effect._sourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
-					_effect._targetSizeParameter.SetValue(new Vector2(tempTargetWidth, tempTargetHeight));
-					_effect._sourceTextureParameter.SetValue(last ?? context.SourceTexture);
+					_effect.SourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
+					_effect.TargetSizeParameter.SetValue(new Vector2(tempTargetWidth, tempTargetHeight));
+					_effect.SourceTextureParameter.SetValue(last ?? context.SourceTexture);
 
 					EffectPass pass = null;
 					if (factor == 2)
 					{
-						pass = _effect._linear2Pass;
+						pass = _effect.Linear2Pass;
 					}
 					else if (factor == 4)
 					{
-						pass = _effect._linear4Pass;
+						pass = _effect.Linear4Pass;
 					}
 					else if (factor == 6)
 					{
-						pass = _effect._linear6Pass;
+						pass = _effect.Linear6Pass;
 					}
 					else if (factor == 8)
 					{
-						pass = _effect._linear8Pass;
+						pass = _effect.Linear8Pass;
 					}
 
 					context.DrawFullScreenQuad(pass);
@@ -196,25 +196,25 @@ namespace DigitalRise.PostProcessing.Processing
 						context.RenderTarget = temp;
 					}
 
-					_effect._sourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
-					_effect._targetSizeParameter.SetValue(new Vector2(tempTargetWidth, tempTargetHeight));
+					_effect.SourceSizeParameter.SetValue(new Vector2(sourceWidth, sourceHeight));
+					_effect.TargetSizeParameter.SetValue(new Vector2(tempTargetWidth, tempTargetHeight));
 					var source = last ?? context.SourceTexture;
-					_effect._sourceTextureParameter.SetValue(source);
+					_effect.SourceTextureParameter.SetValue(source);
 
 					EffectPass pass = null;
 					if (source != context.GBuffer0)
 					{
 						if (factor == 2)
 						{
-							pass = _effect._point2Pass;
+							pass = _effect.Point2Pass;
 						}
 						else if (factor == 3)
 						{
-							pass = _effect._point3Pass;
+							pass = _effect.Point3Pass;
 						}
 						else
 						{
-							pass = _effect._point4Pass;
+							pass = _effect.Point4Pass;
 						}
 					}
 					else
@@ -222,15 +222,15 @@ namespace DigitalRise.PostProcessing.Processing
 						// This is the depth buffer and it needs special handling.
 						if (factor == 2)
 						{
-							pass = _effect._point2DepthPass;
+							pass = _effect.Point2DepthPass;
 						}
 						else if (factor == 3)
 						{
-							pass = _effect._point3DepthPass;
+							pass = _effect.Point3DepthPass;
 						}
 						else
 						{
-							pass = _effect._point4DepthPass;
+							pass = _effect.Point4DepthPass;
 						}
 					}
 
@@ -242,7 +242,7 @@ namespace DigitalRise.PostProcessing.Processing
 					sourceHeight = tempTargetHeight;
 				} while (sourceWidth > targetWidth || sourceHeight > targetHeight);
 
-				_effect._sourceTextureParameter.SetValue((Texture2D)null);
+				_effect.SourceTextureParameter.SetValue((Texture2D)null);
 
 				Debug.Assert(last == null, "Intermediate render target should have been recycled.");
 			}

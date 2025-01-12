@@ -132,7 +132,6 @@ namespace DigitalRise.PostProcessing.Processing
 		/// This constant value determines the length of the arrays <see cref="Offsets"/> and 
 		/// <see cref="Weights"/>, and the max. allowed <see cref="NumberOfSamples"/>.
 		/// </remarks>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Max number of samples may depend on profile.")]
 		public int MaxNumberOfSamples
 		{
 			get { return 23; }
